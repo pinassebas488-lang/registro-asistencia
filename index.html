@@ -348,12 +348,15 @@
 
       <!-- GESTIÓN DE PERSONAL -->
       <div class="page-content" id="page-personal">
-        <div style="max-width:760px;">
-          <div class="tab-bar">
-            <button class="tab-btn active" id="tab-nuevo-btn" onclick="switchPersonalTab('nuevo')">➕ Nuevo</button>
-            <button class="tab-btn" id="tab-buscar-btn" onclick="switchPersonalTab('buscar')">🔍 Buscar / Editar / Eliminar</button>
-          </div>
-          <div class="tab-panel active" id="tab-nuevo">
+        <div class="tab-bar">
+          <button class="tab-btn active" id="tab-nuevo-btn" onclick="switchPersonalTab('nuevo')">➕ Nuevo Colaborador</button>
+          <button class="tab-btn" id="tab-buscar-btn" onclick="switchPersonalTab('buscar')">🔍 Buscar por ID</button>
+          <button class="tab-btn" id="tab-lista-btn" onclick="switchPersonalTab('lista')">📋 Todo el Personal</button>
+        </div>
+
+        <!-- TAB NUEVO -->
+        <div class="tab-panel active" id="tab-nuevo">
+          <div style="max-width:720px;">
             <div class="card">
               <div class="card-title" id="form-personal-titulo">➕ Registrar Nuevo Colaborador</div>
               <input type="hidden" id="p-id-original">
@@ -376,9 +379,13 @@
               <div class="respuesta" id="respuesta-personal"></div>
             </div>
           </div>
-          <div class="tab-panel" id="tab-buscar">
+        </div>
+
+        <!-- TAB BUSCAR -->
+        <div class="tab-panel" id="tab-buscar">
+          <div style="max-width:720px;">
             <div class="card">
-              <div class="card-title">🔍 Buscar Colaborador</div>
+              <div class="card-title">🔍 Buscar Colaborador por ID</div>
               <div style="display:flex;gap:10px;flex-wrap:wrap;">
                 <input type="text" id="buscar-personal-id" placeholder="Ingresa ID del colaborador"
                   style="flex:1;min-width:180px;padding:9px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Outfit',sans-serif;outline:none;"
@@ -386,6 +393,46 @@
                 <button class="btn btn-secondary" onclick="buscarPersonalAdmin()">🔍 Buscar</button>
               </div>
               <div id="busqueda-personal-resultado" style="margin-top:14px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB LISTA COMPLETA -->
+        <div class="tab-panel" id="tab-lista">
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+              <div class="card-title" style="margin-bottom:0;">👥 Lista de Colaboradores</div>
+              <button class="btn btn-ghost btn-sm" onclick="cargarListaPersonal()">🔄 Actualizar</button>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;">
+              <input type="text" id="filtro-lista-nombre" placeholder="🔍 Nombre o ID..."
+                style="flex:1;min-width:160px;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Outfit',sans-serif;font-size:13px;outline:none;"
+                oninput="filtrarTablaPersonal()">
+              <select id="filtro-lista-area" onchange="filtrarTablaPersonal()"
+                style="padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Outfit',sans-serif;font-size:13px;outline:none;">
+                <option value="">Todas las áreas</option>
+              </select>
+              <select id="filtro-lista-estado" onchange="filtrarTablaPersonal()"
+                style="padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Outfit',sans-serif;font-size:13px;outline:none;">
+                <option value="">Todos</option>
+                <option value="activo" selected>✅ Activos</option>
+                <option value="inactivo">🔴 Inactivos</option>
+              </select>
+            </div>
+            <div id="lista-personal-contador" style="font-size:12px;color:var(--text-muted);margin-bottom:8px;"></div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th><th>ID</th><th>Nombre Completo</th><th>Área</th><th>Cargo</th><th>Teléfono</th><th>Estado</th><th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="lista-personal-tbody">
+                  <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-muted);">
+                    <div class="empty-state"><span>⏳</span><p>Cargando personal...</p></div>
+                  </td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -454,6 +501,7 @@
           <div class="tab-bar">
             <button class="tab-btn active" id="cred-tab-crear-btn" onclick="switchCredTab('crear')">➕ Crear Acceso</button>
             <button class="tab-btn" id="cred-tab-lista-btn" onclick="switchCredTab('lista')">📋 Gestionar Accesos</button>
+            <button class="tab-btn" id="cred-tab-mipass-btn" onclick="switchCredTab('mipass')">🔑 Mi Contraseña</button>
           </div>
 
           <div class="tab-panel active" id="cred-tab-crear">
@@ -498,6 +546,27 @@
               <div id="cred-lista-wrap"><div class="empty-state"><span>⏳</span><p>Cargando...</p></div></div>
             </div>
           </div>
+
+          <div class="tab-panel" id="cred-tab-mipass">
+            <div class="card" style="max-width:460px;">
+              <div class="card-title">🔑 Cambiar Mi Contraseña</div>
+              <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Solo cambia la contraseña de tu propio usuario de administrador.</p>
+              <div class="form-group">
+                <label>Contraseña Actual *</label>
+                <input type="password" id="mp-actual" placeholder="Tu contraseña actual" autocomplete="current-password">
+              </div>
+              <div class="form-group">
+                <label>Nueva Contraseña *</label>
+                <input type="password" id="mp-nueva" placeholder="Mínimo 4 caracteres" autocomplete="new-password">
+              </div>
+              <div class="form-group">
+                <label>Confirmar Nueva Contraseña *</label>
+                <input type="password" id="mp-confirmar" placeholder="Repite la nueva contraseña" autocomplete="new-password">
+              </div>
+              <button class="btn btn-primary" id="btn-cambiar-pass" onclick="cambiarMiContrasena()">🔑 Cambiar Contraseña</button>
+              <div class="respuesta" id="respuesta-mipass"></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -531,6 +600,19 @@
   </div>
 </div>
 
+<!-- Modal inactivar/reactivar -->
+<div class="modal-overlay" id="modal-toggle-activo">
+  <div class="modal-box">
+    <div style="font-size:32px;text-align:center;margin-bottom:10px;" id="modal-toggle-emoji">⚠️</div>
+    <div style="font-size:17px;font-weight:700;text-align:center;margin-bottom:4px;">¿Cambiar estado?</div>
+    <p style="text-align:center;color:var(--text-muted);font-size:13px;margin-bottom:18px;" id="modal-toggle-nombre">—</p>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="btn btn-ghost" onclick="cerrarModal('modal-toggle-activo')">Cancelar</button>
+      <button class="btn btn-danger" id="btn-confirmar-toggle" onclick="confirmarToggleActivo()">🔴 Sí, inactivar</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script>
@@ -548,7 +630,7 @@ const CONFIG = {
 // ESTADO
 // ════════════════════════════════
 let SESSION = { loggedIn:false, usuario:'', nombre:'', rol:'', permisos:[] };
-let reporteData=[], idAEliminar='', usuarioCredAEliminar='';
+let reporteData=[], idAEliminar='', usuarioCredAEliminar='', idToggleActivo='', pendienteActivo=null;
 let modoEdicionPersonal=false, modoEdicionCred=false;
 let qrCodeReader=null, isScanning=false, searchTimeout=null;
 let staffData=null, selectedCameraId=null, cameraEnabled=true;
@@ -743,7 +825,15 @@ async function cargarDashboard(){
 // ════════════════════════════════
 // GESTIÓN DE PERSONAL
 // ════════════════════════════════
-function switchPersonalTab(t){['nuevo','buscar'].forEach(x=>{document.getElementById('tab-'+x).classList.toggle('active',x===t);document.getElementById('tab-'+x+'-btn').classList.toggle('active',x===t);});if(t==='buscar')setTimeout(()=>document.getElementById('buscar-personal-id').focus(),100);}
+function switchPersonalTab(t){
+  ['nuevo','buscar','lista'].forEach(x=>{
+    const p=document.getElementById('tab-'+x); const b=document.getElementById('tab-'+x+'-btn');
+    if(p) p.classList.toggle('active',x===t);
+    if(b) b.classList.toggle('active',x===t);
+  });
+  if(t==='buscar') setTimeout(()=>document.getElementById('buscar-personal-id').focus(),100);
+  if(t==='lista') cargarListaPersonal();
+}
 
 async function guardarPersonal(){if(modoEdicionPersonal)await actualizarPersonal();else await registrarNuevoPersonal();}
 
@@ -826,9 +916,125 @@ async function confirmarEliminar(){
   const btn=document.getElementById('btn-confirmar-eliminar');btn.innerHTML='<span class="loading"></span>';btn.disabled=true;
   const res=await llamarAppsScript('eliminarUsuario',{id:idAEliminar});
   btn.innerHTML='🗑️ Sí, eliminar';btn.disabled=false;cerrarModal('modal-eliminar');
-  if(res?.exito){mostrarToast('🗑️ Eliminado','success');document.getElementById('busqueda-personal-resultado').innerHTML=`<div class="respuesta success" style="display:block;">✅ ${res.mensaje}</div>`;document.getElementById('buscar-personal-id').value='';}
+  if(res?.exito){mostrarToast('🗑️ Eliminado','success');document.getElementById('busqueda-personal-resultado').innerHTML=`<div class="respuesta success" style="display:block;">✅ ${res.mensaje}</div>`;document.getElementById('buscar-personal-id').value='';cargarListaPersonal();}
   else{mostrarToast('❌ '+(res?.mensaje||'Error'),'error');}
   idAEliminar='';
+}
+
+
+// ════════════════════════════════
+// LISTA COMPLETA DE PERSONAL
+// ════════════════════════════════
+let listaPersonalData = [];
+
+async function cargarListaPersonal() {
+  const tbody = document.getElementById('lista-personal-tbody');
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text-muted);"><div class="empty-state"><span>⏳</span><p>Cargando...</p></div></td></tr>';
+  document.getElementById('lista-personal-contador').textContent = '';
+
+  const res = await llamarAppsScript('listarTodoElPersonal');
+  if (res?.error || !res?.personal) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text-muted);">❌ Error al cargar el personal</td></tr>';
+    return;
+  }
+
+  listaPersonalData = res.personal;
+
+  // Poblar filtro de áreas
+  const areas = [...new Set(res.personal.map(p => p.area).filter(Boolean))].sort();
+  const selArea = document.getElementById('filtro-lista-area');
+  const areaActual = selArea.value;
+  selArea.innerHTML = '<option value="">Todas las áreas</option>';
+  areas.forEach(a => selArea.innerHTML += `<option value="${a}">${a}</option>`);
+  if (areaActual) selArea.value = areaActual;
+
+  filtrarTablaPersonal();
+}
+
+function filtrarTablaPersonal() {
+  const busq   = (document.getElementById('filtro-lista-nombre').value || '').toLowerCase().trim();
+  const area   = (document.getElementById('filtro-lista-area').value || '').toLowerCase();
+  const estado = (document.getElementById('filtro-lista-estado').value || '');
+
+  const filtrado = listaPersonalData.filter(p => {
+    const nombre = ((p.nombres||'') + ' ' + (p.apellidos||'')).toLowerCase();
+    const id     = (p.id||'').toLowerCase();
+    const pArea  = (p.area||'').toLowerCase();
+    const activo = p.activo !== false && p.activo !== 'false' && p.activo !== 0;
+
+    if (busq && !nombre.includes(busq) && !id.includes(busq)) return false;
+    if (area && pArea !== area) return false;
+    if (estado === 'activo'   && !activo) return false;
+    if (estado === 'inactivo' && activo)  return false;
+    return true;
+  });
+
+  renderizarTablaPersonal(filtrado);
+}
+
+function renderizarTablaPersonal(data) {
+  const tbody = document.getElementById('lista-personal-tbody');
+  const contador = document.getElementById('lista-personal-contador');
+
+  const activos   = data.filter(p => p.activo !== false && p.activo !== 'false').length;
+  const inactivos = data.length - activos;
+  contador.innerHTML = `<span style="color:var(--text-muted);">Mostrando <b style="color:var(--text);">${data.length}</b> colaboradores — <span style="color:#34d399;">✅ ${activos} activos</span> · <span style="color:#f87171;">🔴 ${inactivos} inactivos</span></span>`;
+
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text-muted);"><div class="empty-state"><span>🔍</span><p>No se encontraron resultados</p></div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = data.map((p, i) => {
+    const activo = p.activo !== false && p.activo !== 'false' && p.activo !== 0;
+    const nombre = (p.nombres||'') + ' ' + (p.apellidos||'');
+    return `<tr style="${activo ? '' : 'opacity:0.55;'}">
+      <td style="color:var(--text-muted);font-size:12px;">${i+1}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;">${p.id}</td>
+      <td><span style="font-weight:600;">${nombre.trim()}</span></td>
+      <td style="font-size:13px;">${p.area||'-'}</td>
+      <td style="font-size:12px;color:var(--text-muted);">${p.cargo||'-'}</td>
+      <td style="font-size:12px;color:var(--text-muted);">${p.telefono||'-'}</td>
+      <td>
+        <span class="badge ${activo ? 'badge-green' : 'badge-red'}">${activo ? '✅ Activo' : '🔴 Inactivo'}</span>
+      </td>
+      <td>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;">
+          <button class="btn btn-secondary btn-sm" onclick='cargarFormEdicionPersonal(${JSON.stringify(p)})' title="Editar">✏️</button>
+          <button class="btn btn-sm ${activo ? 'btn-ghost' : 'btn-primary'}"
+            onclick="toggleActivoPersonal('${p.id}','${nombre.trim()}',${activo})"
+            title="${activo ? 'Inactivar' : 'Reactivar'}"
+            style="${activo ? 'color:#f87171;' : ''}">
+            ${activo ? '🔴' : '✅'}
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="abrirModalEliminar('${p.id}','${nombre.trim()}')" title="Eliminar">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function toggleActivoPersonal(id, nombre, estaActivo) {
+  idToggleActivo = id;
+  const accion = estaActivo ? 'inactivar' : 'reactivar';
+  const emoji  = estaActivo ? '🔴' : '✅';
+  document.getElementById('modal-toggle-nombre').textContent = `${emoji} ${accion.charAt(0).toUpperCase()+accion.slice(1)} a: ${nombre} (ID: ${id})`;
+  document.getElementById('btn-confirmar-toggle').textContent = `${emoji} Sí, ${accion}`;
+  document.getElementById('btn-confirmar-toggle').className = estaActivo ? 'btn btn-danger' : 'btn btn-primary';
+  document.getElementById('modal-toggle-activo').classList.add('show');
+  pendienteActivo = !estaActivo;
+}
+
+async function confirmarToggleActivo() {
+  if (!idToggleActivo) return;
+  const btn = document.getElementById('btn-confirmar-toggle');
+  btn.innerHTML = '<span class="loading"></span>'; btn.disabled = true;
+  const res = await llamarAppsScript('cambiarEstadoPersonal', { id: idToggleActivo, activo: pendienteActivo });
+  btn.innerHTML = btn.textContent; btn.disabled = false;
+  cerrarModal('modal-toggle-activo');
+  if (res?.exito) { mostrarToast(res.mensaje, 'success'); cargarListaPersonal(); }
+  else { mostrarToast('❌ ' + (res?.mensaje || 'Error'), 'error'); }
+  idToggleActivo = ''; pendienteActivo = null;
 }
 
 // ════════════════════════════════
@@ -892,7 +1098,18 @@ function ocultarProg(id){setTimeout(()=>{document.getElementById('prog-'+id).sty
 // ════════════════════════════════
 // CREDENCIALES
 // ════════════════════════════════
-function switchCredTab(t){['crear','lista'].forEach(x=>{document.getElementById('cred-tab-'+x).classList.toggle('active',x===t);document.getElementById('cred-tab-'+x+'-btn').classList.toggle('active',x===t);});if(t==='lista')cargarListaCredenciales();}
+function switchCredTab(t){
+  ['crear','lista','mipass'].forEach(x=>{
+    document.getElementById('cred-tab-'+x).classList.toggle('active',x===t);
+    document.getElementById('cred-tab-'+x+'-btn').classList.toggle('active',x===t);
+  });
+  if(t==='lista') cargarListaCredenciales();
+  if(t==='mipass'){
+    ['mp-actual','mp-nueva','mp-confirmar'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('respuesta-mipass').style.display='none';
+    setTimeout(()=>document.getElementById('mp-actual').focus(),100);
+  }
+}
 
 async function guardarCredencial(){if(modoEdicionCred)await actualizarCredencial();else await crearCredencial();}
 
@@ -982,6 +1199,30 @@ async function confirmarEliminarCred(){
 }
 
 // ════════════════════════════════
+
+// CAMBIAR PROPIA CONTRASEÑA (admin)
+async function cambiarMiContrasena() {
+  const actual   = document.getElementById('mp-actual').value.trim();
+  const nueva    = document.getElementById('mp-nueva').value.trim();
+  const confirmar = document.getElementById('mp-confirmar').value.trim();
+  if (!actual || !nueva || !confirmar) { mostrarRespuestaEl('respuesta-mipass','⚠️ Completa todos los campos','error'); return; }
+  if (nueva.length < 4) { mostrarRespuestaEl('respuesta-mipass','⚠️ La nueva contraseña debe tener al menos 4 caracteres','error'); return; }
+  if (nueva !== confirmar) { mostrarRespuestaEl('respuesta-mipass','⚠️ Las contraseñas nuevas no coinciden','error'); return; }
+  const btn = document.getElementById('btn-cambiar-pass');
+  btn.innerHTML = '<span class="loading"></span> Cambiando...'; btn.disabled = true;
+  const res = await llamarAppsScript('cambiarContrasenaAdmin', { usuario: SESSION.usuario, passActual: actual, passNueva: nueva });
+  btn.innerHTML = '🔑 Cambiar Contraseña'; btn.disabled = false;
+  if (res?.exito) {
+    mostrarRespuestaEl('respuesta-mipass', '✅ ' + res.mensaje, 'success');
+    mostrarToast('✅ Contraseña actualizada', 'success');
+    document.getElementById('mp-actual').value = '';
+    document.getElementById('mp-nueva').value = '';
+    document.getElementById('mp-confirmar').value = '';
+  } else {
+    mostrarRespuestaEl('respuesta-mipass', '❌ ' + (res?.mensaje || 'Error'), 'error');
+  }
+}
+
 // INIT
 // ════════════════════════════════
 function iniciarAplicacion(){
