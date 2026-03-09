@@ -86,6 +86,7 @@
     .stat-icon.blue{background:rgba(59,130,246,.15);}
     .stat-icon.amber{background:rgba(245,158,11,.15);}
     .stat-icon.purple{background:rgba(139,92,246,.15);}
+    .stat-icon.red{background:rgba(239,68,68,.15);}
     .stat-value{font-size:24px;font-weight:800;margin-bottom:3px;}
     .stat-label{font-size:11px;color:var(--text-muted);font-weight:500;}
     .scan-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
@@ -128,6 +129,24 @@
     .employee-info p{font-size:12px;color:var(--text-muted);margin:2px 0;}
     .employee-info .val{color:var(--text);font-weight:600;}
 
+    /* HORARIO INFO PANEL */
+    .schedule-info{background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.25);border-radius:var(--radius-sm);padding:12px;display:none;margin-bottom:12px;}
+    .schedule-info h4{color:#93c5fd;font-size:12px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+    .schedule-slots{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+    .schedule-slot{background:var(--surface2);border-radius:6px;padding:7px 10px;font-size:11px;}
+    .schedule-slot .slot-label{color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-size:10px;margin-bottom:2px;}
+    .schedule-slot .slot-time{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:var(--text);}
+    .schedule-slot.active-slot{border:1px solid rgba(16,185,129,.4);background:rgba(16,185,129,.07);}
+    .schedule-slot .slot-time.on-time{color:#34d399;}
+    .schedule-slot .slot-time.late{color:#f87171;}
+
+    /* PUNTUALIDAD BADGE EN REGISTRO */
+    .punct-alert{border-radius:var(--radius-sm);padding:10px 13px;font-size:13px;font-weight:600;margin-bottom:10px;display:none;align-items:center;gap:8px;}
+    .punct-alert.on-time{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:#34d399;}
+    .punct-alert.tardanza{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:#fcd34d;}
+    .punct-alert.anticipada{background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);color:#c4b5fd;}
+    .punct-alert.sin-horario{background:rgba(100,116,139,.1);border:1px solid rgba(100,116,139,.2);color:var(--text-muted);}
+
     /* QR */
     .camera-toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
     .switch{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;}
@@ -154,6 +173,8 @@
     .badge-blue{background:rgba(59,130,246,.15);color:#93c5fd;}
     .badge-amber{background:rgba(245,158,11,.15);color:#fcd34d;}
     .badge-purple{background:rgba(139,92,246,.15);color:#c4b5fd;}
+    .badge-gray{background:rgba(100,116,139,.15);color:#94a3b8;}
+    .badge-orange{background:rgba(249,115,22,.15);color:#fb923c;}
 
     /* TABS */
     .tab-bar{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:12px;}
@@ -176,6 +197,20 @@
     .checkbox-item{display:flex;align-items:center;gap:6px;cursor:pointer;}
     .checkbox-item input[type=checkbox]{width:14px;height:14px;accent-color:var(--primary);cursor:pointer;}
     .checkbox-item span{font-size:13px;color:var(--text);font-weight:500;}
+
+    /* HORARIOS - SECCIÓN DE CONFIGURACIÓN */
+    .schedule-section{background:rgba(59,130,246,.04);border:1px solid rgba(59,130,246,.2);border-radius:var(--radius-sm);padding:14px;margin-top:10px;}
+    .schedule-section-title{font-size:12px;font-weight:700;color:#93c5fd;margin-bottom:12px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px;}
+    .schedule-type-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+    .schedule-type-btn{padding:7px 14px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;transition:var(--transition);}
+    .schedule-type-btn.active{background:rgba(59,130,246,.15);color:#93c5fd;border-color:rgba(59,130,246,.4);}
+    .schedule-slots-form{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .schedule-slot-input{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;}
+    .schedule-slot-input .slot-header{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:6px;display:flex;align-items:center;gap:4px;}
+    .schedule-slot-input input[type=time]{width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;font-family:'JetBrains Mono',monospace;outline:none;transition:var(--transition);}
+    .schedule-slot-input input[type=time]:focus{border-color:var(--secondary);box-shadow:0 0 0 2px rgba(59,130,246,.15);}
+    .schedule-slot-input .slot-note{font-size:10px;color:var(--text-muted);margin-top:4px;}
+    .schedule-divider{grid-column:1/-1;border:none;border-top:1px dashed var(--border);margin:4px 0;}
 
     /* PROGRESS */
     .progress-wrap{margin:8px 0;display:none;}
@@ -220,8 +255,8 @@
     .cred-perms{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;}
     .cred-actions{display:flex;gap:6px;flex-shrink:0;}
 
-    @media(max-width:900px){.scan-grid{grid-template-columns:1fr;}.sidebar{width:210px;}.main-area{margin-left:210px;}}
-    @media(max-width:650px){.sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}.main-area{margin-left:0;}.topbar{padding:10px 13px;}.page-content{padding:13px;}.mobile-menu-btn{display:flex;align-items:center;}.form-grid{grid-template-columns:1fr;}}
+    @media(max-width:900px){.scan-grid{grid-template-columns:1fr;}.sidebar{width:210px;}.main-area{margin-left:210px;}.schedule-slots-form{grid-template-columns:1fr;}}
+    @media(max-width:650px){.sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}.main-area{margin-left:0;}.topbar{padding:10px 13px;}.page-content{padding:13px;}.mobile-menu-btn{display:flex;align-items:center;}.form-grid{grid-template-columns:1fr;}.schedule-slots-form{grid-template-columns:1fr;}}
   </style>
 </head>
 <body>
@@ -235,7 +270,7 @@
       <div class="login-logo">
         <div class="login-logo-icon">🏢</div>
         <h2>La Base Cowork</h2>
-        <p>Sistema de Control de Asistencia v5.0</p>
+        <p>Sistema de Control de Asistencia v5.1</p>
       </div>
       <div class="login-input-group">
         <label>Usuario</label>
@@ -247,7 +282,7 @@
       </div>
       <button class="login-btn" onclick="verificarLogin()">Ingresar →</button>
       <div id="login-error" class="login-error">⚠️ Usuario o contraseña incorrectos</div>
-      <div class="login-footer"><p>© 2026 La Base Cowork — v5.0</p></div>
+      <div class="login-footer"><p>© 2026 La Base Cowork — v5.1</p></div>
     </div>
   </div>
 </div>
@@ -309,15 +344,31 @@
                   <label>ID del Colaborador</label>
                   <input type="text" id="id" required placeholder="Ingrese ID o escanee QR">
                 </div>
+
+                <!-- Info colaborador -->
                 <div class="employee-info" id="employee-info">
                   <h4>👤 Colaborador encontrado</h4>
                   <p>Nombre: <span class="val" id="employee-name">-</span></p>
                   <p>Área: <span class="val" id="employee-area">-</span></p>
                   <p>Cargo: <span class="val" id="employee-position">-</span></p>
+                  <p>Jornada: <span class="val" id="employee-jornada">-</span></p>
                 </div>
+
+                <!-- Panel de horario del colaborador -->
+                <div class="schedule-info" id="schedule-info">
+                  <h4>🕐 Horario Configurado</h4>
+                  <div class="schedule-slots" id="schedule-slots-display"></div>
+                </div>
+
+                <!-- Alerta de puntualidad (se calcula antes de registrar) -->
+                <div class="punct-alert" id="punct-alert"></div>
+
                 <div class="form-group">
                   <label>Estado</label>
-                  <select id="estado"><option value="INGRESO">✅ INGRESO</option><option value="SALIDA">🚪 SALIDA</option></select>
+                  <select id="estado" onchange="recalcularPuntualidad()">
+                    <option value="INGRESO">✅ INGRESO</option>
+                    <option value="SALIDA">🚪 SALIDA</option>
+                  </select>
                 </div>
                 <button type="submit" class="btn btn-primary btn-full" id="btn-submit" disabled>✅ Registrar Asistencia</button>
               </form>
@@ -337,6 +388,7 @@
           <div class="stat-card"><div class="stat-icon green">📥</div><div class="stat-value" id="stat-ingresos">0</div><div class="stat-label">Ingresos Hoy</div></div>
           <div class="stat-card"><div class="stat-icon blue">📤</div><div class="stat-value" id="stat-salidas">0</div><div class="stat-label">Salidas Hoy</div></div>
           <div class="stat-card"><div class="stat-icon amber">👥</div><div class="stat-value" id="stat-unicos">0</div><div class="stat-label">Personas Únicas</div></div>
+          <div class="stat-card"><div class="stat-icon red">⏰</div><div class="stat-value" id="stat-tardanzas">0</div><div class="stat-label">Tardanzas Hoy</div></div>
           <div class="stat-card"><div class="stat-icon purple">📋</div><div class="stat-value" id="stat-total">0</div><div class="stat-label">Total Hoy</div></div>
           <div class="stat-card"><div class="stat-icon green">🗂️</div><div class="stat-value" id="stat-personal">0</div><div class="stat-label">Personal Registrado</div></div>
         </div>
@@ -356,7 +408,7 @@
 
         <!-- TAB NUEVO -->
         <div class="tab-panel active" id="tab-nuevo">
-          <div style="max-width:720px;">
+          <div style="max-width:760px;">
             <div class="card">
               <div class="card-title" id="form-personal-titulo">➕ Registrar Nuevo Colaborador</div>
               <input type="hidden" id="p-id-original">
@@ -371,7 +423,23 @@
                 <div class="form-group"><label>Correo Electrónico</label><input type="email" id="p-correo" placeholder="Ej: juan@empresa.com"></div>
                 <div class="form-group full"><label>URL Foto (Google Drive)</label><input type="text" id="p-foto" placeholder="https://drive.google.com/..."></div>
               </div>
-              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
+
+              <!-- CONFIGURACIÓN DE HORARIO -->
+              <div class="schedule-section">
+                <div class="schedule-section-title">🕐 Configuración de Horario Laboral</div>
+                <div class="schedule-type-row">
+                  <button type="button" class="schedule-type-btn active" id="stype-ninguno" onclick="setScheduleType('ninguno')">🚫 Sin horario</button>
+                  <button type="button" class="schedule-type-btn" id="stype-medio" onclick="setScheduleType('medio')">🌅 Medio tiempo</button>
+                  <button type="button" class="schedule-type-btn" id="stype-completo" onclick="setScheduleType('completo')">☀️ Tiempo completo</button>
+                </div>
+                <div id="schedule-form-container" style="display:none;">
+                  <div class="schedule-slots-form" id="schedule-slots-form">
+                    <!-- Se llena dinámicamente -->
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
                 <button class="btn btn-primary" id="btn-guardar-personal" onclick="guardarPersonal()">💾 Guardar</button>
                 <button class="btn btn-ghost" id="btn-cancelar-edicion-p" onclick="cancelarEdicionPersonal()" style="display:none;">✖ Cancelar</button>
                 <button class="btn btn-ghost" onclick="limpiarFormPersonal()">🗑️ Limpiar</button>
@@ -424,7 +492,7 @@
               <table>
                 <thead>
                   <tr>
-                    <th>#</th><th>ID</th><th>Nombre Completo</th><th>Área</th><th>Cargo</th><th>Teléfono</th><th>Estado</th><th>Acciones</th>
+                    <th>#</th><th>ID</th><th>Nombre Completo</th><th>Área</th><th>Cargo</th><th>Jornada</th><th>Estado</th><th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody id="lista-personal-tbody">
@@ -465,11 +533,13 @@
           <div class="report-stat"><div class="num" id="rep-stat-ingresos">0</div><div class="lbl">Ingresos</div></div>
           <div class="report-stat"><div class="num" id="rep-stat-salidas">0</div><div class="lbl">Salidas</div></div>
           <div class="report-stat"><div class="num" id="rep-stat-personas">0</div><div class="lbl">Personas</div></div>
+          <div class="report-stat"><div class="num" id="rep-stat-tardanzas" style="color:#fcd34d;">0</div><div class="lbl">Tardanzas</div></div>
+          <div class="report-stat"><div class="num" id="rep-stat-anticipadas" style="color:#c4b5fd;">0</div><div class="lbl">Sal. Anticipadas</div></div>
         </div>
         <div class="card" id="reporte-tabla-card" style="display:none;">
           <div class="card-title">📋 Resultados</div>
           <div class="table-wrap">
-            <table><thead><tr><th>#</th><th>Fecha/Hora</th><th>ID</th><th>Nombre</th><th>Área</th><th>Cargo</th><th>Estado</th></tr></thead>
+            <table><thead><tr><th>#</th><th>Fecha/Hora</th><th>ID</th><th>Nombre</th><th>Área</th><th>Cargo</th><th>Estado</th><th>Puntualidad</th><th>Detalle</th></tr></thead>
             <tbody id="reporte-tbody"></tbody></table>
           </div>
         </div>
@@ -550,19 +620,10 @@
           <div class="tab-panel" id="cred-tab-mipass">
             <div class="card" style="max-width:460px;">
               <div class="card-title">🔑 Cambiar Mi Contraseña</div>
-              <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Solo cambia la contraseña de tu propio usuario de administrador.</p>
-              <div class="form-group">
-                <label>Contraseña Actual *</label>
-                <input type="password" id="mp-actual" placeholder="Tu contraseña actual" autocomplete="current-password">
-              </div>
-              <div class="form-group">
-                <label>Nueva Contraseña *</label>
-                <input type="password" id="mp-nueva" placeholder="Mínimo 4 caracteres" autocomplete="new-password">
-              </div>
-              <div class="form-group">
-                <label>Confirmar Nueva Contraseña *</label>
-                <input type="password" id="mp-confirmar" placeholder="Repite la nueva contraseña" autocomplete="new-password">
-              </div>
+              <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Solo cambia la contraseña de tu propio usuario.</p>
+              <div class="form-group"><label>Contraseña Actual *</label><input type="password" id="mp-actual" placeholder="Tu contraseña actual" autocomplete="current-password"></div>
+              <div class="form-group"><label>Nueva Contraseña *</label><input type="password" id="mp-nueva" placeholder="Mínimo 4 caracteres" autocomplete="new-password"></div>
+              <div class="form-group"><label>Confirmar Nueva Contraseña *</label><input type="password" id="mp-confirmar" placeholder="Repite la nueva contraseña" autocomplete="new-password"></div>
               <button class="btn btn-primary" id="btn-cambiar-pass" onclick="cambiarMiContrasena()">🔑 Cambiar Contraseña</button>
               <div class="respuesta" id="respuesta-mipass"></div>
             </div>
@@ -574,7 +635,7 @@
   </div>
 </div>
 
-<!-- Modal eliminar personal -->
+<!-- Modals -->
 <div class="modal-overlay" id="modal-eliminar">
   <div class="modal-box">
     <div style="font-size:32px;text-align:center;margin-bottom:10px;">⚠️</div>
@@ -587,7 +648,6 @@
   </div>
 </div>
 
-<!-- Modal revocar credencial -->
 <div class="modal-overlay" id="modal-eliminar-cred">
   <div class="modal-box">
     <div style="font-size:32px;text-align:center;margin-bottom:10px;">🔐</div>
@@ -600,7 +660,6 @@
   </div>
 </div>
 
-<!-- Modal inactivar/reactivar -->
 <div class="modal-overlay" id="modal-toggle-activo">
   <div class="modal-box">
     <div style="font-size:32px;text-align:center;margin-bottom:10px;" id="modal-toggle-emoji">⚠️</div>
@@ -634,6 +693,284 @@ let reporteData=[], idAEliminar='', usuarioCredAEliminar='', idToggleActivo='', 
 let modoEdicionPersonal=false, modoEdicionCred=false;
 let qrCodeReader=null, isScanning=false, searchTimeout=null;
 let staffData=null, selectedCameraId=null, cameraEnabled=true;
+let currentScheduleType = 'ninguno'; // 'ninguno' | 'medio' | 'completo'
+
+// ════════════════════════════════════════════════════════════
+// SISTEMA DE HORARIOS Y PUNTUALIDAD
+// ════════════════════════════════════════════════════════════
+
+/**
+ * Estructura del horario:
+ * tipo: 'ninguno' | 'medio' | 'completo'
+ * medio:    { entrada: 'HH:MM', salida: 'HH:MM' }
+ * completo: { entrada1: 'HH:MM', salidaAlmuerzo: 'HH:MM', retornoAlmuerzo: 'HH:MM', salida2: 'HH:MM' }
+ */
+
+// Renderiza los inputs del formulario de horario según el tipo seleccionado
+function setScheduleType(tipo) {
+  currentScheduleType = tipo;
+  ['ninguno','medio','completo'].forEach(t => {
+    document.getElementById('stype-' + t).classList.toggle('active', t === tipo);
+  });
+  const container = document.getElementById('schedule-form-container');
+  const slotsForm = document.getElementById('schedule-slots-form');
+  if (tipo === 'ninguno') {
+    container.style.display = 'none';
+    slotsForm.innerHTML = '';
+    return;
+  }
+  container.style.display = 'block';
+  if (tipo === 'medio') {
+    slotsForm.innerHTML = `
+      <div class="schedule-slot-input">
+        <div class="slot-header">✅ Hora límite de Entrada</div>
+        <input type="time" id="sch-entrada1" placeholder="08:00">
+        <div class="slot-note">Llegadas después de esta hora = tardanza</div>
+      </div>
+      <div class="schedule-slot-input">
+        <div class="slot-header">🚪 Hora mínima de Salida</div>
+        <input type="time" id="sch-salida1" placeholder="13:00">
+        <div class="slot-note">Salidas antes de esta hora = salida anticipada</div>
+      </div>`;
+  } else if (tipo === 'completo') {
+    slotsForm.innerHTML = `
+      <div class="schedule-slot-input">
+        <div class="slot-header">✅ Hora límite de Entrada AM</div>
+        <input type="time" id="sch-entrada1" placeholder="08:00">
+        <div class="slot-note">Entrada en la mañana</div>
+      </div>
+      <div class="schedule-slot-input">
+        <div class="slot-header">🍽️ Hora mínima de Salida Almuerzo</div>
+        <input type="time" id="sch-salida1" placeholder="13:00">
+        <div class="slot-note">Salida a almorzar</div>
+      </div>
+      <hr class="schedule-divider">
+      <div class="schedule-slot-input">
+        <div class="slot-header">🔄 Hora límite de Retorno Almuerzo</div>
+        <input type="time" id="sch-entrada2" placeholder="14:00">
+        <div class="slot-note">Regreso del almuerzo</div>
+      </div>
+      <div class="schedule-slot-input">
+        <div class="slot-header">🏁 Hora mínima de Salida Final</div>
+        <input type="time" id="sch-salida2" placeholder="18:00">
+        <div class="slot-note">Fin de jornada</div>
+      </div>`;
+  }
+}
+
+// Lee los valores del formulario de horario
+function leerHorarioDelFormulario() {
+  if (currentScheduleType === 'ninguno') return { tipo: 'ninguno' };
+  if (currentScheduleType === 'medio') {
+    return {
+      tipo: 'medio',
+      entrada1: document.getElementById('sch-entrada1')?.value || '',
+      salida1:  document.getElementById('sch-salida1')?.value  || ''
+    };
+  }
+  if (currentScheduleType === 'completo') {
+    return {
+      tipo: 'completo',
+      entrada1:        document.getElementById('sch-entrada1')?.value || '',
+      salida1:         document.getElementById('sch-salida1')?.value  || '',
+      entrada2:        document.getElementById('sch-entrada2')?.value || '',
+      salida2:         document.getElementById('sch-salida2')?.value  || ''
+    };
+  }
+  return { tipo: 'ninguno' };
+}
+
+// Carga el horario en el formulario al editar un colaborador
+function cargarHorarioEnFormulario(horario) {
+  if (!horario || horario.tipo === 'ninguno' || !horario.tipo) {
+    setScheduleType('ninguno');
+    return;
+  }
+  setScheduleType(horario.tipo);
+  // Espera un tick para que se rendericen los inputs
+  setTimeout(() => {
+    if (horario.entrada1 && document.getElementById('sch-entrada1'))
+      document.getElementById('sch-entrada1').value = horario.entrada1;
+    if (horario.salida1 && document.getElementById('sch-salida1'))
+      document.getElementById('sch-salida1').value = horario.salida1;
+    if (horario.entrada2 && document.getElementById('sch-entrada2'))
+      document.getElementById('sch-entrada2').value = horario.entrada2;
+    if (horario.salida2 && document.getElementById('sch-salida2'))
+      document.getElementById('sch-salida2').value = horario.salida2;
+  }, 50);
+}
+
+// Convierte "HH:MM" a minutos desde medianoche
+function horaAMinutos(hhmm) {
+  if (!hhmm) return null;
+  const partes = hhmm.split(':');
+  if (partes.length < 2) return null;
+  return parseInt(partes[0]) * 60 + parseInt(partes[1]);
+}
+
+// Minutos actuales en Lima
+function minutosAhora() {
+  const ahora = new Date();
+  return ahora.getHours() * 60 + ahora.getMinutes();
+}
+
+/**
+ * Determina el tipo de registro más probable basándose en la hora actual y el horario.
+ * Retorna el "slot" activo: 'entrada1', 'salida1', 'entrada2', 'salida2' o null
+ */
+function detectarSlotActivo(horario, estado) {
+  if (!horario || horario.tipo === 'ninguno') return null;
+  const min = minutosAhora();
+
+  if (horario.tipo === 'medio') {
+    if (estado === 'INGRESO') return 'entrada1';
+    if (estado === 'SALIDA')  return 'salida1';
+  }
+
+  if (horario.tipo === 'completo') {
+    if (estado === 'INGRESO') {
+      // Si hay entrada2 configurada y la hora actual está más cerca de entrada2
+      const e1 = horaAMinutos(horario.entrada1);
+      const e2 = horaAMinutos(horario.entrada2);
+      if (e1 !== null && e2 !== null) {
+        const medioE = (e1 + e2) / 2;
+        return min < medioE ? 'entrada1' : 'entrada2';
+      }
+      return 'entrada1';
+    }
+    if (estado === 'SALIDA') {
+      const s1 = horaAMinutos(horario.salida1);
+      const s2 = horaAMinutos(horario.salida2);
+      if (s1 !== null && s2 !== null) {
+        const medioS = (s1 + s2) / 2;
+        return min < medioS ? 'salida1' : 'salida2';
+      }
+      return 'salida1';
+    }
+  }
+  return null;
+}
+
+/**
+ * Evalúa la puntualidad de un registro.
+ * Retorna: { estado: 'puntual'|'tardanza'|'anticipada'|'sin_horario', minutos: N, slot: '...' }
+ */
+function evaluarPuntualidad(horario, estado) {
+  if (!horario || horario.tipo === 'ninguno') return { estado: 'sin_horario', minutos: 0, slot: null };
+  const slot = detectarSlotActivo(horario, estado);
+  if (!slot) return { estado: 'sin_horario', minutos: 0, slot: null };
+
+  const horaLimite = horaAMinutos(horario[slot]);
+  if (horaLimite === null) return { estado: 'sin_horario', minutos: 0, slot };
+
+  const minActual = minutosAhora();
+  const diff = minActual - horaLimite; // positivo = tarde/después, negativo = temprano/antes
+
+  if (estado === 'INGRESO') {
+    // Entrada: tarde = tardanza, antes = puntual
+    if (diff > 0) return { estado: 'tardanza', minutos: diff, slot };
+    return { estado: 'puntual', minutos: Math.abs(diff), slot };
+  } else {
+    // Salida: antes de hora mínima = salida anticipada, después = puntual
+    if (diff < 0) return { estado: 'anticipada', minutos: Math.abs(diff), slot };
+    return { estado: 'puntual', minutos: diff, slot };
+  }
+}
+
+// Nombres legibles de los slots
+const SLOT_LABELS = {
+  entrada1:        '1ª Entrada',
+  salida1:         '1ª Salida (Almuerzo)',
+  entrada2:        'Retorno Almuerzo',
+  salida2:         'Salida Final',
+};
+const SLOT_LABELS_MEDIO = {
+  entrada1: 'Entrada',
+  salida1:  'Salida',
+};
+
+function slotLabel(slot, tipo) {
+  if (tipo === 'medio') return SLOT_LABELS_MEDIO[slot] || slot;
+  return SLOT_LABELS[slot] || slot;
+}
+
+// Muestra el panel de horario al encontrar un colaborador
+function mostrarHorarioColaborador(horario) {
+  const panel = document.getElementById('schedule-info');
+  const slotsDiv = document.getElementById('schedule-slots-display');
+  if (!horario || horario.tipo === 'ninguno') {
+    panel.style.display = 'none';
+    return;
+  }
+  panel.style.display = 'block';
+  const slots = [];
+  const tipo = horario.tipo;
+  if (tipo === 'medio') {
+    if (horario.entrada1) slots.push({ key:'entrada1', label:'Límite Entrada', hora: horario.entrada1 });
+    if (horario.salida1)  slots.push({ key:'salida1',  label:'Hora Mínima Salida', hora: horario.salida1 });
+  } else if (tipo === 'completo') {
+    if (horario.entrada1) slots.push({ key:'entrada1',  label:'Límite Entrada AM', hora: horario.entrada1 });
+    if (horario.salida1)  slots.push({ key:'salida1',   label:'Salida Almuerzo', hora: horario.salida1 });
+    if (horario.entrada2) slots.push({ key:'entrada2',  label:'Límite Retorno', hora: horario.entrada2 });
+    if (horario.salida2)  slots.push({ key:'salida2',   label:'Salida Final', hora: horario.salida2 });
+  }
+  if (!slots.length) { panel.style.display = 'none'; return; }
+  const estadoActual = document.getElementById('estado').value;
+  const slotActivo = detectarSlotActivo(horario, estadoActual);
+  slotsDiv.innerHTML = slots.map(s => `
+    <div class="schedule-slot ${s.key === slotActivo ? 'active-slot' : ''}">
+      <div class="slot-label">${s.label}</div>
+      <div class="slot-time">${s.hora}</div>
+    </div>`).join('');
+}
+
+// Actualiza y muestra el badge de puntualidad
+function recalcularPuntualidad() {
+  if (!staffData || !staffData.horario) { ocultarPunctAlert(); return; }
+  const estado = document.getElementById('estado').value;
+  const eval_ = evaluarPuntualidad(staffData.horario, estado);
+  mostrarPunctAlert(eval_, estado);
+  // Actualizar slots activos visualmente
+  mostrarHorarioColaborador(staffData.horario);
+}
+
+function mostrarPunctAlert(eval_, estado) {
+  const el = document.getElementById('punct-alert');
+  el.style.display = 'flex';
+  if (eval_.estado === 'sin_horario') {
+    el.className = 'punct-alert sin-horario';
+    el.innerHTML = '📋 Sin horario configurado — se registrará sin evaluación de puntualidad';
+    return;
+  }
+  const slotNombre = slotLabel(eval_.slot, staffData?.horario?.tipo);
+  if (eval_.estado === 'puntual') {
+    el.className = 'punct-alert on-time';
+    if (estado === 'INGRESO') {
+      el.innerHTML = `✅ <b>Puntual</b> — ${eval_.minutos} min antes del límite de ${slotNombre}`;
+    } else {
+      el.innerHTML = `✅ <b>A tiempo</b> — ${eval_.minutos} min después de la hora mínima de ${slotNombre}`;
+    }
+  } else if (eval_.estado === 'tardanza') {
+    el.className = 'punct-alert tardanza';
+    el.innerHTML = `⏰ <b>TARDANZA</b> — ${eval_.minutos} minuto${eval_.minutos !== 1 ? 's' : ''} de retraso en ${slotNombre}`;
+  } else if (eval_.estado === 'anticipada') {
+    el.className = 'punct-alert anticipada';
+    el.innerHTML = `⚠️ <b>SALIDA ANTICIPADA</b> — ${eval_.minutos} minuto${eval_.minutos !== 1 ? 's' : ''} antes de la hora mínima de ${slotNombre}`;
+  }
+}
+
+function ocultarPunctAlert() {
+  document.getElementById('punct-alert').style.display = 'none';
+}
+
+// Badge de puntualidad para tablas
+function badgePuntualidad(punct) {
+  if (!punct || punct === 'sin_horario') return '<span class="badge badge-gray">—</span>';
+  if (punct === 'puntual') return '<span class="badge badge-green">✅ Puntual</span>';
+  if (punct === 'tardanza') return '<span class="badge badge-amber">⏰ Tardanza</span>';
+  if (punct === 'anticipada') return '<span class="badge badge-purple">⚠️ Anticipada</span>';
+  return '<span class="badge badge-gray">—</span>';
+}
 
 // ════════════════════════════════
 // LOGIN
@@ -774,38 +1111,83 @@ async function buscarColaborador(id){
     document.getElementById('employee-name').textContent=res.datos.nombre||'-';
     document.getElementById('employee-area').textContent=res.datos.area||'-';
     document.getElementById('employee-position').textContent=res.datos.cargo||'-';
+
+    // Mostrar jornada
+    const horario = res.datos.horario;
+    const jornadaLabels = { ninguno:'Sin horario', medio:'Medio tiempo', completo:'Tiempo completo' };
+    document.getElementById('employee-jornada').textContent = horario ? (jornadaLabels[horario.tipo] || 'Sin horario') : 'Sin horario';
+
     document.getElementById('employee-info').style.display='block';
     document.getElementById('btn-submit').disabled=false;
+
+    // Mostrar horario y calcular puntualidad
+    mostrarHorarioColaborador(horario);
+    recalcularPuntualidad();
   }else{
     ocultarInfoColaborador();
     mostrarRespuesta(res?.mensaje||'No encontrado','warning');
     document.getElementById('btn-submit').disabled=true;
   }
 }
-function ocultarInfoColaborador(){document.getElementById('employee-info').style.display='none';staffData=null;}
+
+function ocultarInfoColaborador(){
+  document.getElementById('employee-info').style.display='none';
+  document.getElementById('schedule-info').style.display='none';
+  ocultarPunctAlert();
+  staffData=null;
+}
+
 function mostrarRespuesta(msg,tipo){const r=document.getElementById('respuesta');r.textContent=msg;r.className='respuesta '+tipo;r.style.display='block';if(tipo==='success')setTimeout(()=>r.style.display='none',5000);}
 
 async function enviarFormulario(e){
   e.preventDefault();if(!staffData) return mostrarRespuesta('ID no válido','error');
+  const estado = document.getElementById('estado').value;
+  // Calcular puntualidad final en el momento del registro
+  const horario = staffData.horario || { tipo: 'ninguno' };
+  const evalPunct = evaluarPuntualidad(horario, estado);
+
   const btn=document.getElementById('btn-submit');const orig=btn.innerHTML;
   btn.innerHTML='<span class="loading"></span> Registrando...';btn.disabled=true;
   const res=await llamarAppsScript('registrarAsistencia',{
     id:document.getElementById('id').value.trim(),
     nombre:staffData.nombre,area:staffData.area,cargo:staffData.cargo,
-    telefono:staffData.telefono||'',estado:document.getElementById('estado').value,
-    idDispositivo:generarIdDispositivo()
+    telefono:staffData.telefono||'',estado,
+    idDispositivo:generarIdDispositivo(),
+    // Datos de puntualidad para guardar en Sheets
+    puntualidad: evalPunct.estado,
+    minutosDiff: evalPunct.minutos,
+    slotHorario: evalPunct.slot || ''
   });
   btn.innerHTML=orig;
-  if(res?.exito){mostrarRespuesta(res.mensaje,'success');mostrarToast('✅ Registro exitoso','success');document.getElementById('formulario').reset();ocultarInfoColaborador();btn.disabled=true;cargarUltimosRegistros();}
-  else{mostrarRespuesta(res?.mensaje||'Error','error');mostrarToast(res?.mensaje||'Error','error');btn.disabled=false;}
+  if(res?.exito){
+    let msg = res.mensaje;
+    // Añadir detalle de puntualidad al mensaje de éxito
+    if (evalPunct.estado === 'tardanza') msg += ` — ⏰ Tardanza: ${evalPunct.minutos} min`;
+    if (evalPunct.estado === 'anticipada') msg += ` — ⚠️ Salida anticipada: ${evalPunct.minutos} min`;
+    mostrarRespuesta(msg, evalPunct.estado === 'puntual' || evalPunct.estado === 'sin_horario' ? 'success' : 'warning');
+    mostrarToast(evalPunct.estado === 'tardanza' ? '⏰ Registrado con tardanza' : evalPunct.estado === 'anticipada' ? '⚠️ Salida anticipada registrada' : '✅ Registro exitoso', evalPunct.estado === 'puntual' || evalPunct.estado === 'sin_horario' ? 'success' : 'warning');
+    document.getElementById('formulario').reset();
+    ocultarInfoColaborador();
+    btn.disabled=true;
+    cargarUltimosRegistros();
+  }else{
+    mostrarRespuesta(res?.mensaje||'Error','error');
+    mostrarToast(res?.mensaje||'Error','error');
+    btn.disabled=false;
+  }
 }
 
 async function cargarUltimosRegistros(){
   const res=await llamarAppsScript('obtenerUltimosRegistros',{limite:8});
   const wrap=document.getElementById('ultimos-registros-wrap');
   if(!res?.registros?.length){wrap.innerHTML='<div class="empty-state"><span>📭</span><p>Sin registros hoy</p></div>';return;}
-  wrap.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Hora</th><th>Nombre</th><th>Estado</th></tr></thead><tbody>
-    ${res.registros.map(r=>`<tr><td class="recent-row-time">${r.hora}</td><td>${r.nombre}</td><td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td></tr>`).join('')}
+  wrap.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Hora</th><th>Nombre</th><th>Estado</th><th>Puntualidad</th></tr></thead><tbody>
+    ${res.registros.map(r=>`<tr>
+      <td class="recent-row-time">${r.hora}</td>
+      <td>${r.nombre}</td>
+      <td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td>
+      <td>${badgePuntualidad(r.puntualidad)}</td>
+    </tr>`).join('')}
   </tbody></table></div>`;
 }
 
@@ -813,13 +1195,28 @@ async function cargarUltimosRegistros(){
 // DASHBOARD
 // ════════════════════════════════
 async function cargarDashboard(){
-  ['stat-ingresos','stat-salidas','stat-unicos','stat-total','stat-personal'].forEach(id=>document.getElementById(id).textContent='...');
+  ['stat-ingresos','stat-salidas','stat-unicos','stat-tardanzas','stat-total','stat-personal'].forEach(id=>document.getElementById(id).textContent='...');
   const [stats,rec,pers]=await Promise.all([llamarAppsScript('obtenerEstadisticasHoy'),llamarAppsScript('obtenerUltimosRegistros',{limite:15}),llamarAppsScript('contarUsuarios')]);
-  if(stats&&!stats.error){document.getElementById('stat-ingresos').textContent=stats.ingresosHoy??0;document.getElementById('stat-salidas').textContent=stats.salidasHoy??0;document.getElementById('stat-unicos').textContent=stats.estudiantesUnicos??0;document.getElementById('stat-total').textContent=stats.totalRegistros??0;}
+  if(stats&&!stats.error){
+    document.getElementById('stat-ingresos').textContent=stats.ingresosHoy??0;
+    document.getElementById('stat-salidas').textContent=stats.salidasHoy??0;
+    document.getElementById('stat-unicos').textContent=stats.estudiantesUnicos??0;
+    document.getElementById('stat-tardanzas').textContent=stats.tardanzasHoy??0;
+    document.getElementById('stat-total').textContent=stats.totalRegistros??0;
+  }
   if(pers&&!pers.error) document.getElementById('stat-personal').textContent=pers.total??0;
   const wrap=document.getElementById('dash-registros-wrap');
-  if(rec?.registros?.length){wrap.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Hora</th><th>ID</th><th>Nombre</th><th>Área</th><th>Estado</th></tr></thead><tbody>${rec.registros.map(r=>`<tr><td class="recent-row-time">${r.hora}</td><td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${r.id}</td><td>${r.nombre}</td><td>${r.area}</td><td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td></tr>`).join('')}</tbody></table></div>`;}
-  else{wrap.innerHTML='<div class="empty-state"><span>📭</span><p>Sin actividad hoy</p></div>';}
+  if(rec?.registros?.length){
+    wrap.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Hora</th><th>ID</th><th>Nombre</th><th>Área</th><th>Estado</th><th>Puntualidad</th></tr></thead><tbody>
+      ${rec.registros.map(r=>`<tr>
+        <td class="recent-row-time">${r.hora}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${r.id}</td>
+        <td>${r.nombre}</td><td>${r.area}</td>
+        <td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td>
+        <td>${badgePuntualidad(r.puntualidad)}</td>
+      </tr>`).join('')}
+    </tbody></table></div>`;
+  }else{wrap.innerHTML='<div class="empty-state"><span>📭</span><p>Sin actividad hoy</p></div>';}
 }
 
 // ════════════════════════════════
@@ -844,7 +1241,15 @@ async function registrarNuevoPersonal(){
   const area=document.getElementById('p-area').value.trim();
   if(!id||!nombres||!apellidos||!area){mostrarRespuestaEl('respuesta-personal','⚠️ ID, Nombres, Apellidos y Área son obligatorios','error');return;}
   const btn=document.getElementById('btn-guardar-personal');btn.innerHTML='<span class="loading"></span> Guardando...';btn.disabled=true;
-  const res=await llamarAppsScript('registrarNuevoUsuario',{id,nombres,apellidos,grado:area,perfil:document.getElementById('p-cargo').value.trim(),telefono:document.getElementById('p-telefono').value.trim(),foto:document.getElementById('p-foto').value.trim(),correo:document.getElementById('p-correo').value.trim()});
+  const horario = leerHorarioDelFormulario();
+  const res=await llamarAppsScript('registrarNuevoUsuario',{
+    id,nombres,apellidos,grado:area,
+    perfil:document.getElementById('p-cargo').value.trim(),
+    telefono:document.getElementById('p-telefono').value.trim(),
+    foto:document.getElementById('p-foto').value.trim(),
+    correo:document.getElementById('p-correo').value.trim(),
+    horario: JSON.stringify(horario)
+  });
   btn.innerHTML='💾 Guardar';btn.disabled=false;
   if(res?.exito){mostrarRespuestaEl('respuesta-personal','✅ '+res.mensaje,'success');mostrarToast('✅ Colaborador registrado','success');limpiarFormPersonal();}
   else{mostrarRespuestaEl('respuesta-personal','❌ '+(res?.mensaje||'Error'),'error');}
@@ -857,13 +1262,25 @@ async function actualizarPersonal(){
   const area=document.getElementById('p-area').value.trim();
   if(!nombres||!apellidos||!area){mostrarRespuestaEl('respuesta-personal','⚠️ Nombres, Apellidos y Área son obligatorios','error');return;}
   const btn=document.getElementById('btn-guardar-personal');btn.innerHTML='<span class="loading"></span> Actualizando...';btn.disabled=true;
-  const res=await llamarAppsScript('actualizarUsuario',{id:idO,nombres,apellidos,grado:area,perfil:document.getElementById('p-cargo').value.trim(),telefono:document.getElementById('p-telefono').value.trim(),foto:document.getElementById('p-foto').value.trim(),correo:document.getElementById('p-correo').value.trim()});
+  const horario = leerHorarioDelFormulario();
+  const res=await llamarAppsScript('actualizarUsuario',{
+    id:idO,nombres,apellidos,grado:area,
+    perfil:document.getElementById('p-cargo').value.trim(),
+    telefono:document.getElementById('p-telefono').value.trim(),
+    foto:document.getElementById('p-foto').value.trim(),
+    correo:document.getElementById('p-correo').value.trim(),
+    horario: JSON.stringify(horario)
+  });
   btn.innerHTML='💾 Actualizar';btn.disabled=false;
   if(res?.exito){mostrarRespuestaEl('respuesta-personal','✅ '+res.mensaje,'success');mostrarToast('✅ Actualizado','success');cancelarEdicionPersonal();}
   else{mostrarRespuestaEl('respuesta-personal','❌ '+(res?.mensaje||'Error'),'error');}
 }
 
-function limpiarFormPersonal(){['p-id','p-nombres','p-apellidos','p-area','p-cargo','p-telefono','p-correo','p-foto','p-id-original','p-id-display'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('respuesta-personal').style.display='none';}
+function limpiarFormPersonal(){
+  ['p-id','p-nombres','p-apellidos','p-area','p-cargo','p-telefono','p-correo','p-foto','p-id-original','p-id-display'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('respuesta-personal').style.display='none';
+  setScheduleType('ninguno');
+}
 
 function cargarFormEdicionPersonal(d){
   modoEdicionPersonal=true;
@@ -871,6 +1288,11 @@ function cargarFormEdicionPersonal(d){
   document.getElementById('p-nombres').value=d.nombres||'';document.getElementById('p-apellidos').value=d.apellidos||'';
   document.getElementById('p-area').value=d.area||'';document.getElementById('p-cargo').value=d.cargo||'';
   document.getElementById('p-telefono').value=d.telefono||'';document.getElementById('p-correo').value=d.correo||'';document.getElementById('p-foto').value=d.foto||'';
+  // Cargar horario
+  let horario = { tipo: 'ninguno' };
+  try { horario = d.horario ? (typeof d.horario === 'string' ? JSON.parse(d.horario) : d.horario) : { tipo: 'ninguno' }; } catch(e) {}
+  cargarHorarioEnFormulario(horario);
+
   document.getElementById('grupo-id-nuevo').style.display='none';document.getElementById('grupo-id-editar').style.display='block';
   document.getElementById('form-personal-titulo').textContent='✏️ Editar: '+d.nombres+' '+d.apellidos;
   document.getElementById('btn-guardar-personal').innerHTML='💾 Actualizar';document.getElementById('btn-cancelar-edicion-p').style.display='inline-flex';
@@ -890,6 +1312,14 @@ async function buscarPersonalAdmin(){
   const res=await llamarAppsScript('buscarUsuarioCompleto',{id});
   if(res?.encontrado){
     const d=res.datos;
+    let horarioLabel = 'Sin horario';
+    if (d.horario) {
+      try {
+        const h = typeof d.horario === 'string' ? JSON.parse(d.horario) : d.horario;
+        const jLabels = { ninguno:'Sin horario', medio:'Medio tiempo', completo:'Tiempo completo' };
+        horarioLabel = jLabels[h.tipo] || 'Sin horario';
+      } catch(e) {}
+    }
     wrap.innerHTML=`<div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:var(--radius-sm);padding:15px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
         <h4 style="color:var(--primary);font-size:14px;">👤 ${d.nombres} ${d.apellidos}</h4>
@@ -902,6 +1332,7 @@ async function buscarPersonalAdmin(){
         <div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">ID</span><br><b style="font-family:'JetBrains Mono',monospace;">${d.id}</b></div>
         <div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Área</span><br><b>${d.area||'-'}</b></div>
         <div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Cargo</span><br><b>${d.cargo||'-'}</b></div>
+        <div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Jornada</span><br><b>${horarioLabel}</b></div>
         <div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Teléfono</span><br><b>${d.telefono||'-'}</b></div>
         <div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Correo</span><br><b>${d.correo||'-'}</b></div>
       </div>
@@ -921,7 +1352,6 @@ async function confirmarEliminar(){
   idAEliminar='';
 }
 
-
 // ════════════════════════════════
 // LISTA COMPLETA DE PERSONAL
 // ════════════════════════════════
@@ -931,23 +1361,18 @@ async function cargarListaPersonal() {
   const tbody = document.getElementById('lista-personal-tbody');
   tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text-muted);"><div class="empty-state"><span>⏳</span><p>Cargando...</p></div></td></tr>';
   document.getElementById('lista-personal-contador').textContent = '';
-
   const res = await llamarAppsScript('listarTodoElPersonal');
   if (res?.error || !res?.personal) {
     tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text-muted);">❌ Error al cargar el personal</td></tr>';
     return;
   }
-
   listaPersonalData = res.personal;
-
-  // Poblar filtro de áreas
   const areas = [...new Set(res.personal.map(p => p.area).filter(Boolean))].sort();
   const selArea = document.getElementById('filtro-lista-area');
   const areaActual = selArea.value;
   selArea.innerHTML = '<option value="">Todas las áreas</option>';
   areas.forEach(a => selArea.innerHTML += `<option value="${a}">${a}</option>`);
   if (areaActual) selArea.value = areaActual;
-
   filtrarTablaPersonal();
 }
 
@@ -955,49 +1380,47 @@ function filtrarTablaPersonal() {
   const busq   = (document.getElementById('filtro-lista-nombre').value || '').toLowerCase().trim();
   const area   = (document.getElementById('filtro-lista-area').value || '').toLowerCase();
   const estado = (document.getElementById('filtro-lista-estado').value || '');
-
   const filtrado = listaPersonalData.filter(p => {
     const nombre = ((p.nombres||'') + ' ' + (p.apellidos||'')).toLowerCase();
     const id     = (p.id||'').toLowerCase();
     const pArea  = (p.area||'').toLowerCase();
     const activo = p.activo !== false && p.activo !== 'false' && p.activo !== 0;
-
     if (busq && !nombre.includes(busq) && !id.includes(busq)) return false;
     if (area && pArea !== area) return false;
     if (estado === 'activo'   && !activo) return false;
     if (estado === 'inactivo' && activo)  return false;
     return true;
   });
-
   renderizarTablaPersonal(filtrado);
 }
 
 function renderizarTablaPersonal(data) {
   const tbody = document.getElementById('lista-personal-tbody');
   const contador = document.getElementById('lista-personal-contador');
-
   const activos   = data.filter(p => p.activo !== false && p.activo !== 'false').length;
   const inactivos = data.length - activos;
   contador.innerHTML = `<span style="color:var(--text-muted);">Mostrando <b style="color:var(--text);">${data.length}</b> colaboradores — <span style="color:#34d399;">✅ ${activos} activos</span> · <span style="color:#f87171;">🔴 ${inactivos} inactivos</span></span>`;
-
   if (!data.length) {
     tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text-muted);"><div class="empty-state"><span>🔍</span><p>No se encontraron resultados</p></div></td></tr>';
     return;
   }
-
+  const jornadaLabels = { ninguno:'—', medio:'🌅 Medio', completo:'☀️ Completo' };
   tbody.innerHTML = data.map((p, i) => {
     const activo = p.activo !== false && p.activo !== 'false' && p.activo !== 0;
     const nombre = (p.nombres||'') + ' ' + (p.apellidos||'');
+    let jornadaLabel = '—';
+    try {
+      const h = p.horario ? (typeof p.horario === 'string' ? JSON.parse(p.horario) : p.horario) : null;
+      if (h) jornadaLabel = jornadaLabels[h.tipo] || '—';
+    } catch(e) {}
     return `<tr style="${activo ? '' : 'opacity:0.55;'}">
       <td style="color:var(--text-muted);font-size:12px;">${i+1}</td>
       <td style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;">${p.id}</td>
       <td><span style="font-weight:600;">${nombre.trim()}</span></td>
       <td style="font-size:13px;">${p.area||'-'}</td>
       <td style="font-size:12px;color:var(--text-muted);">${p.cargo||'-'}</td>
-      <td style="font-size:12px;color:var(--text-muted);">${p.telefono||'-'}</td>
-      <td>
-        <span class="badge ${activo ? 'badge-green' : 'badge-red'}">${activo ? '✅ Activo' : '🔴 Inactivo'}</span>
-      </td>
+      <td style="font-size:12px;">${jornadaLabel}</td>
+      <td><span class="badge ${activo ? 'badge-green' : 'badge-red'}">${activo ? '✅ Activo' : '🔴 Inactivo'}</span></td>
       <td>
         <div style="display:flex;gap:5px;flex-wrap:wrap;">
           <button class="btn btn-secondary btn-sm" onclick='cargarFormEdicionPersonal(${JSON.stringify(p)})' title="Editar">✏️</button>
@@ -1063,27 +1486,104 @@ async function cargarReporte(){
 
 function renderizarTablaReporte(registros){
   const card=document.getElementById('reporte-tabla-card');const res=document.getElementById('reporte-resumen');const tbody=document.getElementById('reporte-tbody');
-  if(!registros.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:26px;color:var(--text-muted)">Sin registros</td></tr>';card.style.display='block';res.style.display='none';return;}
-  const ing=registros.filter(r=>r.estado==='INGRESO').length;const sal=registros.filter(r=>r.estado==='SALIDA').length;const pers=new Set(registros.map(r=>r.id)).size;
-  document.getElementById('rep-stat-total').textContent=registros.length;document.getElementById('rep-stat-ingresos').textContent=ing;document.getElementById('rep-stat-salidas').textContent=sal;document.getElementById('rep-stat-personas').textContent=pers;
+  if(!registros.length){tbody.innerHTML='<tr><td colspan="9" style="text-align:center;padding:26px;color:var(--text-muted)">Sin registros</td></tr>';card.style.display='block';res.style.display='none';return;}
+  const ing=registros.filter(r=>r.estado==='INGRESO').length;
+  const sal=registros.filter(r=>r.estado==='SALIDA').length;
+  const pers=new Set(registros.map(r=>r.id)).size;
+  const tard=registros.filter(r=>r.puntualidad==='tardanza').length;
+  const anti=registros.filter(r=>r.puntualidad==='anticipada').length;
+  document.getElementById('rep-stat-total').textContent=registros.length;
+  document.getElementById('rep-stat-ingresos').textContent=ing;
+  document.getElementById('rep-stat-salidas').textContent=sal;
+  document.getElementById('rep-stat-personas').textContent=pers;
+  document.getElementById('rep-stat-tardanzas').textContent=tard;
+  document.getElementById('rep-stat-anticipadas').textContent=anti;
   res.style.display='flex';
-  tbody.innerHTML=registros.map((r,i)=>`<tr><td style="color:var(--text-muted);font-size:12px;">${i+1}</td><td class="recent-row-time">${r.fechaHora}</td><td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${r.id}</td><td>${r.nombre}</td><td>${r.area}</td><td>${r.perfil}</td><td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td></tr>`).join('');
+  tbody.innerHTML=registros.map((r,i)=>{
+    let detalleMin = '';
+    if (r.puntualidad === 'tardanza') detalleMin = `<span style="color:#fcd34d;font-size:11px;">+${r.minutosDiff||0} min</span>`;
+    else if (r.puntualidad === 'anticipada') detalleMin = `<span style="color:#c4b5fd;font-size:11px;">-${r.minutosDiff||0} min</span>`;
+    else if (r.puntualidad === 'puntual') detalleMin = `<span style="color:#34d399;font-size:11px;">✓</span>`;
+    return `<tr>
+      <td style="color:var(--text-muted);font-size:12px;">${i+1}</td>
+      <td class="recent-row-time">${r.fechaHora}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${r.id}</td>
+      <td>${r.nombre}</td><td>${r.area}</td><td>${r.perfil}</td>
+      <td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td>
+      <td>${badgePuntualidad(r.puntualidad)}</td>
+      <td>${detalleMin}</td>
+    </tr>`;
+  }).join('');
   card.style.display='block';mostrarToast(`✅ ${registros.length} registros`,'success');
 }
 
 function exportarExcel(){
   if(!reporteData.length)return mostrarToast('⚠️ Sin datos','warning');
-  const ing=reporteData.filter(r=>r.estado==='INGRESO').length;const sal=reporteData.filter(r=>r.estado==='SALIDA').length;const pers=new Set(reporteData.map(r=>r.id)).size;
+  const ing=reporteData.filter(r=>r.estado==='INGRESO').length;
+  const sal=reporteData.filter(r=>r.estado==='SALIDA').length;
+  const pers=new Set(reporteData.map(r=>r.id)).size;
+  const tard=reporteData.filter(r=>r.puntualidad==='tardanza').length;
+  const anti=reporteData.filter(r=>r.puntualidad==='anticipada').length;
+  const punt=reporteData.filter(r=>r.puntualidad==='puntual').length;
   const fI=document.getElementById('rep-fecha-inicio').value;const fF=document.getElementById('rep-fecha-fin').value;
   const wb=XLSX.utils.book_new();
-  const ws=XLSX.utils.aoa_to_sheet([['REPORTE DE ASISTENCIA — LA BASE COWORK'],[`Período: ${fI} al ${fF}`],[`Generado: ${new Date().toLocaleString('es-PE')}`],[],['#','Fecha/Hora','ID','Nombre Completo','Área / Depto.','Cargo','Estado'],...reporteData.map((r,i)=>[i+1,r.fechaHora,r.id,r.nombre,r.area,r.perfil,r.estado])]);
-  ws['!cols']=[{wch:5},{wch:20},{wch:12},{wch:30},{wch:22},{wch:20},{wch:10}];ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:6}},{s:{r:1,c:0},e:{r:1,c:6}},{s:{r:2,c:0},e:{r:2,c:6}}];
+
+  // Hoja principal con puntualidad
+  const ws=XLSX.utils.aoa_to_sheet([
+    ['REPORTE DE ASISTENCIA — LA BASE COWORK'],
+    [`Período: ${fI} al ${fF}`],
+    [`Generado: ${new Date().toLocaleString('es-PE')}`],
+    [],
+    ['#','Fecha/Hora','ID','Nombre Completo','Área / Depto.','Cargo','Estado','Puntualidad','Minutos Diff','Slot Horario'],
+    ...reporteData.map((r,i)=>[
+      i+1,r.fechaHora,r.id,r.nombre,r.area,r.perfil,r.estado,
+      r.puntualidad==='tardanza'?'TARDANZA':r.puntualidad==='anticipada'?'SALIDA ANTICIPADA':r.puntualidad==='puntual'?'PUNTUAL':'—',
+      r.puntualidad==='tardanza'?`+${r.minutosDiff||0}`:r.puntualidad==='anticipada'?`-${r.minutosDiff||0}`:'',
+      r.slotHorario||''
+    ])
+  ]);
+  ws['!cols']=[{wch:5},{wch:20},{wch:12},{wch:30},{wch:22},{wch:20},{wch:10},{wch:18},{wch:12},{wch:18}];
+  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:9}},{s:{r:1,c:0},e:{r:1,c:9}},{s:{r:2,c:0},e:{r:2,c:9}}];
   XLSX.utils.book_append_sheet(wb,ws,'Asistencia');
-  const wsR=XLSX.utils.aoa_to_sheet([['RESUMEN'],[],['Indicador','Valor'],['Período',`${fI} al ${fF}`],['Total',reporteData.length],['Ingresos',ing],['Salidas',sal],['Personas',pers],['Generado',new Date().toLocaleString('es-PE')]]);
-  wsR['!cols']=[{wch:22},{wch:30}];XLSX.utils.book_append_sheet(wb,wsR,'Resumen');
+
+  // Hoja de resumen
+  const wsR=XLSX.utils.aoa_to_sheet([
+    ['RESUMEN'],
+    [],
+    ['Indicador','Valor'],
+    ['Período',`${fI} al ${fF}`],
+    ['Total registros',reporteData.length],
+    ['Ingresos',ing],['Salidas',sal],['Personas únicas',pers],
+    ['',''],
+    ['PUNTUALIDAD',''],
+    ['Puntuales',punt],
+    ['Tardanzas',tard],
+    ['Salidas anticipadas',anti],
+    ['',''],
+    ['Generado',new Date().toLocaleString('es-PE')]
+  ]);
+  wsR['!cols']=[{wch:22},{wch:30}];
+  XLSX.utils.book_append_sheet(wb,wsR,'Resumen');
+
+  // Hoja por persona
   const ids=[...new Set(reporteData.map(r=>r.id))];
-  if(ids.length<=100){const rows=[['ID','Nombre','Área','Ingresos','Salidas','Total']];ids.forEach(p=>{const rr=reporteData.filter(r=>r.id===p);const i=rr.filter(r=>r.estado==='INGRESO').length;const s=rr.filter(r=>r.estado==='SALIDA').length;rows.push([p,rr[0]?.nombre||'-',rr[0]?.area||'-',i,s,i+s]);});const wP=XLSX.utils.aoa_to_sheet(rows);wP['!cols']=[{wch:12},{wch:30},{wch:20},{wch:10},{wch:10},{wch:10}];XLSX.utils.book_append_sheet(wb,wP,'Por Persona');}
-  XLSX.writeFile(wb,`reporte_asistencia_${new Date().toISOString().split('T')[0]}.xlsx`);mostrarToast('📥 Excel descargado','success');
+  if(ids.length<=100){
+    const rows=[['ID','Nombre','Área','Ingresos','Salidas','Tardanzas','Sal. Anticipadas','Total']];
+    ids.forEach(p=>{
+      const rr=reporteData.filter(r=>r.id===p);
+      const iC=rr.filter(r=>r.estado==='INGRESO').length;
+      const sC=rr.filter(r=>r.estado==='SALIDA').length;
+      const tC=rr.filter(r=>r.puntualidad==='tardanza').length;
+      const aC=rr.filter(r=>r.puntualidad==='anticipada').length;
+      rows.push([p,rr[0]?.nombre||'-',rr[0]?.area||'-',iC,sC,tC,aC,iC+sC]);
+    });
+    const wP=XLSX.utils.aoa_to_sheet(rows);
+    wP['!cols']=[{wch:12},{wch:30},{wch:20},{wch:10},{wch:10},{wch:12},{wch:16},{wch:10}];
+    XLSX.utils.book_append_sheet(wb,wP,'Por Persona');
+  }
+
+  XLSX.writeFile(wb,`reporte_asistencia_${new Date().toISOString().split('T')[0]}.xlsx`);
+  mostrarToast('📥 Excel descargado','success');
 }
 
 // ════════════════════════════════
@@ -1099,26 +1599,14 @@ function ocultarProg(id){setTimeout(()=>{document.getElementById('prog-'+id).sty
 // CREDENCIALES
 // ════════════════════════════════
 function switchCredTab(t){
-  ['crear','lista','mipass'].forEach(x=>{
-    document.getElementById('cred-tab-'+x).classList.toggle('active',x===t);
-    document.getElementById('cred-tab-'+x+'-btn').classList.toggle('active',x===t);
-  });
+  ['crear','lista','mipass'].forEach(x=>{document.getElementById('cred-tab-'+x).classList.toggle('active',x===t);document.getElementById('cred-tab-'+x+'-btn').classList.toggle('active',x===t);});
   if(t==='lista') cargarListaCredenciales();
-  if(t==='mipass'){
-    ['mp-actual','mp-nueva','mp-confirmar'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('respuesta-mipass').style.display='none';
-    setTimeout(()=>document.getElementById('mp-actual').focus(),100);
-  }
+  if(t==='mipass'){['mp-actual','mp-nueva','mp-confirmar'].forEach(id=>document.getElementById(id).value='');document.getElementById('respuesta-mipass').style.display='none';setTimeout(()=>document.getElementById('mp-actual').focus(),100);}
 }
 
 async function guardarCredencial(){if(modoEdicionCred)await actualizarCredencial();else await crearCredencial();}
-
 async function crearCredencial(){
-  const nombre=document.getElementById('cred-nombre').value.trim();
-  const usuario=document.getElementById('cred-usuario').value.trim();
-  const pass=document.getElementById('cred-pass').value.trim();
-  const rol=document.getElementById('cred-rol').value;
-  const permisos=obtenerPermisosSeleccionados();
+  const nombre=document.getElementById('cred-nombre').value.trim();const usuario=document.getElementById('cred-usuario').value.trim();const pass=document.getElementById('cred-pass').value.trim();const rol=document.getElementById('cred-rol').value;const permisos=obtenerPermisosSeleccionados();
   if(!nombre||!usuario||!pass){mostrarRespuestaEl('respuesta-cred','⚠️ Nombre, usuario y contraseña son obligatorios','error');return;}
   if(pass.length<4){mostrarRespuestaEl('respuesta-cred','⚠️ Contraseña mínimo 4 caracteres','error');return;}
   if(permisos.length===0){mostrarRespuestaEl('respuesta-cred','⚠️ Asigna al menos un permiso','error');return;}
@@ -1128,13 +1616,8 @@ async function crearCredencial(){
   if(res?.exito){mostrarRespuestaEl('respuesta-cred','✅ '+res.mensaje,'success');mostrarToast('✅ Acceso creado','success');limpiarFormCred();cargarListaCredenciales();}
   else{mostrarRespuestaEl('respuesta-cred','❌ '+(res?.mensaje||'Error'),'error');}
 }
-
 async function actualizarCredencial(){
-  const uO=document.getElementById('cred-usuario-original').value;
-  const nombre=document.getElementById('cred-nombre').value.trim();
-  const pass=document.getElementById('cred-pass').value.trim();
-  const rol=document.getElementById('cred-rol').value;
-  const permisos=obtenerPermisosSeleccionados();
+  const uO=document.getElementById('cred-usuario-original').value;const nombre=document.getElementById('cred-nombre').value.trim();const pass=document.getElementById('cred-pass').value.trim();const rol=document.getElementById('cred-rol').value;const permisos=obtenerPermisosSeleccionados();
   if(!nombre){mostrarRespuestaEl('respuesta-cred','⚠️ Nombre obligatorio','error');return;}
   if(permisos.length===0){mostrarRespuestaEl('respuesta-cred','⚠️ Asigna al menos un permiso','error');return;}
   const btn=document.getElementById('btn-guardar-cred');btn.innerHTML='<span class="loading"></span> Actualizando...';btn.disabled=true;
@@ -1143,51 +1626,26 @@ async function actualizarCredencial(){
   if(res?.exito){mostrarRespuestaEl('respuesta-cred','✅ '+res.mensaje,'success');mostrarToast('✅ Acceso actualizado','success');cancelarEdicionCred();cargarListaCredenciales();}
   else{mostrarRespuestaEl('respuesta-cred','❌ '+(res?.mensaje||'Error'),'error');}
 }
-
 function obtenerPermisosSeleccionados(){return['asistencia','dashboard','personal','reportes','carnets'].filter(p=>document.getElementById('perm-'+p)?.checked);}
-
 function limpiarFormCred(){['cred-nombre','cred-usuario','cred-pass','cred-usuario-original'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('cred-rol').value='operador';['asistencia','dashboard','personal','reportes','carnets'].forEach(p=>{const el=document.getElementById('perm-'+p);if(el)el.checked=p==='asistencia';});document.getElementById('respuesta-cred').style.display='none';}
-
 function cargarFormEdicionCred(d){
-  modoEdicionCred=true;
-  document.getElementById('cred-usuario-original').value=d.usuario;document.getElementById('cred-nombre').value=d.nombre;
-  document.getElementById('cred-usuario').value=d.usuario;document.getElementById('cred-usuario').disabled=true;
-  document.getElementById('cred-pass').value='';document.getElementById('cred-pass').placeholder='Dejar vacío = no cambiar';
-  document.getElementById('cred-rol').value=d.rol||'operador';
+  modoEdicionCred=true;document.getElementById('cred-usuario-original').value=d.usuario;document.getElementById('cred-nombre').value=d.nombre;document.getElementById('cred-usuario').value=d.usuario;document.getElementById('cred-usuario').disabled=true;document.getElementById('cred-pass').value='';document.getElementById('cred-pass').placeholder='Dejar vacío = no cambiar';document.getElementById('cred-rol').value=d.rol||'operador';
   const p=d.permisos||[];['asistencia','dashboard','personal','reportes','carnets'].forEach(x=>{const el=document.getElementById('perm-'+x);if(el)el.checked=p.includes(x);});
-  document.getElementById('cred-form-titulo').textContent='✏️ Editar acceso: @'+d.usuario;
-  document.getElementById('btn-guardar-cred').innerHTML='💾 Actualizar';document.getElementById('btn-cancelar-cred').style.display='inline-flex';
+  document.getElementById('cred-form-titulo').textContent='✏️ Editar acceso: @'+d.usuario;document.getElementById('btn-guardar-cred').innerHTML='💾 Actualizar';document.getElementById('btn-cancelar-cred').style.display='inline-flex';
   switchCredTab('crear');window.scrollTo({top:0,behavior:'smooth'});
 }
-
 function cancelarEdicionCred(){
-  modoEdicionCred=false;document.getElementById('cred-usuario').disabled=false;document.getElementById('cred-pass').placeholder='Mínimo 4 caracteres';
-  document.getElementById('cred-form-titulo').textContent='➕ Crear Nuevo Acceso al Sistema';document.getElementById('btn-guardar-cred').innerHTML='💾 Guardar Acceso';document.getElementById('btn-cancelar-cred').style.display='none';
-  limpiarFormCred();
+  modoEdicionCred=false;document.getElementById('cred-usuario').disabled=false;document.getElementById('cred-pass').placeholder='Mínimo 4 caracteres';document.getElementById('cred-form-titulo').textContent='➕ Crear Nuevo Acceso al Sistema';document.getElementById('btn-guardar-cred').innerHTML='💾 Guardar Acceso';document.getElementById('btn-cancelar-cred').style.display='none';limpiarFormCred();
 }
-
 async function cargarListaCredenciales(){
   const wrap=document.getElementById('cred-lista-wrap');wrap.innerHTML='<div class="empty-state"><span>⏳</span><p>Cargando...</p></div>';
   const res=await llamarAppsScript('listarCredenciales');
   if(!res?.credenciales?.length){wrap.innerHTML='<div class="empty-state"><span>👤</span><p>No hay accesos registrados</p></div>';return;}
   const PI={asistencia:'📷',dashboard:'📊',personal:'👥',reportes:'📋',carnets:'🪪'};
   const RC={admin:'badge-red',supervisor:'badge-amber',operador:'badge-blue'};
-  wrap.innerHTML=res.credenciales.map(c=>`
-    <div class="cred-card">
-      <div>
-        <div class="cred-name">${c.nombre} <span class="badge ${RC[c.rol]||'badge-blue'}">${c.rol}</span></div>
-        <div class="cred-user">@${c.usuario}</div>
-        <div class="cred-perms">${(c.permisos||[]).map(p=>`<span class="badge badge-green">${PI[p]||''} ${p}</span>`).join('')}</div>
-      </div>
-      <div class="cred-actions">
-        <button class="btn btn-secondary btn-sm" onclick='cargarFormEdicionCred(${JSON.stringify(c)})'>✏️</button>
-        <button class="btn btn-danger btn-sm" onclick="abrirModalEliminarCred('${c.usuario}','${c.nombre}')">🗑️</button>
-      </div>
-    </div>`).join('');
+  wrap.innerHTML=res.credenciales.map(c=>`<div class="cred-card"><div><div class="cred-name">${c.nombre} <span class="badge ${RC[c.rol]||'badge-blue'}">${c.rol}</span></div><div class="cred-user">@${c.usuario}</div><div class="cred-perms">${(c.permisos||[]).map(p=>`<span class="badge badge-green">${PI[p]||''} ${p}</span>`).join('')}</div></div><div class="cred-actions"><button class="btn btn-secondary btn-sm" onclick='cargarFormEdicionCred(${JSON.stringify(c)})'>✏️</button><button class="btn btn-danger btn-sm" onclick="abrirModalEliminarCred('${c.usuario}','${c.nombre}')">🗑️</button></div></div>`).join('');
 }
-
 function abrirModalEliminarCred(u,n){usuarioCredAEliminar=u;document.getElementById('modal-cred-nombre').textContent=`Se revocará el acceso de: ${n} (@${u})`;document.getElementById('modal-eliminar-cred').classList.add('show');}
-
 async function confirmarEliminarCred(){
   if(!usuarioCredAEliminar)return;
   const btn=document.getElementById('btn-confirmar-eliminar-cred');btn.innerHTML='<span class="loading"></span>';btn.disabled=true;
@@ -1199,30 +1657,21 @@ async function confirmarEliminarCred(){
 }
 
 // ════════════════════════════════
-
-// CAMBIAR PROPIA CONTRASEÑA (admin)
+// CAMBIAR CONTRASEÑA
+// ════════════════════════════════
 async function cambiarMiContrasena() {
-  const actual   = document.getElementById('mp-actual').value.trim();
-  const nueva    = document.getElementById('mp-nueva').value.trim();
-  const confirmar = document.getElementById('mp-confirmar').value.trim();
-  if (!actual || !nueva || !confirmar) { mostrarRespuestaEl('respuesta-mipass','⚠️ Completa todos los campos','error'); return; }
-  if (nueva.length < 4) { mostrarRespuestaEl('respuesta-mipass','⚠️ La nueva contraseña debe tener al menos 4 caracteres','error'); return; }
-  if (nueva !== confirmar) { mostrarRespuestaEl('respuesta-mipass','⚠️ Las contraseñas nuevas no coinciden','error'); return; }
-  const btn = document.getElementById('btn-cambiar-pass');
-  btn.innerHTML = '<span class="loading"></span> Cambiando...'; btn.disabled = true;
-  const res = await llamarAppsScript('cambiarContrasenaAdmin', { usuario: SESSION.usuario, passActual: actual, passNueva: nueva });
-  btn.innerHTML = '🔑 Cambiar Contraseña'; btn.disabled = false;
-  if (res?.exito) {
-    mostrarRespuestaEl('respuesta-mipass', '✅ ' + res.mensaje, 'success');
-    mostrarToast('✅ Contraseña actualizada', 'success');
-    document.getElementById('mp-actual').value = '';
-    document.getElementById('mp-nueva').value = '';
-    document.getElementById('mp-confirmar').value = '';
-  } else {
-    mostrarRespuestaEl('respuesta-mipass', '❌ ' + (res?.mensaje || 'Error'), 'error');
-  }
+  const actual=document.getElementById('mp-actual').value.trim();const nueva=document.getElementById('mp-nueva').value.trim();const confirmar=document.getElementById('mp-confirmar').value.trim();
+  if(!actual||!nueva||!confirmar){mostrarRespuestaEl('respuesta-mipass','⚠️ Completa todos los campos','error');return;}
+  if(nueva.length<4){mostrarRespuestaEl('respuesta-mipass','⚠️ La nueva contraseña debe tener al menos 4 caracteres','error');return;}
+  if(nueva!==confirmar){mostrarRespuestaEl('respuesta-mipass','⚠️ Las contraseñas nuevas no coinciden','error');return;}
+  const btn=document.getElementById('btn-cambiar-pass');btn.innerHTML='<span class="loading"></span> Cambiando...';btn.disabled=true;
+  const res=await llamarAppsScript('cambiarContrasenaAdmin',{usuario:SESSION.usuario,passActual:actual,passNueva:nueva});
+  btn.innerHTML='🔑 Cambiar Contraseña';btn.disabled=false;
+  if(res?.exito){mostrarRespuestaEl('respuesta-mipass','✅ '+res.mensaje,'success');mostrarToast('✅ Contraseña actualizada','success');document.getElementById('mp-actual').value='';document.getElementById('mp-nueva').value='';document.getElementById('mp-confirmar').value='';}
+  else{mostrarRespuestaEl('respuesta-mipass','❌ '+(res?.mensaje||'Error'),'error');}
 }
 
+// ════════════════════════════════
 // INIT
 // ════════════════════════════════
 function iniciarAplicacion(){
