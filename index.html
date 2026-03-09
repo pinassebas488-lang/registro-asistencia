@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>CONTROL DE ASISTENCIA LA BASE COWORK</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
@@ -251,6 +251,15 @@
       background: #c82333;
     }
 
+    .btn-download {
+      background: #28a745;
+      margin-top: 5px;
+    }
+
+    .btn-download:hover:not(:disabled) {
+      background: #218838;
+    }
+
     .employee-info {
       background: linear-gradient(45deg, #f8f9fa, #ffffff);
       border: 2px solid var(--primary);
@@ -334,7 +343,7 @@
 
     .admin-panel {
       margin-top: 20px;
-      border: 2px dashed #cbd5e1;
+      border: 2px solid #cbd5e1;
       border-radius: var(--border-radius);
       padding: 12px;
       background: #f8fafc;
@@ -353,6 +362,105 @@
       border-radius: var(--border-radius);
       font-size: clamp(12px, 3vw, 14px);
       text-align: center;
+    }
+
+    .admin-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .admin-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .admin-info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background: #e9ecef;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 10px 0;
+      display: none;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 15px 0;
+    }
+
+    .stat-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .stat-card .number {
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    .stat-card .label {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .estadisticas-btn {
+      background: #6c757d;
+      margin-top: 5px;
+    }
+
+    .estadisticas-btn:hover {
+      background: #5a6268;
+    }
+
+    .ultimos-registros {
+      margin-top: 15px;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+    }
+
+    .registro-item {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+
+    .registro-item:last-child {
+      border-bottom: none;
+    }
+
+    .registro-item.ingreso {
+      border-left: 3px solid #28a745;
+    }
+
+    .registro-item.salida {
+      border-left: 3px solid #dc3545;
     }
 
     /* Estilos para el Login */
@@ -429,6 +537,42 @@
       font-size: 14px;
     }
 
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: white;
+      color: #333;
+      padding: 12px 24px;
+      border-radius: 50px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast.success {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .toast.error {
+      background: #f44336;
+      color: white;
+    }
+
+    .toast.warning {
+      background: #ff9800;
+      color: white;
+    }
+
     @media (max-width: 480px) {
       body {
         padding: 5px;
@@ -455,7 +599,7 @@
   <div id="login-overlay">
     <div class="login-box">
       <h2>🔐 CONTROL DE ASISTENCIA LA BASE COWORK</h2>
-      <input type="text" id="login-user" placeholder="Usuario" autocomplete="off">
+      <input type="text" id="login-user" placeholder="Usuario" autocomplete="off" autofocus>
       <input type="password" id="login-pass" placeholder="Contraseña">
       <button onclick="verificarLogin()">Ingresar</button>
       <p id="login-error" class="login-error">Usuario o contraseña incorrectos</p>
@@ -527,32 +671,78 @@
       
       <div id="respuesta"></div>
 
+      <!-- ESTADÍSTICAS RÁPIDAS -->
+      <button type="button" class="btn estadisticas-btn" id="ver-estadisticas">
+        Ver Estadísticas del Día
+      </button>
+      <div id="estadisticas-container" style="display: none;">
+        <div class="stats-container">
+          <div class="stat-card">
+            <div class="number" id="stat-ingresos">0</div>
+            <div class="label">Ingresos Hoy</div>
+          </div>
+          <div class="stat-card">
+            <div class="number" id="stat-salidas">0</div>
+            <div class="label">Salidas Hoy</div>
+          </div>
+          <div class="stat-card">
+            <div class="number" id="stat-unicos">0</div>
+            <div class="label">Estudiantes Únicos</div>
+          </div>
+          <div class="stat-card">
+            <div class="number" id="stat-total">0</div>
+            <div class="label">Total Registros</div>
+          </div>
+        </div>
+        <div class="ultimos-registros" id="ultimos-registros">
+          <!-- Se llenará dinámicamente -->
+        </div>
+      </div>
+
       <div class="admin-panel">
-        <button type="button" class="btn btn-secondary" id="admin-toggle">Panel Administrador</button>
+        <button type="button" class="btn btn-secondary" id="admin-toggle">📋 Panel Administrador</button>
         <div id="admin-body" style="display: none;">
           <h4>Generar Carnets</h4>
+          
+          <!-- Generar por ID -->
           <div class="form-group">
             <label for="admin-id">ID del Colaborador:</label>
-            <input type="text" id="admin-id" placeholder="Ingrese ID">
+            <input type="text" id="admin-id" placeholder="Ej: 2024001">
           </div>
-          <button type="button" class="btn" id="admin-generar-id">Generar carnet PDF</button>
-          <div class="form-group">
+          <button type="button" class="btn" id="admin-generar-id">
+            📄 Generar Carnet Individual
+          </button>
+          
+          <!-- Generar por Grado -->
+          <div class="form-group" style="margin-top: 15px;">
             <label for="admin-grado">Grado/Sección:</label>
             <select id="admin-grado">
-              <option value="">Seleccione...</option>
+              <option value="">Cargando grados...</option>
             </select>
           </div>
-          <button type="button" class="btn" id="admin-generar-lote">Generar lote PDF</button>
+          <button type="button" class="btn" id="admin-generar-lote">
+            📚 Generar Carnets por Grado
+          </button>
+          
+          <!-- Barra de progreso -->
+          <div class="progress-bar" id="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          
+          <!-- Estado del admin -->
           <div id="admin-status" class="admin-status"></div>
         </div>
       </div>
 
       <!-- Botón de Cerrar Sesión -->
       <button type="button" class="btn btn-logout" onclick="cerrarSesion()">
-        Cerrar Sesión
+        🚪 Cerrar Sesión
       </button>
     </div>
   </div>
+
+  <!-- Toast para notificaciones -->
+  <div id="toast" class="toast"></div>
 
   <script>
     // ============================================
@@ -565,28 +755,54 @@
       // Credenciales de login (cámbialas por las que quieras)
       USUARIO: 'admin',
       CONTRASEÑA: 'pip2026',
+      
+      // Configuración de la app
+      TIEMPO_TOAST: 3000, // 3 segundos
+      MAX_REGISTROS_MOSTRAR: 10,
+      VERSION: '2.0.0'
     };
 
     // ============================================
     // SISTEMA DE LOGIN
     // ============================================
     function verificarLogin() {
-      const user = document.getElementById('login-user').value;
-      const pass = document.getElementById('login-pass').value;
+      const user = document.getElementById('login-user').value.trim();
+      const pass = document.getElementById('login-pass').value.trim();
       
       if (user === CONFIG.USUARIO && pass === CONFIG.CONTRASEÑA) {
         localStorage.setItem('auth_pip', 'true');
+        localStorage.setItem('login_time', new Date().toISOString());
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
+        mostrarToast('¡Bienvenido al sistema!', 'success');
         iniciarAplicacion();
       } else {
         document.getElementById('login-error').style.display = 'block';
+        document.getElementById('login-pass').value = '';
+        document.getElementById('login-user').focus();
       }
     }
 
     function cerrarSesion() {
       localStorage.removeItem('auth_pip');
-      location.reload();
+      localStorage.removeItem('login_time');
+      mostrarToast('Sesión cerrada', 'warning');
+      setTimeout(() => {
+        location.reload();
+      }, 1000);
+    }
+
+    // ============================================
+    // SISTEMA DE TOAST NOTIFICATIONS
+    // ============================================
+    function mostrarToast(mensaje, tipo = 'info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = mensaje;
+      toast.className = 'toast show ' + tipo;
+      
+      setTimeout(() => {
+        toast.className = 'toast';
+      }, CONFIG.TIEMPO_TOAST);
     }
 
     // ============================================
@@ -594,33 +810,79 @@
     // ============================================
     async function llamarAppsScript(funcion, parametros = {}) {
       try {
-        // Mostrar estado de carga
-        console.log('Llamando a Apps Script:', funcion, parametros);
+        console.log(`📡 Llamando a Apps Script: ${funcion}`, parametros);
+        
+        // Mostrar progreso si es una operación larga
+        if (funcion.includes('generar')) {
+          mostrarProgreso(30);
+        }
         
         // Construir URL con los parámetros
         const url = new URL(CONFIG.APPS_SCRIPT_URL);
         url.searchParams.append('funcion', funcion);
         url.searchParams.append('datos', JSON.stringify(parametros));
         
-        // Hacer la petición
+        // Hacer la petición con timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
+        
         const respuesta = await fetch(url.toString(), {
           method: 'GET',
           mode: 'cors',
+          signal: controller.signal
         });
         
+        clearTimeout(timeoutId);
+        
+        if (!respuesta.ok) {
+          throw new Error(`HTTP error! status: ${respuesta.status}`);
+        }
+        
         const texto = await respuesta.text();
-        console.log('Respuesta de Apps Script:', texto);
+        console.log('📥 Respuesta de Apps Script:', texto);
+        
+        if (funcion.includes('generar')) {
+          mostrarProgreso(80);
+        }
         
         try {
-          return JSON.parse(texto);
+          const data = JSON.parse(texto);
+          if (funcion.includes('generar')) {
+            mostrarProgreso(100);
+            setTimeout(() => ocultarProgreso(), 500);
+          }
+          return data;
         } catch (e) {
-          console.error('Error parseando JSON:', e);
+          console.error('❌ Error parseando JSON:', e);
+          ocultarProgreso();
           return { error: true, mensaje: 'Respuesta no válida del servidor' };
         }
       } catch (error) {
-        console.error('Error en llamarAppsScript:', error);
+        console.error('❌ Error en llamarAppsScript:', error);
+        ocultarProgreso();
+        
+        if (error.name === 'AbortError') {
+          return { error: true, mensaje: 'La operación tomó demasiado tiempo' };
+        }
+        
         return { error: true, mensaje: error.message };
       }
+    }
+
+    function mostrarProgreso(porcentaje) {
+      const progressBar = document.getElementById('progress-bar');
+      const progressFill = document.getElementById('progress-fill');
+      
+      progressBar.style.display = 'block';
+      progressFill.style.width = porcentaje + '%';
+    }
+
+    function ocultarProgreso() {
+      const progressBar = document.getElementById('progress-bar');
+      setTimeout(() => {
+        progressBar.style.display = 'none';
+        document.getElementById('progress-fill').style.width = '0%';
+      }, 500);
     }
 
     // ============================================
@@ -632,9 +894,10 @@
     let studentData = null;
     let selectedCameraId = null;
     let cameraEnabled = true;
+    let autoRefreshInterval = null;
 
     // ============================================
-    // FUNCIONES DE TIEMPO
+    // FUNCIONES DE TIEMPO Y ESTADÍSTICAS
     // ============================================
     function actualizarReloj() {
       const ahora = new Date();
@@ -642,10 +905,57 @@
         hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
       });
       const fecha = ahora.toLocaleDateString('es-PE', {
-        weekday: 'short', day: 'numeric', month: 'short'
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
       });
       
-      document.getElementById('reloj-tiempo').innerHTML = `${hora}<br><small>${fecha}</small>`;
+      document.getElementById('reloj-tiempo').innerHTML = `
+        <span style="font-size: 28px;">${hora}</span><br>
+        <small style="font-size: 14px;">${fecha}</small>
+      `;
+    }
+
+    async function cargarEstadisticas() {
+      try {
+        const resultado = await llamarAppsScript('obtenerEstadisticasHoy');
+        
+        if (resultado && !resultado.error) {
+          document.getElementById('stat-ingresos').textContent = resultado.ingresosHoy || 0;
+          document.getElementById('stat-salidas').textContent = resultado.salidasHoy || 0;
+          document.getElementById('stat-unicos').textContent = resultado.estudiantesUnicos || 0;
+          document.getElementById('stat-total').textContent = resultado.totalRegistros || 0;
+        }
+      } catch (error) {
+        console.error('Error cargando estadísticas:', error);
+      }
+    }
+
+    async function cargarUltimosRegistros() {
+      try {
+        const resultado = await llamarAppsScript('obtenerUltimosRegistros', { limite: CONFIG.MAX_REGISTROS_MOSTRAR });
+        
+        const container = document.getElementById('ultimos-registros');
+        
+        if (resultado && resultado.registros) {
+          container.innerHTML = '';
+          
+          if (resultado.registros.length === 0) {
+            container.innerHTML = '<div class="registro-item" style="justify-content: center;">No hay registros hoy</div>';
+            return;
+          }
+          
+          resultado.registros.forEach(reg => {
+            const div = document.createElement('div');
+            div.className = `registro-item ${reg.estado.toLowerCase()}`;
+            div.innerHTML = `
+              <span><strong>${reg.hora}</strong> - ${reg.nombre}</span>
+              <span style="font-weight: bold; color: ${reg.estado === 'INGRESO' ? '#28a745' : '#dc3545'}">${reg.estado}</span>
+            `;
+            container.appendChild(div);
+          });
+        }
+      } catch (error) {
+        console.error('Error cargando registros:', error);
+      }
     }
 
     // ============================================
@@ -729,9 +1039,9 @@
         
         let tipo = 'Cámara ' + (index + 1);
         if (device.label.toLowerCase().includes('back') || device.label.toLowerCase().includes('rear')) {
-          tipo = 'Cámara Trasera';
+          tipo = '📷 Cámara Trasera';
         } else if (device.label.toLowerCase().includes('front') || device.label.toLowerCase().includes('user')) {
-          tipo = 'Cámara Frontal';
+          tipo = '🤳 Cámara Frontal';
         }
         
         option.textContent = tipo;
@@ -788,15 +1098,15 @@
         selectedCameraId,
         config,
         (decodedText) => {
-          actualizarEstadoQR("QR detectado correctamente");
+          actualizarEstadoQR("✅ QR detectado correctamente");
           procesarQR(decodedText);
         },
         () => {}
       ).then(() => {
         isScanning = true;
-        actualizarEstadoQR("Escaneando... Acerca el código QR");
+        actualizarEstadoQR("📷 Escaneando... Acerca el código QR");
       }).catch(err => {
-        actualizarEstadoQR("Error al acceder a la cámara", true);
+        actualizarEstadoQR("❌ Error al acceder a la cámara", true);
         console.error("Error starting QR scanner:", err);
       });
     }
@@ -815,7 +1125,7 @@
       const idEstudiante = textoQR.trim();
       document.getElementById("id").value = idEstudiante;
       buscarEstudiante(idEstudiante);
-      mostrarRespuesta("ID cargado desde QR", "success");
+      mostrarToast("ID cargado desde QR", "success");
     }
     
     // ============================================
@@ -829,7 +1139,6 @@
       
       mostrarBusqueda();
       
-      // Llamar a Apps Script
       const resultado = await llamarAppsScript('buscarEstudiante', { id: id });
       
       if (resultado && resultado.encontrado) {
@@ -883,35 +1192,65 @@
       }
     }
 
-    function mostrarAdminEstado(mensaje, esError) {
+    function mostrarAdminEstado(mensaje, tipo = 'info') {
       const status = document.getElementById('admin-status');
       status.textContent = mensaje;
       status.style.display = 'block';
-      status.style.background = esError ? '#fee2e2' : '#dcfce7';
-      status.style.color = esError ? '#b91c1c' : '#166534';
+      
+      status.className = 'admin-status';
+      if (tipo === 'success') status.classList.add('admin-success');
+      if (tipo === 'error') status.classList.add('admin-error');
+      if (tipo === 'info') status.classList.add('admin-info');
     }
 
     function descargarArchivo(base64, filename, mimeType) {
-      const enlace = document.createElement('a');
-      enlace.href = 'data:' + mimeType + ';base64,' + base64;
-      enlace.download = filename;
-      document.body.appendChild(enlace);
-      enlace.click();
-      document.body.removeChild(enlace);
+      try {
+        // Asegurarnos de que no haya prefijo data: ya incluido
+        const base64Data = base64.includes('base64,') ? base64.split('base64,')[1] : base64;
+        
+        const enlace = document.createElement('a');
+        enlace.href = 'data:' + mimeType + ';base64,' + base64Data;
+        enlace.download = filename;
+        enlace.style.display = 'none';
+        
+        document.body.appendChild(enlace);
+        enlace.click();
+        
+        // Pequeño delay antes de remover el elemento
+        setTimeout(() => {
+          document.body.removeChild(enlace);
+          URL.revokeObjectURL(enlace.href);
+        }, 100);
+        
+        mostrarToast(`Descargando: ${filename}`, 'success');
+        return true;
+      } catch (error) {
+        console.error('Error al descargar:', error);
+        mostrarToast('Error al descargar el archivo', 'error');
+        return false;
+      }
     }
 
     async function cargarGradosSecciones() {
-      const resultado = await llamarAppsScript('listarGrados');
-      const select = document.getElementById('admin-grado');
-      
-      if (resultado && resultado.grados) {
-        select.innerHTML = '<option value="">Seleccione...</option>';
-        resultado.grados.forEach(g => {
-          const option = document.createElement('option');
-          option.value = g;
-          option.textContent = g;
-          select.appendChild(option);
-        });
+      try {
+        const resultado = await llamarAppsScript('listarGrados');
+        const select = document.getElementById('admin-grado');
+        
+        if (resultado && resultado.grados) {
+          select.innerHTML = '<option value="">📌 Seleccione un grado...</option>';
+          resultado.grados.forEach(g => {
+            const option = document.createElement('option');
+            option.value = g;
+            option.textContent = g;
+            select.appendChild(option);
+          });
+          mostrarAdminEstado(`${resultado.grados.length} grados cargados`, 'info');
+        } else {
+          select.innerHTML = '<option value="">No hay grados disponibles</option>';
+        }
+      } catch (error) {
+        console.error('Error cargando grados:', error);
+        mostrarAdminEstado('Error al cargar grados', 'error');
       }
     }
     
@@ -927,6 +1266,7 @@
       }
       
       const btnSubmit = document.getElementById("btn-submit");
+      const originalText = btnSubmit.innerHTML;
       btnSubmit.innerHTML = '<div class="loading"></div> Registrando...';
       btnSubmit.disabled = true;
       
@@ -941,25 +1281,35 @@
       
       const resultado = await llamarAppsScript('registrarAsistencia', data);
       
-      btnSubmit.innerHTML = 'Registrar Asistencia';
+      btnSubmit.innerHTML = originalText;
       
       if (resultado && resultado.exito) {
         mostrarRespuesta(resultado.mensaje, "success");
+        mostrarToast(`✅ ${estado} registrado correctamente`, 'success');
+        
+        // Limpiar formulario
         document.getElementById("formulario").reset();
         document.getElementById("estado").value = "INGRESO";
         ocultarInfoEstudiante();
         deshabilitarBotonRegistro();
-        habilitarBotonRegistro();
+        
+        // Actualizar estadísticas
+        cargarEstadisticas();
+        cargarUltimosRegistros();
       } else {
         mostrarRespuesta(resultado?.mensaje || 'Error al registrar', "error");
+        mostrarToast('❌ Error al registrar', 'error');
         habilitarBotonRegistro();
       }
     }
     
     function iniciarAplicacion() {
+      console.log(`🚀 Iniciando aplicación v${CONFIG.VERSION}`);
+      
       // Configurar event listeners
       document.getElementById("formulario").addEventListener("submit", enviarFormulario);
       
+      // Input con debounce para búsqueda
       document.getElementById("id").addEventListener("input", function(e) {
         const id = e.target.value.trim();
         
@@ -968,55 +1318,121 @@
         if (id.length > 0) {
           ocultarInfoEstudiante();
           deshabilitarBotonRegistro();
-          searchTimeout = setTimeout(() => buscarEstudiante(id), 1000);
+          searchTimeout = setTimeout(() => buscarEstudiante(id), 800);
+        } else {
+          ocultarInfoEstudiante();
+          deshabilitarBotonRegistro();
         }
       });
       
+      // Toggle cámara
       document.getElementById("camera-toggle").addEventListener("change", function(e) {
         toggleCamera(e.target.checked);
       });
 
+      // Panel admin toggle
       document.getElementById('admin-toggle').addEventListener('click', function() {
         const body = document.getElementById('admin-body');
-        body.style.display = body.style.display === 'none' ? 'block' : 'none';
+        const isVisible = body.style.display === 'none' || body.style.display === '';
+        
+        body.style.display = isVisible ? 'block' : 'none';
+        
+        if (isVisible) {
+          cargarGradosSecciones();
+        }
       });
 
+      // Generar carnet individual
       document.getElementById('admin-generar-id').addEventListener('click', async function() {
         const id = document.getElementById('admin-id').value.trim();
         if (!id) {
-          mostrarAdminEstado('Ingrese un ID válido', true);
+          mostrarAdminEstado('⚠️ Ingrese un ID válido', 'error');
           return;
         }
-        mostrarAdminEstado('Generando PDF...', false);
+        
+        mostrarAdminEstado('📄 Generando PDF...', 'info');
         const resultado = await llamarAppsScript('generarCarnet', { id: id });
+        
         if (resultado && resultado.ok) {
-          mostrarAdminEstado('PDF generado correctamente', false);
+          mostrarAdminEstado('✅ PDF generado, descargando...', 'success');
+          
+          // Descargar el archivo
+          const descargado = descargarArchivo(
+            resultado.data,
+            resultado.filename,
+            'application/pdf'
+          );
+          
+          if (descargado) {
+            mostrarAdminEstado('✅ PDF descargado correctamente', 'success');
+            setTimeout(() => {
+              document.getElementById('admin-status').style.display = 'none';
+            }, 3000);
+          }
         } else {
-          mostrarAdminEstado(resultado?.mensaje || 'Error al generar PDF', true);
+          mostrarAdminEstado(resultado?.mensaje || '❌ Error al generar PDF', 'error');
         }
       });
 
+      // Generar lote por grado
       document.getElementById('admin-generar-lote').addEventListener('click', async function() {
         const grado = document.getElementById('admin-grado').value;
         if (!grado) {
-          mostrarAdminEstado('Seleccione un grado/sección', true);
+          mostrarAdminEstado('⚠️ Seleccione un grado/sección', 'error');
           return;
         }
-        mostrarAdminEstado('Generando lote...', false);
+        
+        mostrarAdminEstado('📚 Generando lote de carnets...', 'info');
         const resultado = await llamarAppsScript('generarLote', { grado: grado });
+        
         if (resultado && resultado.ok) {
-          mostrarAdminEstado('Lote generado correctamente', false);
+          mostrarAdminEstado('✅ Lote generado, descargando...', 'success');
+          
+          // Descargar el archivo
+          const descargado = descargarArchivo(
+            resultado.data,
+            resultado.filename,
+            'application/pdf'
+          );
+          
+          if (descargado) {
+            mostrarAdminEstado('✅ Lote descargado correctamente', 'success');
+            setTimeout(() => {
+              document.getElementById('admin-status').style.display = 'none';
+            }, 3000);
+          }
         } else {
-          mostrarAdminEstado(resultado?.mensaje || 'Error al generar lote', true);
+          mostrarAdminEstado(resultado?.mensaje || '❌ Error al generar lote', 'error');
         }
       });
 
-      // Iniciar reloj
+      // Toggle estadísticas
+      document.getElementById('ver-estadisticas').addEventListener('click', function() {
+        const container = document.getElementById('estadisticas-container');
+        const isVisible = container.style.display === 'none' || container.style.display === '';
+        
+        container.style.display = isVisible ? 'block' : 'none';
+        
+        if (isVisible) {
+          cargarEstadisticas();
+          cargarUltimosRegistros();
+        }
+      });
+
+      // Iniciar reloj y auto-refresh
       setInterval(actualizarReloj, 1000);
       actualizarReloj();
       
-      // Cargar grados
-      cargarGradosSecciones();
+      // Auto-refresh de estadísticas cada 30 segundos
+      autoRefreshInterval = setInterval(() => {
+        if (document.getElementById('estadisticas-container').style.display === 'block') {
+          cargarEstadisticas();
+          cargarUltimosRegistros();
+        }
+      }, 30000);
+      
+      // Cargar grados en segundo plano
+      setTimeout(cargarGradosSecciones, 2000);
       
       // Iniciar cámara después de un momento
       setTimeout(() => {
@@ -1024,6 +1440,9 @@
           cargarCamaras();
         }
       }, 1000);
+
+      // Mostrar bienvenida
+      mostrarToast('Sistema listo para usar', 'success');
     }
 
     // ============================================
@@ -1035,11 +1454,17 @@
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
         iniciarAplicacion();
+      } else {
+        // Enfocar el campo de usuario
+        document.getElementById('login-user').focus();
       }
     });
     
     window.addEventListener('beforeunload', function() {
       detenerEscaneo();
+      if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+      }
     });
     
     window.addEventListener('resize', function() {
@@ -1047,7 +1472,15 @@
         reiniciarQR();
       }
     });
+
+    // Permitir Enter en el login
+    document.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        if (document.getElementById('login-overlay').style.display !== 'none') {
+          verificarLogin();
+        }
+      }
+    });
   </script>
 </body>
 </html>
-
