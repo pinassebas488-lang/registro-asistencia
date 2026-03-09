@@ -571,61 +571,20 @@
 
   <script>
     // ============================================
-    // CONFIGURACIÓN OPTIMIZADA
+    // CONFIGURACIÓN - ¡CAMBIA ESTOS VALORES!
     // ============================================
     const CONFIG = {
-      // URL de tu Apps Script (¡CAMBIA ESTO!)
+      // URL de tu Apps Script (CAMBIA ESTO por la URL que obtienes al publicar)
       APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxxNz9FhBV3ybKs8CMow5mc1PusG2AybD6_POwWvsUR813pNC60OFS_VDzbpzGs24k/exec',
       
-      // Credenciales de login
+      // Credenciales de login (cámbialas por las que quieras)
       USUARIO: 'admin',
       CONTRASEÑA: 'pip2026',
       
-      // ⚡ OPTIMIZACIONES DE VELOCIDAD
+      // Configuración de la app
       TIEMPO_TOAST: 3000,
-      VERSION: '3.0.0-ultra-rapido',
-      DEBOUNCE_MS: 250,        // Reducido a 250ms para respuesta casi instantánea
-      TIMEOUT_MS: 10000,        // Reducido a 10 segundos máximo
-      CACHE_DURATION: 120000,   // Caché de 2 minutos para búsquedas repetidas
-      MAX_CACHE_SIZE: 100        // Máximo 100 estudiantes en caché
+      VERSION: '2.0.0-sin-estadisticas'
     };
-
-    // ============================================
-    // SISTEMA DE CACHÉ ULTRA RÁPIDO
-    // ============================================
-    const cacheEstudiantes = new Map();
-    
-    function obtenerDelCache(id) {
-      const cached = cacheEstudiantes.get(id);
-      if (cached && (Date.now() - cached.timestamp) < CONFIG.CACHE_DURATION) {
-        console.log('⚡ Cache hit:', id);
-        return cached.data;
-      }
-      return null;
-    }
-    
-    function guardarEnCache(id, data) {
-      // Limpiar caché si es necesario
-      if (cacheEstudiantes.size >= CONFIG.MAX_CACHE_SIZE) {
-        const ahora = Date.now();
-        let oldestKey = null;
-        let oldestTime = ahora;
-        
-        for (let [key, value] of cacheEstudiantes.entries()) {
-          if (value.timestamp < oldestTime) {
-            oldestTime = value.timestamp;
-            oldestKey = key;
-          }
-        }
-        
-        if (oldestKey) cacheEstudiantes.delete(oldestKey);
-      }
-      
-      cacheEstudiantes.set(id, {
-        data: data,
-        timestamp: Date.now()
-      });
-    }
 
     // ============================================
     // SISTEMA DE LOGIN
@@ -638,7 +597,7 @@
         localStorage.setItem('auth_pip', 'true');
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
-        mostrarToast('¡Bienvenido!', 'success');
+        mostrarToast('¡Bienvenido al sistema!', 'success');
         iniciarAplicacion();
       } else {
         document.getElementById('login-error').style.display = 'block';
@@ -648,9 +607,8 @@
 
     function cerrarSesion() {
       localStorage.removeItem('auth_pip');
-      cacheEstudiantes.clear(); // Limpiar caché al salir
       mostrarToast('Sesión cerrada', 'warning');
-      setTimeout(() => location.reload(), 800);
+      setTimeout(() => location.reload(), 1000);
     }
 
     // ============================================
@@ -664,58 +622,41 @@
     }
 
     // ============================================
-    // COMUNICACIÓN OPTIMIZADA CON APPS SCRIPT
+    // COMUNICACIÓN CON APPS SCRIPT
     // ============================================
     async function llamarAppsScript(funcion, parametros = {}) {
-      const startTime = performance.now();
-      
       try {
         console.log(`📡 Llamando: ${funcion}`);
         
-        // Solo mostrar progreso para operaciones pesadas
-        const esPesado = funcion.includes('generar') || funcion.includes('Lote');
-        if (esPesado) mostrarProgreso(30);
+        if (funcion.includes('generar')) mostrarProgreso(30);
         
         const url = new URL(CONFIG.APPS_SCRIPT_URL);
         url.searchParams.append('funcion', funcion);
         url.searchParams.append('datos', JSON.stringify(parametros));
         
-        // Timeout agresivo para mejor rendimiento
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), CONFIG.TIMEOUT_MS);
+        setTimeout(() => controller.abort(), 30000);
         
         const respuesta = await fetch(url.toString(), {
           method: 'GET',
           mode: 'cors',
-          signal: controller.signal,
-          headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
-          }
+          signal: controller.signal
         });
-        
-        clearTimeout(timeoutId);
         
         if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
         
         const texto = await respuesta.text();
-        const endTime = performance.now();
-        console.log(`⚡ Respuesta en ${Math.round(endTime - startTime)}ms`);
+        console.log('📥 Respuesta:', texto);
         
-        if (esPesado) {
+        if (funcion.includes('generar')) {
           mostrarProgreso(80);
-          setTimeout(() => ocultarProgreso(), 300);
+          setTimeout(() => ocultarProgreso(), 500);
         }
         
         return JSON.parse(texto);
       } catch (error) {
-        console.error('❌ Error:', error.message);
+        console.error('❌ Error:', error);
         ocultarProgreso();
-        
-        if (error.name === 'AbortError') {
-          return { error: true, mensaje: 'Tiempo de espera agotado' };
-        }
-        
         return { error: true, mensaje: error.message };
       }
     }
@@ -729,7 +670,7 @@
       setTimeout(() => {
         document.getElementById('progress-bar').style.display = 'none';
         document.getElementById('progress-fill').style.width = '0%';
-      }, 300);
+      }, 500);
     }
 
     // ============================================
@@ -849,7 +790,7 @@
         (decodedText) => {
           document.getElementById('id').value = decodedText.trim();
           buscarEstudiante(decodedText.trim());
-          mostrarToast('✅ QR detectado', 'success');
+          mostrarToast('✅ QR detectado');
         },
         () => {}
       ).then(() => {
@@ -869,32 +810,20 @@
     
     function reiniciarQR() {
       detenerEscaneo();
-      if (selectedCameraId && cameraEnabled) setTimeout(iniciarEscaneo, 300);
+      if (selectedCameraId && cameraEnabled) setTimeout(iniciarEscaneo, 500);
     }
 
     // ============================================
-    // BÚSQUEDA OPTIMIZADA CON CACHÉ
+    // FUNCIONES DE BÚSQUEDA Y REGISTRO
     // ============================================
     async function buscarEstudiante(id) {
       if (!id.trim()) return ocultarInfoEstudiante();
       
-      // Verificar caché primero (instantáneo)
-      const cached = obtenerDelCache(id);
-      if (cached) {
-        studentData = cached;
-        mostrarInfoEstudiante(cached);
-        habilitarBotonRegistro();
-        mostrarToast('⚡ Datos en caché', 'success');
-        return;
-      }
-      
       mostrarBusqueda();
-      
       const resultado = await llamarAppsScript('buscarEstudiante', { id });
       
       if (resultado?.encontrado) {
         studentData = resultado.datos;
-        guardarEnCache(id, resultado.datos);
         mostrarInfoEstudiante(resultado.datos);
         habilitarBotonRegistro();
       } else {
@@ -933,7 +862,7 @@
       r.textContent = msg;
       r.className = tipo;
       r.style.display = 'block';
-      if (tipo === 'success') setTimeout(() => r.style.display = 'none', 3000);
+      if (tipo === 'success') setTimeout(() => r.style.display = 'none', 5000);
     }
 
     // ============================================
@@ -966,21 +895,16 @@
     }
 
     // ============================================
-    // REGISTRO OPTIMIZADO
+    // ENVÍO DE FORMULARIO
     // ============================================
     async function enviarFormulario(e) {
       e.preventDefault();
       
-      if (!studentData) {
-        mostrarRespuesta('Primero busca un ID válido', 'warning');
-        return;
-      }
+      if (!studentData) return mostrarRespuesta('ID no válido', 'error');
       
       const btn = document.getElementById('btn-submit');
-      const originalText = btn.innerHTML;
-      
-      // Feedback visual inmediato
-      btn.innerHTML = '⏳ Registrando...';
+      const original = btn.innerHTML;
+      btn.innerHTML = '<div class="loading"></div> Registrando...';
       btn.disabled = true;
       
       const res = await llamarAppsScript('registrarAsistencia', {
@@ -992,24 +916,17 @@
         estado: document.getElementById('estado').value
       });
       
-      btn.innerHTML = originalText;
+      btn.innerHTML = original;
       
       if (res?.exito) {
-        mostrarRespuesta('✅ Registro exitoso', 'success');
-        mostrarToast('✅ Registro completado', 'success');
-        
-        // Limpiar formulario
+        mostrarRespuesta(res.mensaje, 'success');
+        mostrarToast('✅ Registro exitoso', 'success');
         document.getElementById('formulario').reset();
         ocultarInfoEstudiante();
         deshabilitarBotonRegistro();
-        
-        // Actualizar caché con nuevo timestamp
-        if (studentData) {
-          guardarEnCache(studentData.id, studentData);
-        }
       } else {
         mostrarRespuesta(res?.mensaje || 'Error', 'error');
-        btn.disabled = false;
+        habilitarBotonRegistro();
       }
     }
 
@@ -1019,28 +936,16 @@
     function iniciarAplicacion() {
       document.getElementById('formulario').addEventListener('submit', enviarFormulario);
       
-      // Input con debounce ultra rápido
       document.getElementById('id').addEventListener('input', function(e) {
-        const id = e.target.value.trim();
-        
-        if (searchTimeout) clearTimeout(searchTimeout);
-        
-        if (id.length > 0) {
+        clearTimeout(searchTimeout);
+        if (e.target.value.trim().length > 0) {
           ocultarInfoEstudiante();
           deshabilitarBotonRegistro();
-          
-          // Debounce más rápido (250ms)
-          searchTimeout = setTimeout(() => {
-            buscarEstudiante(id);
-          }, CONFIG.DEBOUNCE_MS);
-        } else {
-          ocultarInfoEstudiante();
-          deshabilitarBotonRegistro();
+          searchTimeout = setTimeout(() => buscarEstudiante(e.target.value.trim()), 800);
         }
       });
       
       document.getElementById('camera-toggle').addEventListener('change', e => toggleCamera(e.target.checked));
-      
       document.getElementById('admin-toggle').addEventListener('click', function() {
         const body = document.getElementById('admin-body');
         body.style.display = body.style.display === 'none' ? 'block' : 'none';
@@ -1057,7 +962,7 @@
         if (res?.ok) {
           mostrarAdminEstado('✅ Descargando...', 'success');
           descargarArchivo(res.data, res.filename);
-          setTimeout(() => document.getElementById('admin-status').style.display = 'none', 2000);
+          setTimeout(() => document.getElementById('admin-status').style.display = 'none', 3000);
         } else {
           mostrarAdminEstado(res?.mensaje || '❌ Error', 'error');
         }
@@ -1073,7 +978,7 @@
         if (res?.ok) {
           mostrarAdminEstado('✅ Descargando...', 'success');
           descargarArchivo(res.data, res.filename);
-          setTimeout(() => document.getElementById('admin-status').style.display = 'none', 2000);
+          setTimeout(() => document.getElementById('admin-status').style.display = 'none', 3000);
         } else {
           mostrarAdminEstado(res?.mensaje || '❌ Error', 'error');
         }
@@ -1081,7 +986,7 @@
       
       setInterval(actualizarReloj, 1000);
       actualizarReloj();
-      setTimeout(() => { if (cameraEnabled) cargarCamaras(); }, 500);
+      setTimeout(() => { if (cameraEnabled) cargarCamaras(); }, 1000);
     }
     
     function mostrarAdminEstado(msg, tipo) {
@@ -1101,7 +1006,6 @@
     
     window.onbeforeunload = function() {
       detenerEscaneo();
-      cacheEstudiantes.clear(); // Limpiar caché al salir
     };
   </script>
 </body>
