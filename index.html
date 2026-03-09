@@ -251,15 +251,6 @@
       background: #c82333;
     }
 
-    .btn-download {
-      background: #28a745;
-      margin-top: 5px;
-    }
-
-    .btn-download:hover:not(:disabled) {
-      background: #218838;
-    }
-
     .employee-info {
       background: linear-gradient(45deg, #f8f9fa, #ffffff);
       border: 2px solid var(--primary);
@@ -399,144 +390,6 @@
       transition: width 0.3s ease;
     }
 
-    .stats-container {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin: 15px 0;
-    }
-
-    .stat-card {
-      background: white;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 12px;
-      text-align: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    .stat-card .number {
-      font-size: 24px;
-      font-weight: bold;
-      color: var(--primary);
-    }
-
-    .stat-card .label {
-      font-size: 12px;
-      color: #64748b;
-    }
-
-    .estadisticas-btn {
-      background: #6c757d;
-      margin-top: 5px;
-    }
-
-    .estadisticas-btn:hover {
-      background: #5a6268;
-    }
-
-    .ultimos-registros {
-      margin-top: 15px;
-      max-height: 200px;
-      overflow-y: auto;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-    }
-
-    .registro-item {
-      padding: 8px 12px;
-      border-bottom: 1px solid #e2e8f0;
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-    }
-
-    .registro-item:last-child {
-      border-bottom: none;
-    }
-
-    .registro-item.ingreso {
-      border-left: 3px solid #28a745;
-    }
-
-    .registro-item.salida {
-      border-left: 3px solid #dc3545;
-    }
-
-    /* Estilos para el Login */
-    #login-overlay {
-      display: flex;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .login-box {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 350px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-      animation: slideIn 0.5s ease-out;
-    }
-
-    .login-box h2 {
-      color: #4CAF50;
-      margin-bottom: 20px;
-      text-align: center;
-      font-size: 24px;
-    }
-
-    .login-box input {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      font-size: 16px;
-      transition: var(--transition);
-    }
-
-    .login-box input:focus {
-      border-color: var(--primary);
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
-    }
-
-    .login-box button {
-      width: 100%;
-      padding: 12px;
-      background: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .login-box button:hover {
-      background: #45a049;
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
-    }
-
-    .login-error {
-      color: #dc3545;
-      margin-top: 15px;
-      text-align: center;
-      display: none;
-      font-size: 14px;
-    }
-
     .toast {
       position: fixed;
       bottom: 20px;
@@ -671,34 +524,6 @@
       
       <div id="respuesta"></div>
 
-      <!-- ESTADÍSTICAS RÁPIDAS -->
-      <button type="button" class="btn estadisticas-btn" id="ver-estadisticas">
-        Ver Estadísticas del Día
-      </button>
-      <div id="estadisticas-container" style="display: none;">
-        <div class="stats-container">
-          <div class="stat-card">
-            <div class="number" id="stat-ingresos">0</div>
-            <div class="label">Ingresos Hoy</div>
-          </div>
-          <div class="stat-card">
-            <div class="number" id="stat-salidas">0</div>
-            <div class="label">Salidas Hoy</div>
-          </div>
-          <div class="stat-card">
-            <div class="number" id="stat-unicos">0</div>
-            <div class="label">Colaboradores Únicos</div>
-          </div>
-          <div class="stat-card">
-            <div class="number" id="stat-total">0</div>
-            <div class="label">Total Registros</div>
-          </div>
-        </div>
-        <div class="ultimos-registros" id="ultimos-registros">
-          <!-- Se llenará dinámicamente -->
-        </div>
-      </div>
-
       <div class="admin-panel">
         <button type="button" class="btn btn-secondary" id="admin-toggle">📋 Panel Administrador</button>
         <div id="admin-body" style="display: none;">
@@ -757,9 +582,8 @@
       CONTRASEÑA: 'pip2026',
       
       // Configuración de la app
-      TIEMPO_TOAST: 3000, // 3 segundos
-      MAX_REGISTROS_MOSTRAR: 10,
-      VERSION: '2.0.0'
+      TIEMPO_TOAST: 3000,
+      VERSION: '2.0.0-sin-estadisticas'
     };
 
     // ============================================
@@ -771,7 +595,6 @@
       
       if (user === CONFIG.USUARIO && pass === CONFIG.CONTRASEÑA) {
         localStorage.setItem('auth_pip', 'true');
-        localStorage.setItem('login_time', new Date().toISOString());
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
         mostrarToast('¡Bienvenido al sistema!', 'success');
@@ -779,30 +602,23 @@
       } else {
         document.getElementById('login-error').style.display = 'block';
         document.getElementById('login-pass').value = '';
-        document.getElementById('login-user').focus();
       }
     }
 
     function cerrarSesion() {
       localStorage.removeItem('auth_pip');
-      localStorage.removeItem('login_time');
       mostrarToast('Sesión cerrada', 'warning');
-      setTimeout(() => {
-        location.reload();
-      }, 1000);
+      setTimeout(() => location.reload(), 1000);
     }
 
     // ============================================
-    // SISTEMA DE TOAST NOTIFICATIONS
+    // SISTEMA DE TOAST
     // ============================================
     function mostrarToast(mensaje, tipo = 'info') {
       const toast = document.getElementById('toast');
       toast.textContent = mensaje;
       toast.className = 'toast show ' + tipo;
-      
-      setTimeout(() => {
-        toast.className = 'toast';
-      }, CONFIG.TIEMPO_TOAST);
+      setTimeout(() => toast.className = 'toast', CONFIG.TIEMPO_TOAST);
     }
 
     // ============================================
@@ -810,21 +626,16 @@
     // ============================================
     async function llamarAppsScript(funcion, parametros = {}) {
       try {
-        console.log(`📡 Llamando a Apps Script: ${funcion}`, parametros);
+        console.log(`📡 Llamando: ${funcion}`);
         
-        // Mostrar progreso si es una operación larga
-        if (funcion.includes('generar')) {
-          mostrarProgreso(30);
-        }
+        if (funcion.includes('generar')) mostrarProgreso(30);
         
-        // Construir URL con los parámetros
         const url = new URL(CONFIG.APPS_SCRIPT_URL);
         url.searchParams.append('funcion', funcion);
         url.searchParams.append('datos', JSON.stringify(parametros));
         
-        // Hacer la petición con timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
+        setTimeout(() => controller.abort(), 30000);
         
         const respuesta = await fetch(url.toString(), {
           method: 'GET',
@@ -832,55 +643,32 @@
           signal: controller.signal
         });
         
-        clearTimeout(timeoutId);
-        
-        if (!respuesta.ok) {
-          throw new Error(`HTTP error! status: ${respuesta.status}`);
-        }
+        if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
         
         const texto = await respuesta.text();
-        console.log('📥 Respuesta de Apps Script:', texto);
+        console.log('📥 Respuesta:', texto);
         
         if (funcion.includes('generar')) {
           mostrarProgreso(80);
+          setTimeout(() => ocultarProgreso(), 500);
         }
         
-        try {
-          const data = JSON.parse(texto);
-          if (funcion.includes('generar')) {
-            mostrarProgreso(100);
-            setTimeout(() => ocultarProgreso(), 500);
-          }
-          return data;
-        } catch (e) {
-          console.error('❌ Error parseando JSON:', e);
-          ocultarProgreso();
-          return { error: true, mensaje: 'Respuesta no válida del servidor' };
-        }
+        return JSON.parse(texto);
       } catch (error) {
-        console.error('❌ Error en llamarAppsScript:', error);
+        console.error('❌ Error:', error);
         ocultarProgreso();
-        
-        if (error.name === 'AbortError') {
-          return { error: true, mensaje: 'La operación tomó demasiado tiempo' };
-        }
-        
         return { error: true, mensaje: error.message };
       }
     }
 
-    function mostrarProgreso(porcentaje) {
-      const progressBar = document.getElementById('progress-bar');
-      const progressFill = document.getElementById('progress-fill');
-      
-      progressBar.style.display = 'block';
-      progressFill.style.width = porcentaje + '%';
+    function mostrarProgreso(p) {
+      document.getElementById('progress-bar').style.display = 'block';
+      document.getElementById('progress-fill').style.width = p + '%';
     }
 
     function ocultarProgreso() {
-      const progressBar = document.getElementById('progress-bar');
       setTimeout(() => {
-        progressBar.style.display = 'none';
+        document.getElementById('progress-bar').style.display = 'none';
         document.getElementById('progress-fill').style.width = '0%';
       }, 500);
     }
@@ -894,83 +682,23 @@
     let studentData = null;
     let selectedCameraId = null;
     let cameraEnabled = true;
-    let autoRefreshInterval = null;
 
     // ============================================
-    // FUNCIONES DE TIEMPO Y ESTADÍSTICAS
+    // FUNCIONES DE TIEMPO
     // ============================================
     function actualizarReloj() {
       const ahora = new Date();
-      const hora = ahora.toLocaleTimeString('es-PE', {
-        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-      });
-      const fecha = ahora.toLocaleDateString('es-PE', {
-        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-      });
-      
       document.getElementById('reloj-tiempo').innerHTML = `
-        <span style="font-size: 28px;">${hora}</span><br>
-        <small style="font-size: 14px;">${fecha}</small>
+        <span style="font-size: 28px;">${ahora.toLocaleTimeString('es-PE')}</span><br>
+        <small>${ahora.toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' })}</small>
       `;
-    }
-
-    async function cargarEstadisticas() {
-      try {
-        const resultado = await llamarAppsScript('obtenerEstadisticasHoy');
-        
-        if (resultado && !resultado.error) {
-          document.getElementById('stat-ingresos').textContent = resultado.ingresosHoy || 0;
-          document.getElementById('stat-salidas').textContent = resultado.salidasHoy || 0;
-          document.getElementById('stat-unicos').textContent = resultado.estudiantesUnicos || 0;
-          document.getElementById('stat-total').textContent = resultado.totalRegistros || 0;
-        }
-      } catch (error) {
-        console.error('Error cargando estadísticas:', error);
-      }
-    }
-
-    async function cargarUltimosRegistros() {
-      try {
-        const resultado = await llamarAppsScript('obtenerUltimosRegistros', { limite: CONFIG.MAX_REGISTROS_MOSTRAR });
-        
-        const container = document.getElementById('ultimos-registros');
-        
-        if (resultado && resultado.registros) {
-          container.innerHTML = '';
-          
-          if (resultado.registros.length === 0) {
-            container.innerHTML = '<div class="registro-item" style="justify-content: center;">No hay registros hoy</div>';
-            return;
-          }
-          
-          resultado.registros.forEach(reg => {
-            const div = document.createElement('div');
-            div.className = `registro-item ${reg.estado.toLowerCase()}`;
-            div.innerHTML = `
-              <span><strong>${reg.hora}</strong> - ${reg.nombre}</span>
-              <span style="font-weight: bold; color: ${reg.estado === 'INGRESO' ? '#28a745' : '#dc3545'}">${reg.estado}</span>
-            `;
-            container.appendChild(div);
-          });
-        }
-      } catch (error) {
-        console.error('Error cargando registros:', error);
-      }
     }
 
     // ============================================
     // FUNCIONES DE CÁMARA Y QR
     // ============================================
     function esMobile() {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
-    
-    function actualizarEstadoQR(mensaje, esError = false) {
-      const statusEl = document.getElementById('qr-status');
-      statusEl.textContent = mensaje;
-      statusEl.style.background = esError ? '#ffebee' : '#e3f2fd';
-      statusEl.style.color = esError ? '#c62828' : '#1565c0';
-      statusEl.style.display = 'block';
+      return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     }
     
     function toggleCamera(enabled) {
@@ -979,14 +707,12 @@
       
       if (enabled) {
         statusSpan.textContent = 'Activada';
-        statusSpan.style.color = 'var(--primary)';
         document.getElementById('reader').style.display = 'block';
         document.getElementById('qr-status').style.display = 'block';
         document.getElementById('reiniciar-btn').style.display = 'block';
         cargarCamaras();
       } else {
         statusSpan.textContent = 'Desactivada';
-        statusSpan.style.color = '#999';
         detenerEscaneo();
         document.getElementById('reader').style.display = 'none';
         document.getElementById('qr-status').style.display = 'none';
@@ -1000,31 +726,27 @@
         qrCodeReader.stop().then(() => {
           qrCodeReader = null;
           isScanning = false;
-        }).catch(err => console.error('Error stopping scanner:', err));
+        });
       }
     }
     
     function cargarCamaras() {
       if (!cameraEnabled) return;
       
-      Html5Qrcode.getCameras()
-        .then(devices => {
-          if (devices.length > 0) {
-            if (esMobile() && devices.length > 1) {
-              mostrarSelectorCamara(devices);
-            } else {
-              selectedCameraId = devices.find(d => 
-                d.label.toLowerCase().includes('back') || 
-                d.label.toLowerCase().includes('rear')
-              )?.id || devices[0].id;
-              iniciarEscaneo();
-            }
+      Html5Qrcode.getCameras().then(devices => {
+        if (devices.length > 0) {
+          if (esMobile() && devices.length > 1) {
+            mostrarSelectorCamara(devices);
+          } else {
+            selectedCameraId = devices.find(d => 
+              d.label.toLowerCase().includes('back')
+            )?.id || devices[0].id;
+            iniciarEscaneo();
           }
-        })
-        .catch(err => {
-          console.error("Error getting cameras:", err);
-          actualizarEstadoQR("Error al detectar cámaras", true);
-        });
+        }
+      }).catch(err => {
+        actualizarEstadoQR("Error al detectar cámaras", true);
+      });
     }
     
     function mostrarSelectorCamara(devices) {
@@ -1032,40 +754,23 @@
       const select = document.getElementById('camera-select');
       
       select.innerHTML = '<option value="">Seleccione una cámara...</option>';
-      
-      devices.forEach((device, index) => {
+      devices.forEach((device, i) => {
         const option = document.createElement('option');
         option.value = device.id;
-        
-        let tipo = 'Cámara ' + (index + 1);
-        if (device.label.toLowerCase().includes('back') || device.label.toLowerCase().includes('rear')) {
-          tipo = '📷 Cámara Trasera';
-        } else if (device.label.toLowerCase().includes('front') || device.label.toLowerCase().includes('user')) {
-          tipo = '🤳 Cámara Frontal';
-        }
-        
-        option.textContent = tipo;
+        option.textContent = device.label.includes('back') ? '📷 Cámara Trasera' : `📱 Cámara ${i+1}`;
         select.appendChild(option);
       });
       
       controlsDiv.style.display = 'block';
       
-      select.addEventListener('change', function() {
+      select.onchange = function() {
         if (this.value) {
           selectedCameraId = this.value;
-          if (isScanning) {
-            reiniciarQR();
-          } else {
-            iniciarEscaneo();
-          }
+          reiniciarQR();
         }
-      });
+      };
       
-      // Seleccionar cámara trasera por defecto
-      const rearCamera = devices.find(d => 
-        d.label.toLowerCase().includes('back') || 
-        d.label.toLowerCase().includes('rear')
-      );
+      const rearCamera = devices.find(d => d.label.toLowerCase().includes('back'));
       if (rearCamera) {
         select.value = rearCamera.id;
         selectedCameraId = rearCamera.id;
@@ -1076,94 +781,67 @@
     function iniciarEscaneo() {
       if (isScanning || !selectedCameraId || !cameraEnabled) return;
       
-      const readerId = "reader";
-      if (document.getElementById(readerId).children.length > 0) {
-        document.getElementById(readerId).innerHTML = '';
-      }
-      
-      qrCodeReader = new Html5Qrcode(readerId);
-      
-      actualizarEstadoQR("Iniciando cámara...");
-      
-      const config = { 
-        fps: 10, 
-        qrbox: { 
-          width: Math.min(250, window.innerWidth * 0.7), 
-          height: Math.min(250, window.innerWidth * 0.7) 
-        }, 
-        aspectRatio: 1.0 
-      };
+      document.getElementById('reader').innerHTML = '';
+      qrCodeReader = new Html5Qrcode('reader');
       
       qrCodeReader.start(
         selectedCameraId,
-        config,
+        { fps: 10, qrbox: 250 },
         (decodedText) => {
-          actualizarEstadoQR("✅ QR detectado correctamente");
-          procesarQR(decodedText);
+          document.getElementById('id').value = decodedText.trim();
+          buscarEstudiante(decodedText.trim());
+          mostrarToast('✅ QR detectado');
         },
         () => {}
       ).then(() => {
         isScanning = true;
-        actualizarEstadoQR("📷 Escaneando... Acerca el código QR");
+        actualizarEstadoQR('📷 Escaneando...');
       }).catch(err => {
-        actualizarEstadoQR("❌ Error al acceder a la cámara", true);
-        console.error("Error starting QR scanner:", err);
+        actualizarEstadoQR('❌ Error con cámara', true);
       });
+    }
+    
+    function actualizarEstadoQR(msg, error) {
+      const el = document.getElementById('qr-status');
+      el.textContent = msg;
+      el.style.background = error ? '#ffebee' : '#e3f2fd';
+      el.style.color = error ? '#c62828' : '#1565c0';
     }
     
     function reiniciarQR() {
       detenerEscaneo();
-      
-      if (selectedCameraId && cameraEnabled) {
-        setTimeout(iniciarEscaneo, 500);
-      } else if (cameraEnabled) {
-        setTimeout(cargarCamaras, 500);
-      }
+      if (selectedCameraId && cameraEnabled) setTimeout(iniciarEscaneo, 500);
     }
-    
-    function procesarQR(textoQR) {
-      const idEstudiante = textoQR.trim();
-      document.getElementById("id").value = idEstudiante;
-      buscarEstudiante(idEstudiante);
-      mostrarToast("ID cargado desde QR", "success");
-    }
-    
+
     // ============================================
     // FUNCIONES DE BÚSQUEDA Y REGISTRO
     // ============================================
     async function buscarEstudiante(id) {
-      if (!id.trim()) {
-        ocultarInfoEstudiante();
-        return;
-      }
+      if (!id.trim()) return ocultarInfoEstudiante();
       
       mostrarBusqueda();
+      const resultado = await llamarAppsScript('buscarEstudiante', { id });
       
-      const resultado = await llamarAppsScript('buscarEstudiante', { id: id });
-      
-      if (resultado && resultado.encontrado) {
+      if (resultado?.encontrado) {
         studentData = resultado.datos;
         mostrarInfoEstudiante(resultado.datos);
         habilitarBotonRegistro();
       } else {
         ocultarInfoEstudiante();
-        mostrarRespuesta(resultado?.mensaje || 'Estudiante no encontrado', 'warning');
+        mostrarRespuesta(resultado?.mensaje || 'No encontrado', 'warning');
         deshabilitarBotonRegistro();
       }
     }
     
     function mostrarBusqueda() {
-      const infoDiv = document.getElementById('employee-info');
-      infoDiv.style.display = 'block';
+      document.getElementById('employee-info').style.display = 'block';
       document.getElementById('employee-name').innerHTML = '<div class="loading"></div> Buscando...';
     }
     
-    function mostrarInfoEstudiante(datos) {
-      const infoDiv = document.getElementById('employee-info');
-      infoDiv.style.display = 'block';
-      document.getElementById('employee-name').textContent = datos.nombre || '-';
-      document.getElementById('employee-area').textContent = datos.area || '-';
-      document.getElementById('employee-position').textContent = datos.cargo || '-';
+    function mostrarInfoEstudiante(d) {
+      document.getElementById('employee-name').textContent = d.nombre || '-';
+      document.getElementById('employee-area').textContent = d.area || '-';
+      document.getElementById('employee-position').textContent = d.cargo || '-';
     }
     
     function ocultarInfoEstudiante() {
@@ -1179,309 +857,156 @@
       document.getElementById('btn-submit').disabled = true;
     }
     
-    function mostrarRespuesta(mensaje, tipo) {
-      const respuesta = document.getElementById("respuesta");
-      respuesta.textContent = mensaje;
-      respuesta.className = tipo;
-      respuesta.style.display = "block";
-      
-      if (tipo === "success") {
-        setTimeout(() => {
-          respuesta.style.display = "none";
-        }, 5000);
-      }
+    function mostrarRespuesta(msg, tipo) {
+      const r = document.getElementById('respuesta');
+      r.textContent = msg;
+      r.className = tipo;
+      r.style.display = 'block';
+      if (tipo === 'success') setTimeout(() => r.style.display = 'none', 5000);
     }
 
-    function mostrarAdminEstado(mensaje, tipo = 'info') {
-      const status = document.getElementById('admin-status');
-      status.textContent = mensaje;
-      status.style.display = 'block';
-      
-      status.className = 'admin-status';
-      if (tipo === 'success') status.classList.add('admin-success');
-      if (tipo === 'error') status.classList.add('admin-error');
-      if (tipo === 'info') status.classList.add('admin-info');
-    }
-
-    function descargarArchivo(base64, filename, mimeType) {
+    // ============================================
+    // FUNCIONES DE DESCARGA
+    // ============================================
+    function descargarArchivo(base64, filename) {
       try {
-        // Asegurarnos de que no haya prefijo data: ya incluido
         const base64Data = base64.includes('base64,') ? base64.split('base64,')[1] : base64;
-        
-        const enlace = document.createElement('a');
-        enlace.href = 'data:' + mimeType + ';base64,' + base64Data;
-        enlace.download = filename;
-        enlace.style.display = 'none';
-        
-        document.body.appendChild(enlace);
-        enlace.click();
-        
-        // Pequeño delay antes de remover el elemento
-        setTimeout(() => {
-          document.body.removeChild(enlace);
-          URL.revokeObjectURL(enlace.href);
-        }, 100);
-        
-        mostrarToast(`Descargando: ${filename}`, 'success');
+        const link = document.createElement('a');
+        link.href = 'data:application/pdf;base64,' + base64Data;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(() => document.body.removeChild(link), 100);
+        mostrarToast(`📥 Descargando: ${filename}`, 'success');
         return true;
       } catch (error) {
-        console.error('Error al descargar:', error);
-        mostrarToast('Error al descargar el archivo', 'error');
+        mostrarToast('❌ Error al descargar', 'error');
         return false;
       }
     }
 
-    async function cargarGradosSecciones() {
-      try {
-        const resultado = await llamarAppsScript('listarGrados');
-        const select = document.getElementById('admin-grado');
-        
-        if (resultado && resultado.grados) {
-          select.innerHTML = '<option value="">📌 Seleccione un grado...</option>';
-          resultado.grados.forEach(g => {
-            const option = document.createElement('option');
-            option.value = g;
-            option.textContent = g;
-            select.appendChild(option);
-          });
-          mostrarAdminEstado(`${resultado.grados.length} grados cargados`, 'info');
-        } else {
-          select.innerHTML = '<option value="">No hay grados disponibles</option>';
-        }
-      } catch (error) {
-        console.error('Error cargando grados:', error);
-        mostrarAdminEstado('Error al cargar grados', 'error');
+    async function cargarGrados() {
+      const res = await llamarAppsScript('listarGrados');
+      const select = document.getElementById('admin-grado');
+      if (res?.grados) {
+        select.innerHTML = '<option value="">📌 Seleccione un grado...</option>';
+        res.grados.forEach(g => select.innerHTML += `<option value="${g}">${g}</option>`);
       }
     }
-    
-    async function enviarFormulario(event) {
-      event.preventDefault();
+
+    // ============================================
+    // ENVÍO DE FORMULARIO
+    // ============================================
+    async function enviarFormulario(e) {
+      e.preventDefault();
       
-      const id = document.getElementById("id").value.trim();
-      const estado = document.getElementById("estado").value;
+      if (!studentData) return mostrarRespuesta('ID no válido', 'error');
       
-      if (!id || !studentData) {
-        mostrarRespuesta("Por favor ingrese un ID válido", "error");
-        return;
-      }
+      const btn = document.getElementById('btn-submit');
+      const original = btn.innerHTML;
+      btn.innerHTML = '<div class="loading"></div> Registrando...';
+      btn.disabled = true;
       
-      const btnSubmit = document.getElementById("btn-submit");
-      const originalText = btnSubmit.innerHTML;
-      btnSubmit.innerHTML = '<div class="loading"></div> Registrando...';
-      btnSubmit.disabled = true;
-      
-      const data = { 
-        id: id,
+      const res = await llamarAppsScript('registrarAsistencia', {
+        id: document.getElementById('id').value.trim(),
         nombre: studentData.nombre,
         area: studentData.area,
         cargo: studentData.cargo,
         telefono: studentData.telefono || '',
-        estado: estado 
-      };
+        estado: document.getElementById('estado').value
+      });
       
-      const resultado = await llamarAppsScript('registrarAsistencia', data);
+      btn.innerHTML = original;
       
-      btnSubmit.innerHTML = originalText;
-      
-      if (resultado && resultado.exito) {
-        mostrarRespuesta(resultado.mensaje, "success");
-        mostrarToast(`✅ ${estado} registrado correctamente`, 'success');
-        
-        // Limpiar formulario
-        document.getElementById("formulario").reset();
-        document.getElementById("estado").value = "INGRESO";
+      if (res?.exito) {
+        mostrarRespuesta(res.mensaje, 'success');
+        mostrarToast('✅ Registro exitoso', 'success');
+        document.getElementById('formulario').reset();
         ocultarInfoEstudiante();
         deshabilitarBotonRegistro();
-        
-        // Actualizar estadísticas
-        cargarEstadisticas();
-        cargarUltimosRegistros();
       } else {
-        mostrarRespuesta(resultado?.mensaje || 'Error al registrar', "error");
-        mostrarToast('❌ Error al registrar', 'error');
+        mostrarRespuesta(res?.mensaje || 'Error', 'error');
         habilitarBotonRegistro();
       }
-    }
-    
-    function iniciarAplicacion() {
-      console.log(`🚀 Iniciando aplicación v${CONFIG.VERSION}`);
-      
-      // Configurar event listeners
-      document.getElementById("formulario").addEventListener("submit", enviarFormulario);
-      
-      // Input con debounce para búsqueda
-      document.getElementById("id").addEventListener("input", function(e) {
-        const id = e.target.value.trim();
-        
-        if (searchTimeout) clearTimeout(searchTimeout);
-        
-        if (id.length > 0) {
-          ocultarInfoEstudiante();
-          deshabilitarBotonRegistro();
-          searchTimeout = setTimeout(() => buscarEstudiante(id), 800);
-        } else {
-          ocultarInfoEstudiante();
-          deshabilitarBotonRegistro();
-        }
-      });
-      
-      // Toggle cámara
-      document.getElementById("camera-toggle").addEventListener("change", function(e) {
-        toggleCamera(e.target.checked);
-      });
-
-      // Panel admin toggle
-      document.getElementById('admin-toggle').addEventListener('click', function() {
-        const body = document.getElementById('admin-body');
-        const isVisible = body.style.display === 'none' || body.style.display === '';
-        
-        body.style.display = isVisible ? 'block' : 'none';
-        
-        if (isVisible) {
-          cargarGradosSecciones();
-        }
-      });
-
-      // Generar carnet individual
-      document.getElementById('admin-generar-id').addEventListener('click', async function() {
-        const id = document.getElementById('admin-id').value.trim();
-        if (!id) {
-          mostrarAdminEstado('⚠️ Ingrese un ID válido', 'error');
-          return;
-        }
-        
-        mostrarAdminEstado('📄 Generando PDF...', 'info');
-        const resultado = await llamarAppsScript('generarCarnet', { id: id });
-        
-        if (resultado && resultado.ok) {
-          mostrarAdminEstado('✅ PDF generado, descargando...', 'success');
-          
-          // Descargar el archivo
-          const descargado = descargarArchivo(
-            resultado.data,
-            resultado.filename,
-            'application/pdf'
-          );
-          
-          if (descargado) {
-            mostrarAdminEstado('✅ PDF descargado correctamente', 'success');
-            setTimeout(() => {
-              document.getElementById('admin-status').style.display = 'none';
-            }, 3000);
-          }
-        } else {
-          mostrarAdminEstado(resultado?.mensaje || '❌ Error al generar PDF', 'error');
-        }
-      });
-
-      // Generar lote por grado
-      document.getElementById('admin-generar-lote').addEventListener('click', async function() {
-        const grado = document.getElementById('admin-grado').value;
-        if (!grado) {
-          mostrarAdminEstado('⚠️ Seleccione un grado/sección', 'error');
-          return;
-        }
-        
-        mostrarAdminEstado('📚 Generando lote de carnets...', 'info');
-        const resultado = await llamarAppsScript('generarLote', { grado: grado });
-        
-        if (resultado && resultado.ok) {
-          mostrarAdminEstado('✅ Lote generado, descargando...', 'success');
-          
-          // Descargar el archivo
-          const descargado = descargarArchivo(
-            resultado.data,
-            resultado.filename,
-            'application/pdf'
-          );
-          
-          if (descargado) {
-            mostrarAdminEstado('✅ Lote descargado correctamente', 'success');
-            setTimeout(() => {
-              document.getElementById('admin-status').style.display = 'none';
-            }, 3000);
-          }
-        } else {
-          mostrarAdminEstado(resultado?.mensaje || '❌ Error al generar lote', 'error');
-        }
-      });
-
-      // Toggle estadísticas
-      document.getElementById('ver-estadisticas').addEventListener('click', function() {
-        const container = document.getElementById('estadisticas-container');
-        const isVisible = container.style.display === 'none' || container.style.display === '';
-        
-        container.style.display = isVisible ? 'block' : 'none';
-        
-        if (isVisible) {
-          cargarEstadisticas();
-          cargarUltimosRegistros();
-        }
-      });
-
-      // Iniciar reloj y auto-refresh
-      setInterval(actualizarReloj, 1000);
-      actualizarReloj();
-      
-      // Auto-refresh de estadísticas cada 30 segundos
-      autoRefreshInterval = setInterval(() => {
-        if (document.getElementById('estadisticas-container').style.display === 'block') {
-          cargarEstadisticas();
-          cargarUltimosRegistros();
-        }
-      }, 30000);
-      
-      // Cargar grados en segundo plano
-      setTimeout(cargarGradosSecciones, 2000);
-      
-      // Iniciar cámara después de un momento
-      setTimeout(() => {
-        if (cameraEnabled) {
-          cargarCamaras();
-        }
-      }, 1000);
-
-      // Mostrar bienvenida
-      mostrarToast('Sistema listo para usar', 'success');
     }
 
     // ============================================
     // INICIALIZACIÓN
     // ============================================
-    window.addEventListener('load', function() {
-      // Verificar si ya está autenticado
+    function iniciarAplicacion() {
+      document.getElementById('formulario').addEventListener('submit', enviarFormulario);
+      
+      document.getElementById('id').addEventListener('input', function(e) {
+        clearTimeout(searchTimeout);
+        if (e.target.value.trim().length > 0) {
+          ocultarInfoEstudiante();
+          deshabilitarBotonRegistro();
+          searchTimeout = setTimeout(() => buscarEstudiante(e.target.value.trim()), 800);
+        }
+      });
+      
+      document.getElementById('camera-toggle').addEventListener('change', e => toggleCamera(e.target.checked));
+      document.getElementById('admin-toggle').addEventListener('click', function() {
+        const body = document.getElementById('admin-body');
+        body.style.display = body.style.display === 'none' ? 'block' : 'none';
+        if (body.style.display === 'block') cargarGrados();
+      });
+      
+      document.getElementById('admin-generar-id').addEventListener('click', async function() {
+        const id = document.getElementById('admin-id').value.trim();
+        if (!id) return mostrarAdminEstado('⚠️ Ingrese ID', 'error');
+        
+        mostrarAdminEstado('📄 Generando...', 'info');
+        const res = await llamarAppsScript('generarCarnet', { id });
+        
+        if (res?.ok) {
+          mostrarAdminEstado('✅ Descargando...', 'success');
+          descargarArchivo(res.data, res.filename);
+          setTimeout(() => document.getElementById('admin-status').style.display = 'none', 3000);
+        } else {
+          mostrarAdminEstado(res?.mensaje || '❌ Error', 'error');
+        }
+      });
+      
+      document.getElementById('admin-generar-lote').addEventListener('click', async function() {
+        const grado = document.getElementById('admin-grado').value;
+        if (!grado) return mostrarAdminEstado('⚠️ Seleccione grado', 'error');
+        
+        mostrarAdminEstado('📚 Generando lote...', 'info');
+        const res = await llamarAppsScript('generarLote', { grado });
+        
+        if (res?.ok) {
+          mostrarAdminEstado('✅ Descargando...', 'success');
+          descargarArchivo(res.data, res.filename);
+          setTimeout(() => document.getElementById('admin-status').style.display = 'none', 3000);
+        } else {
+          mostrarAdminEstado(res?.mensaje || '❌ Error', 'error');
+        }
+      });
+      
+      setInterval(actualizarReloj, 1000);
+      actualizarReloj();
+      setTimeout(() => { if (cameraEnabled) cargarCamaras(); }, 1000);
+    }
+    
+    function mostrarAdminEstado(msg, tipo) {
+      const s = document.getElementById('admin-status');
+      s.textContent = msg;
+      s.style.display = 'block';
+      s.className = 'admin-status admin-' + tipo;
+    }
+
+    window.onload = function() {
       if (localStorage.getItem('auth_pip') === 'true') {
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
         iniciarAplicacion();
-      } else {
-        // Enfocar el campo de usuario
-        document.getElementById('login-user').focus();
       }
-    });
+    };
     
-    window.addEventListener('beforeunload', function() {
+    window.onbeforeunload = function() {
       detenerEscaneo();
-      if (autoRefreshInterval) {
-        clearInterval(autoRefreshInterval);
-      }
-    });
-    
-    window.addEventListener('resize', function() {
-      if (isScanning) {
-        reiniciarQR();
-      }
-    });
-
-    // Permitir Enter en el login
-    document.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        if (document.getElementById('login-overlay').style.display !== 'none') {
-          verificarLogin();
-        }
-      }
-    });
+    };
   </script>
 </body>
 </html>
-
