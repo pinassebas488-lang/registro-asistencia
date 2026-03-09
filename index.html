@@ -5,2000 +5,1884 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>CONTROL DE ASISTENCIA LA BASE COWORK</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
     :root {
-      --primary: #4CAF50;
-      --primary-dark: #45a049;
-      --primary-light: #e8f5e9;
-      --secondary: #2196F3;
-      --secondary-dark: #1976D2;
-      --accent: #FF5722;
-      --success: #4CAF50;
-      --success-light: #d4edda;
-      --success-text: #155724;
-      --error: #f44336;
-      --error-light: #f8d7da;
-      --error-text: #721c24;
-      --warning: #ff9800;
-      --warning-light: #fff3cd;
-      --warning-text: #856404;
-      --bg-main: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      --shadow: 0 10px 40px rgba(0,0,0,0.2);
-      --shadow-sm: 0 4px 20px rgba(0,0,0,0.15);
-      --border-radius: 16px;
-      --border-radius-sm: 12px;
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --primary-light: #d1fae5;
+      --secondary: #3b82f6;
+      --secondary-dark: #2563eb;
+      --accent: #f59e0b;
+      --danger: #ef4444;
+      --danger-dark: #dc2626;
+      --success: #10b981;
+      --success-light: #d1fae5;
+      --success-text: #065f46;
+      --error: #ef4444;
+      --error-light: #fee2e2;
+      --error-text: #991b1b;
+      --warning: #f59e0b;
+      --warning-light: #fef3c7;
+      --warning-text: #92400e;
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface2: #334155;
+      --surface3: #475569;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --radius: 14px;
+      --radius-sm: 8px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+      --transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-main);
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
-      padding: 10px;
-      line-height: 1.5;
     }
 
-    /* ============================================
-       LOGIN MEJORADO
-    ============================================ */
+    /* ==================== LOGIN ==================== */
     #login-overlay {
       display: flex;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      inset: 0;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
       z-index: 9999;
       justify-content: center;
       align-items: center;
-      backdrop-filter: blur(5px);
+    }
+
+    .login-bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(16,185,129,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16,185,129,0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .login-glow {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
     }
 
     .login-container {
       width: 100%;
       max-width: 420px;
       padding: 20px;
-      animation: slideUpFade 0.6s ease-out;
+      position: relative;
+      z-index: 1;
+      animation: loginIn 0.6s ease-out;
     }
 
-    @keyframes slideUpFade {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    @keyframes loginIn {
+      from { opacity:0; transform: translateY(24px) scale(0.97); }
+      to { opacity:1; transform: translateY(0) scale(1); }
     }
 
     .login-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
+      background: rgba(30,41,59,0.9);
+      border: 1px solid rgba(16,185,129,0.2);
       border-radius: 24px;
-      padding: 40px 30px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      transition: var(--transition);
+      padding: 40px 32px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 0 60px rgba(16,185,129,0.1), 0 20px 60px rgba(0,0,0,0.5);
     }
 
-    .login-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
-    }
-
-    .login-header {
+    .login-logo {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 28px;
     }
 
-    .login-icon {
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      border-radius: 50%;
+    .login-logo-icon {
+      width: 72px;
+      height: 72px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 20px;
-      box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
+      margin: 0 auto 16px;
+      font-size: 32px;
+      box-shadow: 0 8px 24px rgba(16,185,129,0.3);
     }
 
-    .login-icon span {
-      font-size: 40px;
-      filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));
-    }
-
-    .login-header h2 {
-      color: #333;
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    .login-logo h2 {
+      font-size: 24px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), #34d399);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      margin-bottom: 4px;
     }
 
-    .login-header p {
-      color: #666;
-      font-size: 14px;
-    }
+    .login-logo p { color: var(--text-muted); font-size: 13px; }
 
-    .login-form {
-      margin-bottom: 20px;
-    }
+    .login-input-group { margin-bottom: 18px; }
 
-    .input-group {
-      margin-bottom: 20px;
-    }
-
-    .input-group label {
+    .login-input-group label {
       display: block;
-      margin-bottom: 8px;
-      color: #555;
-      font-weight: 500;
-      font-size: 14px;
+      font-size: 12px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
     }
 
-    .input-wrapper {
+    .login-input-wrap {
       position: relative;
-      display: flex;
-      align-items: center;
     }
 
-    .input-icon {
+    .login-input-wrap span {
       position: absolute;
-      left: 15px;
-      color: #999;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
       font-size: 18px;
-      transition: var(--transition);
+      pointer-events: none;
     }
 
-    .input-group input {
+    .login-input-group input {
       width: 100%;
-      padding: 15px 15px 15px 50px;
-      border: 2px solid #e0e0e0;
-      border-radius: 50px;
-      font-size: 16px;
-      transition: var(--transition);
-      background: white;
+      padding: 13px 14px 13px 44px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: 'Outfit', sans-serif;
       outline: none;
+      transition: var(--transition);
     }
 
-    .input-group input:focus {
+    .login-input-group input:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.1);
-    }
-
-    .input-group input:focus + .input-icon {
-      color: var(--primary);
+      background: rgba(16,185,129,0.05);
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
     }
 
     .login-btn {
       width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      padding: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
       color: white;
       border: none;
-      border-radius: 50px;
-      font-size: 18px;
-      font-weight: 600;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: 'Outfit', sans-serif;
       cursor: pointer;
       transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+      margin-top: 4px;
+      letter-spacing: 0.3px;
     }
 
-    .login-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 30px rgba(76, 175, 80, 0.4);
-    }
-
-    .login-btn:active {
-      transform: translateY(-1px);
-    }
+    .login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(16,185,129,0.3); }
 
     .login-error {
       background: var(--error-light);
       color: var(--error-text);
-      padding: 12px 20px;
-      border-radius: 50px;
-      margin-top: 20px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      margin-top: 14px;
       display: none;
       text-align: center;
-      font-weight: 500;
-      border-left: 4px solid var(--error);
-      animation: shake 0.5s ease-in-out;
+      font-size: 13px;
+      font-weight: 600;
+      animation: shake 0.4s ease;
     }
 
     @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-5px); }
-      40%, 80% { transform: translateX(5px); }
+      0%,100% { transform: translateX(0); }
+      20%,60% { transform: translateX(-6px); }
+      40%,80% { transform: translateX(6px); }
     }
 
-    .login-footer {
-      text-align: center;
-      margin-top: 20px;
-      color: #888;
-      font-size: 12px;
+    .login-footer { text-align: center; margin-top: 20px; color: var(--text-muted); font-size: 11px; }
+
+    /* ==================== LAYOUT PRINCIPAL ==================== */
+    #main-content { display: none; }
+
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
     }
 
-    /* Decoración de fondo */
-    .login-decoration {
-      position: absolute;
+    /* SIDEBAR */
+    .sidebar {
+      width: 260px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
       top: 0;
       left: 0;
+      height: 100vh;
+      z-index: 100;
+      transition: var(--transition);
+    }
+
+    .sidebar-logo {
+      padding: 24px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-logo h1 {
+      font-size: 16px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+    }
+
+    .sidebar-logo p { color: var(--text-muted); font-size: 11px; margin-top: 2px; }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 12px;
+      overflow-y: auto;
+    }
+
+    .nav-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      padding: 0 8px;
+      margin: 16px 0 6px;
+    }
+
+    .nav-section-label:first-child { margin-top: 0; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      background: none;
       width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -1;
-      overflow: hidden;
+      text-align: left;
+      margin-bottom: 2px;
     }
 
-    .decoration-circle {
-      position: absolute;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-    }
+    .nav-item:hover { background: var(--surface2); color: var(--text); }
 
-    .circle1 {
-      width: 300px;
-      height: 300px;
-      top: -100px;
-      right: -100px;
-    }
-
-    .circle2 {
-      width: 200px;
-      height: 200px;
-      bottom: -50px;
-      left: -50px;
-    }
-
-    .circle3 {
-      width: 150px;
-      height: 150px;
-      bottom: 50px;
-      right: 50px;
-    }
-
-    /* ============================================
-       ESTILOS DEL CONTENIDO PRINCIPAL
-    ============================================ */
-    .container {
-      max-width: min(500px, 100vw - 20px);
-      margin: 0 auto;
-      background: white;
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow-sm);
-      overflow: hidden;
-      animation: slideIn 0.5s ease-out;
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .header {
-      background: var(--primary);
-      color: white;
-      padding: clamp(15px, 4vw, 25px);
-      text-align: center;
-    }
-
-    .header h1 {
-      font-size: clamp(18px, 5vw, 24px);
+    .nav-item.active {
+      background: rgba(16,185,129,0.12);
+      color: var(--primary);
       font-weight: 600;
-      margin-bottom: 5px;
     }
 
-    .header p {
-      font-size: clamp(12px, 3vw, 14px);
-      opacity: 0.9;
+    .nav-item .nav-icon { font-size: 18px; width: 22px; text-align: center; flex-shrink: 0; }
+
+    .sidebar-footer {
+      padding: 16px 12px;
+      border-top: 1px solid var(--border);
     }
 
-    .content {
-      padding: clamp(15px, 5vw, 30px);
+    .btn-logout-side {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      color: #f87171;
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      background: none;
+      width: 100%;
     }
 
-    .time-display {
-      background: linear-gradient(45deg, #e8f5e8, #f0fff0);
-      border: 2px solid var(--primary);
-      border-radius: var(--border-radius);
-      padding: 15px;
-      text-align: center;
+    .btn-logout-side:hover { background: rgba(239,68,68,0.1); }
+
+    /* MAIN AREA */
+    .main-area {
+      margin-left: 260px;
+      flex: 1;
+      min-height: 100vh;
+      background: var(--bg);
+    }
+
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar-title { font-size: 20px; font-weight: 700; }
+    .topbar-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: var(--primary);
+      background: rgba(16,185,129,0.1);
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid rgba(16,185,129,0.2);
+    }
+
+    .page-content {
+      padding: 28px;
+      display: none;
+    }
+
+    .page-content.active { display: block; }
+
+    /* ==================== CARDS & GRIDS ==================== */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
       margin-bottom: 20px;
-      font-size: clamp(14px, 4vw, 18px);
-      font-weight: 600;
-      color: #2e7d32;
     }
 
-    /* ============================================
-       CÁMARA Y QR
-    ============================================ */
-    .camera-toggle {
-      background: #f8f9fa;
-      border: 2px solid #e9ecef;
-      border-radius: var(--border-radius);
-      padding: 15px;
-      margin-bottom: 15px;
-      text-align: center;
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .toggle-wrapper {
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: var(--transition);
+    }
+
+    .stat-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      margin-bottom: 10px;
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    .stat-icon.green { background: rgba(16,185,129,0.15); }
+    .stat-icon.blue { background: rgba(59,130,246,0.15); }
+    .stat-icon.amber { background: rgba(245,158,11,0.15); }
+    .stat-icon.purple { background: rgba(139,92,246,0.15); }
+
+    .stat-value { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+    .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+    /* ==================== ASISTENCIA (scanner) ==================== */
+    .scan-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .scan-grid { grid-template-columns: 1fr; }
+      .sidebar { width: 220px; }
+      .main-area { margin-left: 220px; }
+    }
+
+    @media (max-width: 650px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-area { margin-left: 0; }
+      .topbar { padding: 12px 16px; }
+      .page-content { padding: 16px; }
+    }
+
+    /* ==================== FORMULARIOS ==================== */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group.full { grid-column: 1/-1; }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'Outfit', sans-serif;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+      background: rgba(16,185,129,0.04);
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.12);
+    }
+
+    .form-group select option { background: var(--surface2); color: var(--text); }
+
+    /* ==================== BOTONES ==================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 20px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+    }
+
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); }
+
+    .btn-secondary { background: var(--secondary); color: white; }
+    .btn-secondary:hover:not(:disabled) { background: var(--secondary-dark); transform: translateY(-1px); }
+
+    .btn-ghost { background: var(--surface2); color: var(--text); }
+    .btn-ghost:hover:not(:disabled) { background: var(--surface3); }
+
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover:not(:disabled) { background: var(--danger-dark); transform: translateY(-1px); }
+
+    .btn-success { background: #10b981; color: white; }
+    .btn-success:hover:not(:disabled) { background: #059669; transform: translateY(-1px); }
+
+    .btn-excel { background: #1d6f42; color: white; }
+    .btn-excel:hover:not(:disabled) { background: #155534; transform: translateY(-1px); }
+
+    .btn-full { width: 100%; }
+    .btn-sm { padding: 7px 14px; font-size: 13px; }
+
+    /* ==================== RESPUESTA ==================== */
+    .respuesta {
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 14px;
+      display: none;
+      margin-top: 16px;
+    }
+
+    .respuesta.success { background: var(--success-light); color: var(--success-text); border-left: 4px solid var(--success); }
+    .respuesta.error { background: var(--error-light); color: var(--error-text); border-left: 4px solid var(--error); }
+    .respuesta.warning { background: var(--warning-light); color: var(--warning-text); border-left: 4px solid var(--warning); }
+
+    /* ==================== EMPLOYEE INFO ==================== */
+    .employee-info {
+      background: rgba(16,185,129,0.05);
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      display: none;
+      margin-bottom: 16px;
+    }
+
+    .employee-info h4 { color: var(--primary); font-size: 14px; margin-bottom: 8px; font-weight: 700; }
+    .employee-info p { font-size: 13px; color: var(--text-muted); margin: 3px 0; }
+    .employee-info .val { color: var(--text); font-weight: 600; }
+
+    /* ==================== QR ==================== */
+    .camera-toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
       flex-wrap: wrap;
     }
+
+    .switch-label { font-size: 14px; color: var(--text-muted); font-weight: 500; }
 
     .switch {
       position: relative;
       display: inline-block;
-      width: 50px;
-      height: 28px;
+      width: 46px;
+      height: 26px;
+      flex-shrink: 0;
     }
 
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
+    .switch input { opacity: 0; width: 0; height: 0; }
 
     .slider {
       position: absolute;
       cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
+      inset: 0;
+      background: var(--surface3);
+      border-radius: 26px;
       transition: var(--transition);
-      border-radius: 28px;
     }
 
     .slider:before {
-      position: absolute;
       content: "";
-      height: 22px;
-      width: 22px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: var(--transition);
-      border-radius: 50%;
-    }
-
-    input:checked + .slider {
-      background-color: var(--primary);
-    }
-
-    input:checked + .slider:before {
-      transform: translateX(22px);
-    }
-
-    .camera-controls {
-      display: none;
-      margin-bottom: 15px;
-    }
-
-    .camera-select select {
-      width: 100%;
-      padding: 10px;
-      border: 2px solid #ddd;
-      border-radius: var(--border-radius);
-      font-size: 14px;
+      position: absolute;
+      height: 20px; width: 20px;
+      left: 3px; bottom: 3px;
       background: white;
+      border-radius: 50%;
+      transition: var(--transition);
     }
+
+    input:checked + .slider { background: var(--primary); }
+    input:checked + .slider:before { transform: translateX(20px); }
 
     #reader {
       width: 100%;
-      max-width: min(300px, 90vw);
-      margin: 0 auto 20px;
-      border: 2px dashed #ddd;
-      border-radius: var(--border-radius);
+      border-radius: var(--radius-sm);
       overflow: hidden;
       display: none;
+      border: 1px solid var(--border);
+      margin-bottom: 12px;
     }
 
     .qr-status {
-      text-align: center;
-      padding: 10px;
-      margin-bottom: 15px;
-      border-radius: var(--border-radius);
-      background: #e3f2fd;
-      color: #1565c0;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      background: rgba(59,130,246,0.1);
+      color: #93c5fd;
+      font-size: 13px;
+      font-weight: 500;
       display: none;
-      font-size: clamp(12px, 3vw, 14px);
+      margin-bottom: 12px;
     }
 
-    /* ============================================
-       FORMULARIOS Y BOTONES
-    ============================================ */
-    .form-group {
-      margin-bottom: 20px;
-    }
+    /* ==================== TABLA ==================== */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
 
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #333;
-      font-size: clamp(14px, 3.5vw, 16px);
-    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
 
-    .form-group input,
-    .form-group select {
-      width: 100%;
-      padding: clamp(10px, 3vw, 14px);
-      border: 2px solid #ddd;
-      border-radius: var(--border-radius);
-      font-size: clamp(14px, 4vw, 16px);
-      transition: var(--transition);
-      background: white;
-    }
+    thead { background: var(--surface2); }
 
-    .form-group input:focus,
-    .form-group select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
-    }
-
-    .btn {
-      width: 100%;
-      padding: clamp(12px, 3vw, 16px);
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: var(--border-radius);
-      font-size: clamp(14px, 4vw, 16px);
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .btn:hover:not(:disabled) {
-      background: var(--primary-dark);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .btn:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .btn-secondary {
-      background: var(--secondary);
-    }
-
-    .btn-secondary:hover:not(:disabled) {
-      background: var(--secondary-dark);
-    }
-
-    .btn-logout {
-      background: #dc3545;
-      margin-top: 10px;
-    }
-
-    .btn-logout:hover:not(:disabled) {
-      background: #c82333;
-    }
-
-    .employee-info {
-      background: linear-gradient(45deg, #f8f9fa, #ffffff);
-      border: 2px solid var(--primary);
-      border-radius: var(--border-radius);
-      padding: 15px;
-      margin-bottom: 20px;
-      display: none;
-      box-shadow: 0 2px 10px rgba(76, 175, 80, 0.1);
-    }
-
-    .employee-info h3 {
-      color: var(--primary);
-      margin-bottom: 10px;
-      font-size: clamp(16px, 4vw, 18px);
-    }
-
-    .employee-info p {
-      margin: 5px 0;
-      color: #6c757d;
-      font-size: clamp(13px, 3vw, 14px);
-    }
-
-    .employee-info .highlight {
-      font-weight: 600;
-      color: #495057;
-    }
-
-    #respuesta {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: var(--border-radius);
-      text-align: center;
-      font-weight: 600;
-      display: none;
-      font-size: clamp(13px, 3.5vw, 15px);
-    }
-
-    .success {
-      background: var(--success-light);
-      color: var(--success-text);
-      border: 1px solid #c3e6cb;
-    }
-
-    .error {
-      background: var(--error-light);
-      color: var(--error-text);
-      border: 1px solid #f5c6cb;
-    }
-
-    .warning {
-      background: var(--warning-light);
-      color: var(--warning-text);
-      border: 1px solid #ffeaa7;
-    }
-
-    .loading {
-      display: inline-block;
-      width: 18px;
-      height: 18px;
-      border: 2px solid #f3f3f3;
-      border-top: 2px solid var(--primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* ============================================
-       PESTAÑAS DE GESTIÓN
-    ============================================ */
-    .gestion-tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #e0e0e0;
-      padding-bottom: 10px;
-    }
-
-    .gestion-tab {
-      padding: 10px 20px;
-      background: none;
-      border: none;
-      font-size: 16px;
-      font-weight: 600;
-      color: #666;
-      cursor: pointer;
-      border-radius: var(--border-radius) var(--border-radius) 0 0;
-      transition: var(--transition);
-    }
-
-    .gestion-tab.active {
-      color: var(--primary);
-      border-bottom: 3px solid var(--primary);
-    }
-
-    .gestion-tab:hover {
-      color: var(--primary-dark);
-    }
-
-    .gestion-section {
-      display: none;
-    }
-
-    .gestion-section.active {
-      display: block;
-    }
-
-    /* ============================================
-       TABLAS Y REPORTES
-    ============================================ */
-    .admin-panel {
-      margin-top: 20px;
-      border: 2px solid #cbd5e1;
-      border-radius: var(--border-radius);
-      padding: 12px;
-      background: #f8fafc;
-    }
-
-    .admin-panel h4 {
-      font-size: clamp(14px, 4vw, 16px);
-      margin-bottom: 10px;
-      color: #1f2937;
-    }
-
-    .table-container {
-      overflow-x: auto;
-      max-height: 400px;
-      overflow-y: auto;
-      border: 1px solid #e0e0e0;
-      border-radius: var(--border-radius);
-      margin: 20px 0;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-
-    th {
-      background: var(--primary);
-      color: white;
-      padding: 12px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    td {
-      padding: 10px 12px;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    tr:hover {
-      background: #f5f5f5;
-    }
-
-    .estado-badge {
-      padding: 4px 8px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      display: inline-block;
-    }
-
-    .estado-ingreso {
-      background: var(--success-light);
-      color: var(--success-text);
-    }
-
-    .estado-salida {
-      background: var(--warning-light);
-      color: var(--warning-text);
-    }
-
-    .filter-bar {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-      align-items: center;
-    }
-
-    .filter-input {
-      flex: 1;
-      min-width: 150px;
-      padding: 10px;
-      border: 2px solid #e0e0e0;
-      border-radius: var(--border-radius);
-      font-size: 14px;
-    }
-
-    .filter-select {
-      padding: 10px;
-      border: 2px solid #e0e0e0;
-      border-radius: var(--border-radius);
-      font-size: 14px;
-      background: white;
-    }
-
-    .stats-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .stat-card {
-      background: linear-gradient(45deg, #f8f9fa, #ffffff);
-      border: 1px solid #e0e0e0;
-      border-radius: var(--border-radius);
-      padding: 15px;
-      text-align: center;
-    }
-
-    .stat-card .number {
-      font-size: 28px;
+    thead th {
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 11px;
       font-weight: 700;
-      color: var(--primary);
-    }
-
-    .stat-card .label {
-      font-size: 12px;
-      color: #666;
       text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
     }
 
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 10000;
-      justify-content: center;
+    tbody tr { border-bottom: 1px solid var(--border); transition: var(--transition); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface2); }
+
+    tbody td { padding: 12px 14px; vertical-align: middle; }
+
+    .badge {
+      display: inline-flex;
       align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    .modal.active {
-      display: flex;
-    }
+    .badge-green { background: rgba(16,185,129,0.15); color: #34d399; }
+    .badge-red { background: rgba(239,68,68,0.15); color: #f87171; }
+    .badge-blue { background: rgba(59,130,246,0.15); color: #93c5fd; }
 
-    .modal-content {
-      background: white;
-      border-radius: var(--border-radius);
-      padding: 30px;
-      max-width: 500px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    /* ==================== FILTROS REPORTE ==================== */
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
       margin-bottom: 20px;
     }
 
-    .close-btn {
-      background: none;
-      border: none;
-      font-size: 24px;
+    .checkbox-group { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+
+    .checkbox-item { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+
+    .checkbox-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
       cursor: pointer;
-      color: #999;
     }
 
-    .action-btn {
-      padding: 6px 10px;
-      border: none;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      font-size: 12px;
-      margin: 0 2px;
-      transition: var(--transition);
-    }
+    .checkbox-item span { font-size: 14px; color: var(--text); font-weight: 500; }
 
-    .btn-edit {
-      background: var(--secondary);
-      color: white;
-    }
-
-    .btn-edit:hover {
-      background: var(--secondary-dark);
-    }
-
-    .btn-delete {
-      background: #dc3545;
-      color: white;
-    }
-
-    .btn-delete:hover {
-      background: #c82333;
-    }
-
-    .btn-export {
-      background: #6c757d;
-      color: white;
-    }
-
-    .btn-export:hover {
-      background: #5a6268;
-    }
-
+    /* ==================== PROGRESS ==================== */
+    .progress-wrap { margin: 12px 0; display: none; }
     .progress-bar {
       width: 100%;
-      height: 20px;
-      background: #e9ecef;
-      border-radius: 10px;
+      height: 6px;
+      background: var(--surface2);
+      border-radius: 3px;
       overflow: hidden;
-      margin: 10px 0;
-      display: none;
     }
 
     .progress-fill {
       height: 100%;
-      background: var(--primary);
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
       width: 0%;
       transition: width 0.3s ease;
+      border-radius: 3px;
     }
 
+    /* ==================== TOAST ==================== */
     .toast {
       position: fixed;
-      bottom: 20px;
+      bottom: 24px;
       left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: white;
-      color: #333;
-      padding: 12px 24px;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 22px;
       border-radius: 50px;
-      box-shadow: var(--shadow-sm);
-      z-index: 1000;
+      box-shadow: var(--shadow);
+      z-index: 9000;
       opacity: 0;
       transition: all 0.3s ease;
-      font-weight: 500;
+      font-weight: 600;
+      font-size: 14px;
+      white-space: nowrap;
     }
 
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.success { background: var(--success); color: white; border-color: var(--success); }
+    .toast.error { background: var(--danger); color: white; border-color: var(--danger); }
+    .toast.warning { background: var(--warning); color: white; border-color: var(--warning); }
+
+    /* ==================== LOADING ==================== */
+    .loading {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
     }
 
-    .toast.success {
-      background: var(--primary);
-      color: white;
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .toast.error {
-      background: #dc3545;
-      color: white;
-    }
-
-    .toast.warning {
-      background: #ff9800;
-      color: white;
-    }
-
-    .admin-status {
+    /* ==================== MOBILE TOGGLE ==================== */
+    .mobile-menu-btn {
       display: none;
-      margin-top: 10px;
-      padding: 10px;
-      border-radius: var(--border-radius);
-      font-size: clamp(12px, 3vw, 14px);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    @media (max-width: 650px) {
+      .mobile-menu-btn { display: flex; align-items: center; }
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 99;
+      }
+      .sidebar-overlay.show { display: block; }
+    }
+
+    /* ==================== EMPTY STATE ==================== */
+    .empty-state {
       text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
     }
 
-    .admin-success {
-      background: var(--success-light);
-      color: var(--success-text);
-      border: 1px solid #c3e6cb;
+    .empty-state span { font-size: 40px; display: block; margin-bottom: 10px; }
+    .empty-state p { font-size: 14px; }
+
+    /* ==================== DIVIDER ==================== */
+    .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+    /* ==================== RECENT TABLE ==================== */
+    .recent-row-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-muted);
     }
 
-    .admin-error {
-      background: var(--error-light);
-      color: var(--error-text);
-      border: 1px solid #f5c6cb;
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+
+    /* ==================== REPORTE RESUMEN TARJETAS ==================== */
+    .report-summary { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+
+    .report-stat {
+      flex: 1;
+      min-width: 120px;
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      text-align: center;
+      border: 1px solid var(--border);
     }
 
-    .admin-info {
-      background: #d1ecf1;
-      color: #0c5460;
-      border: 1px solid #bee5eb;
-    }
-
-    @media (max-width: 480px) {
-      body {
-        padding: 5px;
-      }
-      
-      .content {
-        padding: 15px;
-      }
-      
-      .toggle-wrapper {
-        justify-content: center;
-      }
-      
-      .filter-bar {
-        flex-direction: column;
-      }
-      
-      .filter-input, .filter-select {
-        width: 100%;
-      }
-      
-      .login-card {
-        padding: 30px 20px;
-      }
-    }
+    .report-stat .num { font-size: 26px; font-weight: 800; }
+    .report-stat .lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
   </style>
 </head>
 <body>
-  <!-- LOGIN -->
-  <div id="login-overlay">
-    <div class="login-decoration">
-      <div class="decoration-circle circle1"></div>
-      <div class="decoration-circle circle2"></div>
-      <div class="decoration-circle circle3"></div>
-    </div>
-    
-    <div class="login-container">
-      <div class="login-card">
-        <div class="login-header">
-          <div class="login-icon">
-            <span>🔐</span>
-          </div>
-          <h2>Bienvenido</h2>
-          <p>Ingresa tus credenciales</p>
+
+<!-- ==================== LOGIN ==================== -->
+<div id="login-overlay">
+  <div class="login-bg-grid"></div>
+  <div class="login-glow"></div>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="login-logo-icon">🏢</div>
+        <h2>La Base Cowork</h2>
+        <p>Sistema de Control de Asistencia v4.0</p>
+      </div>
+      <div class="login-input-group">
+        <label for="login-user">Usuario</label>
+        <div class="login-input-wrap">
+          <span>👤</span>
+          <input type="text" id="login-user" placeholder="Ingresa tu usuario" autocomplete="off" autofocus>
         </div>
-        
-        <div class="login-form">
-          <div class="input-group">
-            <label>Usuario</label>
-            <div class="input-wrapper">
-              <span class="input-icon">👤</span>
-              <input type="text" id="login-user" placeholder="admin" autofocus>
+      </div>
+      <div class="login-input-group">
+        <label for="login-pass">Contraseña</label>
+        <div class="login-input-wrap">
+          <span>🔑</span>
+          <input type="password" id="login-pass" placeholder="Ingresa tu contraseña">
+        </div>
+      </div>
+      <button class="login-btn" onclick="verificarLogin()">Ingresar →</button>
+      <div id="login-error" class="login-error">⚠️ Usuario o contraseña incorrectos</div>
+      <div class="login-footer">
+        <p>© 2026 La Base Cowork — v4.0</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== OVERLAY MÓVIL ==================== -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- ==================== APP PRINCIPAL ==================== -->
+<div id="main-content">
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <h1>🏢 La Base<br>Cowork</h1>
+        <p>Control de Asistencia</p>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Principal</div>
+        <button class="nav-item active" onclick="showPage('asistencia', this)">
+          <span class="nav-icon">📷</span> Registrar Asistencia
+        </button>
+        <button class="nav-item" onclick="showPage('dashboard', this)">
+          <span class="nav-icon">📊</span> Dashboard
+        </button>
+
+        <div class="nav-section-label">Gestión</div>
+        <button class="nav-item" onclick="showPage('usuarios', this)">
+          <span class="nav-icon">👥</span> Registrar Usuario
+        </button>
+        <button class="nav-item" onclick="showPage('reportes', this)">
+          <span class="nav-icon">📋</span> Reportes & Exportar
+        </button>
+
+        <div class="nav-section-label">Admin</div>
+        <button class="nav-item" onclick="showPage('carnets', this)">
+          <span class="nav-icon">🪪</span> Generar Carnets
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="btn-logout-side" onclick="cerrarSesion()">
+          <span>🚪</span> Cerrar Sesión
+        </button>
+      </div>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL -->
+    <main class="main-area">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+          <span class="topbar-title" id="page-title">Registrar Asistencia</span>
+        </div>
+        <div class="topbar-time" id="reloj-tiempo">--:--:--</div>
+      </div>
+
+      <!-- ======== PÁGINA: ASISTENCIA ======== -->
+      <div class="page-content active" id="page-asistencia">
+        <div class="scan-grid">
+          <div>
+            <div class="card">
+              <div class="card-title">📷 Escáner QR</div>
+              <div class="camera-toggle-row">
+                <span class="switch-label">Cámara:</span>
+                <label class="switch">
+                  <input type="checkbox" id="camera-toggle" checked>
+                  <span class="slider"></span>
+                </label>
+                <span id="camera-status" style="font-size:13px;color:var(--text-muted);">Activada</span>
+              </div>
+              <div class="qr-status" id="qr-status">Iniciando cámara...</div>
+              <div style="margin-bottom:10px;">
+                <select id="camera-select" class="form-group" style="width:100%;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Outfit',sans-serif;display:none;">
+                  <option value="">Seleccione una cámara...</option>
+                </select>
+              </div>
+              <div id="reader"></div>
+              <button class="btn btn-ghost btn-sm" id="reiniciar-btn" onclick="reiniciarQR()" style="display:none;width:100%;margin-top:6px;">
+                🔄 Reiniciar Escáner
+              </button>
             </div>
           </div>
-          
-          <div class="input-group">
-            <label>Contraseña</label>
-            <div class="input-wrapper">
-              <span class="input-icon">🔑</span>
-              <input type="password" id="login-pass" placeholder="••••••">
+
+          <div>
+            <div class="card">
+              <div class="card-title">✏️ Registro Manual</div>
+              <form id="formulario">
+                <div class="form-group">
+                  <label for="id">ID del Colaborador</label>
+                  <input type="text" id="id" required placeholder="Ingrese su ID o escanee QR">
+                </div>
+                <div class="employee-info" id="employee-info">
+                  <h4>👤 Información del Colaborador</h4>
+                  <p>Nombre: <span class="val" id="employee-name">-</span></p>
+                  <p>Grado/Sección: <span class="val" id="employee-area">-</span></p>
+                  <p>Perfil: <span class="val" id="employee-position">-</span></p>
+                </div>
+                <div class="form-group">
+                  <label for="estado">Estado</label>
+                  <select id="estado" required>
+                    <option value="INGRESO">✅ INGRESO</option>
+                    <option value="SALIDA">🚪 SALIDA</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full" id="btn-submit" disabled>
+                  ✅ Registrar Asistencia
+                </button>
+              </form>
+              <div class="respuesta" id="respuesta"></div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">🕐 Últimos Registros de Hoy</div>
+              <div id="ultimos-registros-wrap">
+                <div class="empty-state"><span>⏳</span><p>Cargando...</p></div>
+              </div>
             </div>
           </div>
-          
-          <button class="login-btn" onclick="verificarLogin()">
-            <span>Ingresar</span>
-            <span>→</span>
-          </button>
-        </div>
-        
-        <div id="login-error" class="login-error">
-          ⚠️ Usuario o contraseña incorrectos
-        </div>
-        
-        <div class="login-footer">
-          <p>Sistema de Control de Asistencia v5.0</p>
-          <p>© 2026 - La Base Cowork</p>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- CONTENIDO PRINCIPAL -->
-  <div class="container" id="main-content" style="display: none;">
-    <div class="header">
-      <h1>CONTROL DE ASISTENCIA</h1>
-      <p>Escanea tu código QR o ingresa tu ID</p>
-    </div>
-    
-    <div class="content">
-      <div class="time-display" id="reloj-tiempo">Cargando...</div>
-      
-      <!-- PESTAÑAS DE GESTIÓN -->
-      <div class="gestion-tabs">
-        <button class="gestion-tab active" onclick="cambiarSeccion('asistencia')">📱 Asistencia</button>
-        <button class="gestion-tab" onclick="cambiarSeccion('colaboradores')">👥 Colaboradores</button>
-        <button class="gestion-tab" onclick="cambiarSeccion('reportes')">📊 Reportes</button>
+      <!-- ======== PÁGINA: DASHBOARD ======== -->
+      <div class="page-content" id="page-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon green">📥</div>
+            <div class="stat-value" id="stat-ingresos">0</div>
+            <div class="stat-label">Ingresos Hoy</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon blue">📤</div>
+            <div class="stat-value" id="stat-salidas">0</div>
+            <div class="stat-label">Salidas Hoy</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon amber">👥</div>
+            <div class="stat-value" id="stat-unicos">0</div>
+            <div class="stat-label">Personas Únicas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon purple">📋</div>
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-label">Total Registros</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">🗃️</div>
+            <div class="stat-value" id="stat-usuarios-total">0</div>
+            <div class="stat-label">Usuarios en Base</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">📋 Actividad Reciente de Hoy</div>
+          <div id="dash-registros-wrap">
+            <div class="empty-state"><span>⏳</span><p>Cargando...</p></div>
+          </div>
+        </div>
       </div>
 
-      <!-- SECCIÓN ASISTENCIA (ORIGINAL) -->
-      <div id="seccion-asistencia" class="gestion-section active">
-        <div class="camera-toggle">
-          <div class="toggle-wrapper">
-            <span>Cámara:</span>
-            <label class="switch">
-              <input type="checkbox" id="camera-toggle" checked>
-              <span class="slider"></span>
-            </label>
-            <span id="camera-status">Activada</span>
+      <!-- ======== PÁGINA: REGISTRAR USUARIO ======== -->
+      <div class="page-content" id="page-usuarios">
+        <div style="max-width:700px;">
+          <div class="card">
+            <div class="card-title">➕ Registrar Nuevo Usuario</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="nu-id">ID *</label>
+                <input type="text" id="nu-id" placeholder="Ej: 2024001" required>
+              </div>
+              <div class="form-group">
+                <label for="nu-nombres">Nombres *</label>
+                <input type="text" id="nu-nombres" placeholder="Ej: Juan Carlos" required>
+              </div>
+              <div class="form-group">
+                <label for="nu-apellidos">Apellidos *</label>
+                <input type="text" id="nu-apellidos" placeholder="Ej: García Pérez" required>
+              </div>
+              <div class="form-group">
+                <label for="nu-grado">Grado / Sección *</label>
+                <input type="text" id="nu-grado" placeholder="Ej: 5to A" required>
+              </div>
+              <div class="form-group">
+                <label for="nu-perfil">Perfil / Cargo</label>
+                <input type="text" id="nu-perfil" placeholder="Ej: Estudiante">
+              </div>
+              <div class="form-group">
+                <label for="nu-telefono">Teléfono (WhatsApp)</label>
+                <input type="text" id="nu-telefono" placeholder="Ej: 999888777">
+              </div>
+              <div class="form-group full">
+                <label for="nu-foto">URL Foto (Google Drive)</label>
+                <input type="text" id="nu-foto" placeholder="https://drive.google.com/...">
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;">
+              <button class="btn btn-primary" id="btn-registrar-usuario" onclick="registrarNuevoUsuario()">
+                💾 Guardar Usuario
+              </button>
+              <button class="btn btn-ghost" onclick="limpiarFormUsuario()">
+                🗑️ Limpiar
+              </button>
+            </div>
+            <div class="respuesta" id="respuesta-usuario"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">🔍 Buscar Usuario Existente</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <input type="text" id="buscar-usuario-id" placeholder="Ingresa ID del usuario" 
+                style="flex:1;min-width:200px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Outfit',sans-serif;outline:none;">
+              <button class="btn btn-secondary" onclick="buscarUsuarioAdmin()">🔍 Buscar</button>
+            </div>
+            <div id="busqueda-resultado" style="margin-top:14px;"></div>
           </div>
         </div>
-        
-        <div class="qr-status" id="qr-status">Iniciando cámara...</div>
-        
-        <div class="camera-controls" id="camera-controls">
-          <div class="camera-select">
-            <select id="camera-select">
-              <option value="">Seleccione una cámara...</option>
-            </select>
+      </div>
+
+      <!-- ======== PÁGINA: REPORTES ======== -->
+      <div class="page-content" id="page-reportes">
+        <div class="card">
+          <div class="card-title">🔎 Filtros del Reporte</div>
+          <div class="filter-grid">
+            <div class="form-group">
+              <label>Fecha Inicio</label>
+              <input type="date" id="rep-fecha-inicio">
+            </div>
+            <div class="form-group">
+              <label>Fecha Fin</label>
+              <input type="date" id="rep-fecha-fin">
+            </div>
+            <div class="form-group">
+              <label>ID de Usuario (opcional)</label>
+              <input type="text" id="rep-id-usuario" placeholder="Dejar vacío = todos">
+            </div>
+            <div class="form-group">
+              <label>Área / Grado (opcional)</label>
+              <select id="rep-area">
+                <option value="">Todas las áreas</option>
+              </select>
+            </div>
           </div>
-        </div>
-        
-        <div id="reader"></div>
-        
-        <button type="button" class="btn btn-secondary" id="reiniciar-btn" onclick="reiniciarQR()" style="display: none;">
-          Reiniciar Escáner
-        </button>
-        
-        <form id="formulario">
           <div class="form-group">
-            <label for="id">ID del Colaborador:</label>
-            <input type="text" id="id" required placeholder="Ingrese su ID">
+            <label>Tipo de Registro</label>
+            <div class="checkbox-group">
+              <label class="checkbox-item">
+                <input type="checkbox" id="rep-ingreso" checked>
+                <span>✅ INGRESO</span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="rep-salida" checked>
+                <span>🚪 SALIDA</span>
+              </label>
+            </div>
           </div>
-          
-          <div class="employee-info" id="employee-info">
-            <h3>Información del Colaborador</h3>
-            <p><strong>Nombre:</strong> <span id="employee-name" class="highlight">-</span></p>
-            <p><strong>Área:</strong> <span id="employee-area" class="highlight">-</span></p>
-            <p><strong>Cargo:</strong> <span id="employee-position" class="highlight">-</span></p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;">
+            <button class="btn btn-secondary" onclick="cargarReporte()">
+              🔍 Ver Reporte
+            </button>
+            <button class="btn btn-excel" id="btn-exportar-excel" onclick="exportarExcel()" disabled>
+              📥 Exportar Excel
+            </button>
           </div>
-          
-          <div class="form-group">
-            <label for="estado">Estado:</label>
-            <select id="estado" required>
-              <option value="INGRESO">INGRESO</option>
-              <option value="SALIDA">SALIDA</option>
-            </select>
-          </div>
-          
-          <button type="submit" class="btn" id="btn-submit" disabled>
-            Registrar Asistencia
-          </button>
-        </form>
-        
-        <div id="respuesta"></div>
-      </div>
+        </div>
 
-      <!-- SECCIÓN GESTIÓN DE COLABORADORES (NUEVA) -->
-      <div id="seccion-colaboradores" class="gestion-section">
-        <h3 style="margin-bottom: 15px; color: var(--primary);">👥 Gestión de Colaboradores</h3>
-        
-        <button class="btn" onclick="mostrarModalColaborador()">
-          ➕ Nuevo Colaborador
-        </button>
-        
-        <div class="filter-bar">
-          <input type="text" class="filter-input" id="buscarColaborador" 
-                 placeholder="🔍 Buscar por ID, nombre o área..." onkeyup="filtrarColaboradores()">
+        <div id="reporte-resumen" style="display:none;" class="report-summary">
+          <div class="report-stat">
+            <div class="num" id="rep-stat-total">0</div>
+            <div class="lbl">Total Registros</div>
+          </div>
+          <div class="report-stat">
+            <div class="num" id="rep-stat-ingresos">0</div>
+            <div class="lbl">Ingresos</div>
+          </div>
+          <div class="report-stat">
+            <div class="num" id="rep-stat-salidas">0</div>
+            <div class="lbl">Salidas</div>
+          </div>
+          <div class="report-stat">
+            <div class="num" id="rep-stat-personas">0</div>
+            <div class="lbl">Personas Únicas</div>
+          </div>
         </div>
-        
-        <div class="table-container">
-          <table id="tabla-colaboradores">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombres</th>
-                <th>Apellidos</th>
-                <th>Área</th>
-                <th>Cargo</th>
-                <th>Teléfono</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="colaboradores-body">
-              <tr>
-                <td colspan="7" style="text-align: center;">Cargando colaboradores...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
 
-      <!-- SECCIÓN REPORTES DE ASISTENCIA (NUEVA) -->
-      <div id="seccion-reportes" class="gestion-section">
-        <h3 style="margin-bottom: 15px; color: var(--primary);">📊 Reportes de Asistencia</h3>
-        
-        <div class="filter-bar">
-          <input type="date" class="filter-input" id="fechaInicio">
-          <input type="date" class="filter-input" id="fechaFin">
-          <select class="filter-select" id="filtroArea">
-            <option value="">Todas las áreas</option>
-          </select>
-          <select class="filter-select" id="filtroEstado">
-            <option value="">Todos los estados</option>
-            <option value="INGRESO">INGRESO</option>
-            <option value="SALIDA">SALIDA</option>
-          </select>
-          <button class="btn btn-secondary" onclick="cargarReporte()" style="margin: 0;">Filtrar</button>
-          <button class="btn btn-export" onclick="exportarReporte()">📥 Exportar CSV</button>
-        </div>
-        
-        <div class="stats-cards">
-          <div class="stat-card">
-            <div class="number" id="total-registros">0</div>
-            <div class="label">Total Registros</div>
+        <div class="card" id="reporte-tabla-card" style="display:none;">
+          <div class="card-title">📋 Resultados del Reporte</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Fecha/Hora</th>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Área / Grado</th>
+                  <th>Perfil</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="reporte-tbody"></tbody>
+            </table>
           </div>
-          <div class="stat-card">
-            <div class="number" id="total-ingresos">0</div>
-            <div class="label">Ingresos</div>
-          </div>
-          <div class="stat-card">
-            <div class="number" id="total-salidas">0</div>
-            <div class="label">Salidas</div>
-          </div>
-          <div class="stat-card">
-            <div class="number" id="colaboradores-unicos">0</div>
-            <div class="label">Colaboradores Únicos</div>
-          </div>
-        </div>
-        
-        <div class="table-container">
-          <table id="tabla-reporte">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Hora</th>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Área</th>
-                <th>Cargo</th>
-                <th>Estado</th>
-                <th>Dispositivo</th>
-              </tr>
-            </thead>
-            <tbody id="reporte-body">
-              <tr>
-                <td colspan="8" style="text-align: center;">Seleccione filtros y haga clic en Filtrar</td>
-              </tr>
-            </tbody>
-          </table>
         </div>
       </div>
 
-      <!-- PANEL ADMINISTRADOR (ORIGINAL) -->
-      <div class="admin-panel">
-        <button type="button" class="btn btn-secondary" id="admin-toggle">📋 Panel Administrador</button>
-        <div id="admin-body" style="display: none;">
-          <h4>Generar Carnets</h4>
-          
-          <div class="form-group">
-            <label for="admin-id">ID del Colaborador:</label>
-            <input type="text" id="admin-id" placeholder="Ej: 2024001">
+      <!-- ======== PÁGINA: CARNETS ======== -->
+      <div class="page-content" id="page-carnets">
+        <div style="max-width:600px;">
+          <div class="card">
+            <div class="card-title">🪪 Generar Carnet Individual</div>
+            <div class="form-group">
+              <label for="carnet-id">ID del Colaborador</label>
+              <input type="text" id="carnet-id" placeholder="Ej: 2024001">
+            </div>
+            <button class="btn btn-primary" id="btn-carnet-ind" onclick="generarCarnetIndividual()">
+              📄 Generar PDF
+            </button>
+            <div class="progress-wrap" id="prog-ind">
+              <div class="progress-bar"><div class="progress-fill" id="prog-ind-fill"></div></div>
+            </div>
+            <div class="respuesta" id="resp-carnet-ind"></div>
           </div>
-          <button type="button" class="btn" id="admin-generar-id">
-            📄 Generar Carnet Individual
-          </button>
-          
-          <div class="form-group" style="margin-top: 15px;">
-            <label for="admin-area">Área:</label>
-            <select id="admin-area">
-              <option value="">Cargando áreas...</option>
-            </select>
+
+          <div class="card">
+            <div class="card-title">📚 Generar Carnets por Grado</div>
+            <div class="form-group">
+              <label for="carnet-grado">Grado / Sección</label>
+              <select id="carnet-grado">
+                <option value="">Cargando grados...</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" id="btn-carnet-lote" onclick="generarCarnetLote()">
+              📚 Generar Lote PDF
+            </button>
+            <div class="progress-wrap" id="prog-lote">
+              <div class="progress-bar"><div class="progress-fill" id="prog-lote-fill"></div></div>
+            </div>
+            <div class="respuesta" id="resp-carnet-lote"></div>
           </div>
-          <button type="button" class="btn" id="admin-generar-lote">
-            📚 Generar Carnets por Área
-          </button>
-          
-          <div class="progress-bar" id="progress-bar">
-            <div class="progress-fill" id="progress-fill"></div>
-          </div>
-          
-          <div id="admin-status" class="admin-status"></div>
         </div>
       </div>
 
-      <!-- Botón de Cerrar Sesión -->
-      <button type="button" class="btn btn-logout" onclick="cerrarSesion()">
-        🚪 Cerrar Sesión
-      </button>
-    </div>
+    </main>
   </div>
+</div>
 
-  <!-- MODAL PARA COLABORADORES -->
-  <div id="modal-colaborador" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="modal-titulo">Nuevo Colaborador</h3>
-        <button class="close-btn" onclick="cerrarModalColaborador()">&times;</button>
-      </div>
-      
-      <form id="form-colaborador" onsubmit="guardarColaborador(event)">
-        <input type="hidden" id="colaborador-id-original">
-        
-        <div class="form-group">
-          <label>ID *</label>
-          <input type="text" id="colaborador-id" required class="filter-input" placeholder="ID único">
-          <small style="color: #666; display: block; margin-top: 5px;">⚠️ El ID no se puede repetir</small>
-        </div>
-        
-        <div class="form-group">
-          <label>Nombres *</label>
-          <input type="text" id="colaborador-nombres" required class="filter-input">
-        </div>
-        
-        <div class="form-group">
-          <label>Apellidos *</label>
-          <input type="text" id="colaborador-apellidos" required class="filter-input">
-        </div>
-        
-        <div class="form-group">
-          <label>Área *</label>
-          <input type="text" id="colaborador-area" required class="filter-input" 
-                 placeholder="Ej: Ventas / 5to A">
-        </div>
-        
-        <div class="form-group">
-          <label>Cargo</label>
-          <input type="text" id="colaborador-cargo" class="filter-input" 
-                 placeholder="Ej: Supervisor / Estudiante">
-        </div>
-        
-        <div class="form-group">
-          <label>Teléfono</label>
-          <input type="text" id="colaborador-telefono" class="filter-input" 
-                 placeholder="Ej: 987654321">
-        </div>
-        
-        <div class="form-group">
-          <label>URL de Foto (opcional)</label>
-          <input type="url" id="colaborador-foto" class="filter-input" 
-                 placeholder="https://...">
-        </div>
-        
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
-          <button type="submit" class="btn" style="flex: 1;">Guardar</button>
-          <button type="button" class="btn btn-secondary" style="flex: 1;" 
-                  onclick="cerrarModalColaborador()">Cancelar</button>
-        </div>
-      </form>
-    </div>
-  </div>
+<div id="toast" class="toast"></div>
 
-  <!-- Toast -->
-  <div id="toast" class="toast"></div>
+<script>
+// ============================================================
+// CONFIGURACIÓN
+// ============================================================
+const CONFIG = {
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxxNz9FhBV3ybKs8CMow5mc1PusG2AybD6_POwWvsUR813pNC60OFS_VDzbpzGs24k/exec',
+  USUARIO: 'admin',
+  CONTRASEÑA: 'pip2026',
+  TIEMPO_TOAST: 3500
+};
 
-  <script>
-    // ============================================
-    // CONFIGURACIÓN
-    // ============================================
-    const CONFIG = {
-      APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxxNz9FhBV3ybKs8CMow5mc1PusG2AybD6_POwWvsUR813pNC60OFS_VDzbpzGs24k/exec', // ¡CAMBIA ESTO!
-      USUARIO: 'admin',
-      CONTRASEÑA: 'pip2026',
-      TIEMPO_TOAST: 3000,
-      VERSION: '5.0.0-completo'
-    };
+// ============================================================
+// ESTADO GLOBAL
+// ============================================================
+let qrCodeReader = null, isScanning = false, searchTimeout = null;
+let studentData = null, selectedCameraId = null, cameraEnabled = true;
+let reporteData = [];
 
-    // ============================================
-    // SISTEMA DE LOGIN
-    // ============================================
-    function verificarLogin() {
-      const user = document.getElementById('login-user').value.trim();
-      const pass = document.getElementById('login-pass').value.trim();
-      const errorEl = document.getElementById('login-error');
-      
-      if (user === CONFIG.USUARIO && pass === CONFIG.CONTRASEÑA) {
-        const btn = event?.target || document.querySelector('.login-btn');
-        btn.innerHTML = '<span>✓ Acceso concedido</span>';
-        
-        localStorage.setItem('auth_pip', 'true');
-        
-        setTimeout(() => {
-          document.getElementById('login-overlay').style.display = 'none';
-          document.getElementById('main-content').style.display = 'block';
-          mostrarToast('¡Bienvenido al sistema!', 'success');
-          iniciarAplicacion();
-        }, 500);
-      } else {
-        errorEl.style.display = 'block';
-        document.getElementById('login-pass').value = '';
-        document.getElementById('login-user').focus();
-        
-        setTimeout(() => {
-          errorEl.style.display = 'none';
-        }, 3000);
-      }
-    }
+// ============================================================
+// LOGIN
+// ============================================================
+function verificarLogin() {
+  const user = document.getElementById('login-user').value.trim();
+  const pass = document.getElementById('login-pass').value.trim();
+  const errEl = document.getElementById('login-error');
+  if (user === CONFIG.USUARIO && pass === CONFIG.CONTRASEÑA) {
+    localStorage.setItem('auth_pip', 'true');
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('main-content').style.display = 'block';
+    mostrarToast('¡Bienvenido!', 'success');
+    iniciarAplicacion();
+  } else {
+    errEl.style.display = 'block';
+    document.getElementById('login-pass').value = '';
+    setTimeout(() => errEl.style.display = 'none', 3000);
+  }
+}
 
-    function cerrarSesion() {
-      localStorage.removeItem('auth_pip');
-      mostrarToast('Sesión cerrada', 'warning');
-      setTimeout(() => location.reload(), 1000);
-    }
+function cerrarSesion() {
+  localStorage.removeItem('auth_pip');
+  mostrarToast('Sesión cerrada', 'warning');
+  setTimeout(() => location.reload(), 1000);
+}
 
-    // ============================================
-    // SISTEMA DE TOAST
-    // ============================================
-    function mostrarToast(mensaje, tipo = 'info') {
-      const toast = document.getElementById('toast');
-      toast.textContent = mensaje;
-      toast.className = 'toast show ' + tipo;
-      setTimeout(() => toast.className = 'toast', CONFIG.TIEMPO_TOAST);
-    }
+// ============================================================
+// NAVEGACIÓN
+// ============================================================
+function showPage(page, btn) {
+  document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  if (btn) btn.classList.add('active');
+  const titles = {
+    asistencia: 'Registrar Asistencia',
+    dashboard: 'Dashboard',
+    usuarios: 'Registrar Usuario',
+    reportes: 'Reportes & Exportar',
+    carnets: 'Generar Carnets'
+  };
+  document.getElementById('page-title').textContent = titles[page] || page;
+  closeSidebar();
+  if (page === 'dashboard') cargarDashboard();
+  if (page === 'reportes') cargarAreasEnFiltro();
+  if (page === 'carnets') cargarGradosCarnets();
+}
 
-    // ============================================
-    // COMUNICACIÓN CON APPS SCRIPT
-    // ============================================
-    async function llamarAppsScript(funcion, parametros = {}) {
-      try {
-        console.log(`📡 Llamando: ${funcion}`);
-        
-        if (funcion.includes('generar')) mostrarProgreso(30);
-        
-        const url = new URL(CONFIG.APPS_SCRIPT_URL);
-        url.searchParams.append('funcion', funcion);
-        url.searchParams.append('datos', JSON.stringify(parametros));
-        
-        const controller = new AbortController();
-        setTimeout(() => controller.abort(), 30000);
-        
-        const respuesta = await fetch(url.toString(), {
-          method: 'GET',
-          mode: 'cors',
-          signal: controller.signal
-        });
-        
-        if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
-        
-        const texto = await respuesta.text();
-        console.log('📥 Respuesta:', texto);
-        
-        if (funcion.includes('generar')) {
-          mostrarProgreso(80);
-          setTimeout(() => ocultarProgreso(), 500);
-        }
-        
-        return JSON.parse(texto);
-      } catch (error) {
-        console.error('❌ Error:', error);
-        ocultarProgreso();
-        return { error: true, mensaje: error.message };
-      }
-    }
+// ============================================================
+// SIDEBAR MOBILE
+// ============================================================
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+}
 
-    function mostrarProgreso(p) {
-      document.getElementById('progress-bar').style.display = 'block';
-      document.getElementById('progress-fill').style.width = p + '%';
-    }
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
 
-    function ocultarProgreso() {
-      setTimeout(() => {
-        document.getElementById('progress-bar').style.display = 'none';
-        document.getElementById('progress-fill').style.width = '0%';
-      }, 500);
-    }
+// ============================================================
+// TOAST
+// ============================================================
+function mostrarToast(msg, tipo = 'info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + tipo;
+  setTimeout(() => t.className = 'toast', CONFIG.TIEMPO_TOAST);
+}
 
-    // ============================================
-    // GENERAR ID ÚNICO DEL DISPOSITIVO
-    // ============================================
-    function generarIdDispositivo() {
-      let deviceId = localStorage.getItem('device_id');
-      if (!deviceId) {
-        const nav = navigator;
-        const screen = window.screen;
-        const componentes = [
-          nav.userAgent,
-          nav.language,
-          screen.width,
-          screen.height,
-          nav.hardwareConcurrency || '1',
-          new Date().getTimezoneOffset(),
-          nav.platform || 'unknown'
-        ].join('|');
-        
-        let hash = 0;
-        for (let i = 0; i < componentes.length; i++) {
-          hash = ((hash << 5) - hash) + componentes.charCodeAt(i);
-          hash |= 0;
-        }
-        
-        deviceId = 'dev_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36);
-        localStorage.setItem('device_id', deviceId);
-      }
-      return deviceId;
-    }
+// ============================================================
+// COMUNICACIÓN CON APPS SCRIPT
+// ============================================================
+async function llamarAppsScript(funcion, parametros = {}) {
+  try {
+    const url = new URL(CONFIG.APPS_SCRIPT_URL);
+    url.searchParams.append('funcion', funcion);
+    url.searchParams.append('datos', JSON.stringify(parametros));
+    const ctrl = new AbortController();
+    const tmt = setTimeout(() => ctrl.abort(), 30000);
+    const res = await fetch(url.toString(), { method: 'GET', mode: 'cors', signal: ctrl.signal });
+    clearTimeout(tmt);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return JSON.parse(await res.text());
+  } catch (e) {
+    return { error: true, mensaje: e.message };
+  }
+}
 
-    // ============================================
-    // CAMBIAR SECCIONES
-    // ============================================
-    function cambiarSeccion(seccion) {
-      document.querySelectorAll('.gestion-tab').forEach(tab => tab.classList.remove('active'));
-      document.querySelectorAll('.gestion-section').forEach(section => section.classList.remove('active'));
-      
-      if (seccion === 'asistencia') {
-        document.querySelectorAll('.gestion-tab')[0].classList.add('active');
-        document.getElementById('seccion-asistencia').classList.add('active');
-      } else if (seccion === 'colaboradores') {
-        document.querySelectorAll('.gestion-tab')[1].classList.add('active');
-        document.getElementById('seccion-colaboradores').classList.add('active');
-        cargarColaboradores();
-      } else if (seccion === 'reportes') {
-        document.querySelectorAll('.gestion-tab')[2].classList.add('active');
-        document.getElementById('seccion-reportes').classList.add('active');
-        cargarAreasParaFiltro();
-        const hoy = new Date();
-        const primero = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-        document.getElementById('fechaInicio').value = primero.toISOString().split('T')[0];
-        document.getElementById('fechaFin').value = hoy.toISOString().split('T')[0];
-      }
-    }
+// ============================================================
+// DISPOSITIVO ID
+// ============================================================
+function generarIdDispositivo() {
+  let id = localStorage.getItem('device_id');
+  if (!id) {
+    const c = [navigator.userAgent, navigator.language, screen.width, screen.height, new Date().getTimezoneOffset()].join('|');
+    let h = 0;
+    for (let i = 0; i < c.length; i++) { h = ((h << 5) - h) + c.charCodeAt(i); h |= 0; }
+    id = 'dev_' + Math.abs(h).toString(36) + '_' + Date.now().toString(36);
+    localStorage.setItem('device_id', id);
+  }
+  return id;
+}
 
-    // ============================================
-    // FUNCIONES DE TIEMPO
-    // ============================================
-    function actualizarReloj() {
-      const ahora = new Date();
-      document.getElementById('reloj-tiempo').innerHTML = `
-        <span style="font-size: 28px;">${ahora.toLocaleTimeString('es-PE')}</span><br>
-        <small>${ahora.toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' })}</small>
-      `;
-    }
+// ============================================================
+// RELOJ
+// ============================================================
+function actualizarReloj() {
+  const ahora = new Date();
+  document.getElementById('reloj-tiempo').textContent = ahora.toLocaleTimeString('es-PE');
+}
 
-    // ============================================
-    // FUNCIONES DE CÁMARA Y QR (ORIGINALES)
-    // ============================================
-    let qrCodeReader = null;
-    let isScanning = false;
-    let searchTimeout = null;
-    let collaboratorData = null;
-    let selectedCameraId = null;
-    let cameraEnabled = true;
+// ============================================================
+// CÁMARA / QR
+// ============================================================
+function esMobile() { return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent); }
 
-    function esMobile() {
-      return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    }
-    
-    function toggleCamera(enabled) {
-      cameraEnabled = enabled;
-      const statusSpan = document.getElementById('camera-status');
-      
-      if (enabled) {
-        statusSpan.textContent = 'Activada';
-        document.getElementById('reader').style.display = 'block';
-        document.getElementById('qr-status').style.display = 'block';
-        document.getElementById('reiniciar-btn').style.display = 'block';
-        cargarCamaras();
-      } else {
-        statusSpan.textContent = 'Desactivada';
-        detenerEscaneo();
-        document.getElementById('reader').style.display = 'none';
-        document.getElementById('qr-status').style.display = 'none';
-        document.getElementById('reiniciar-btn').style.display = 'none';
-        document.getElementById('camera-controls').style.display = 'none';
-      }
-    }
-    
-    function detenerEscaneo() {
-      if (qrCodeReader && isScanning) {
-        qrCodeReader.stop().then(() => {
-          qrCodeReader = null;
-          isScanning = false;
-        });
-      }
-    }
-    
-    function cargarCamaras() {
-      if (!cameraEnabled) return;
-      
-      Html5Qrcode.getCameras().then(devices => {
-        if (devices.length > 0) {
-          if (esMobile() && devices.length > 1) {
-            mostrarSelectorCamara(devices);
-          } else {
-            selectedCameraId = devices.find(d => 
-              d.label.toLowerCase().includes('back')
-            )?.id || devices[0].id;
-            iniciarEscaneo();
-          }
-        }
-      }).catch(err => {
-        actualizarEstadoQR("Error al detectar cámaras", true);
-      });
-    }
-    
-    function mostrarSelectorCamara(devices) {
-      const controlsDiv = document.getElementById('camera-controls');
-      const select = document.getElementById('camera-select');
-      
-      select.innerHTML = '<option value="">Seleccione una cámara...</option>';
-      devices.forEach((device, i) => {
-        const option = document.createElement('option');
-        option.value = device.id;
-        option.textContent = device.label.includes('back') ? '📷 Cámara Trasera' : `📱 Cámara ${i+1}`;
-        select.appendChild(option);
-      });
-      
-      controlsDiv.style.display = 'block';
-      
-      select.onchange = function() {
-        if (this.value) {
-          selectedCameraId = this.value;
-          reiniciarQR();
-        }
-      };
-      
-      const rearCamera = devices.find(d => d.label.toLowerCase().includes('back'));
-      if (rearCamera) {
-        select.value = rearCamera.id;
-        selectedCameraId = rearCamera.id;
+function toggleCamera(enabled) {
+  cameraEnabled = enabled;
+  document.getElementById('camera-status').textContent = enabled ? 'Activada' : 'Desactivada';
+  const r = document.getElementById('reader');
+  const s = document.getElementById('qr-status');
+  const rb = document.getElementById('reiniciar-btn');
+  if (enabled) {
+    r.style.display = 'block'; s.style.display = 'block'; rb.style.display = 'block';
+    cargarCamaras();
+  } else {
+    detenerEscaneo();
+    r.style.display = 'none'; s.style.display = 'none'; rb.style.display = 'none';
+    document.getElementById('camera-select').style.display = 'none';
+  }
+}
+
+function detenerEscaneo() {
+  if (qrCodeReader && isScanning) {
+    qrCodeReader.stop().then(() => { qrCodeReader = null; isScanning = false; }).catch(() => {});
+  }
+}
+
+function cargarCamaras() {
+  if (!cameraEnabled) return;
+  Html5Qrcode.getCameras().then(devices => {
+    if (devices.length > 0) {
+      if (esMobile() && devices.length > 1) mostrarSelectorCamara(devices);
+      else {
+        selectedCameraId = devices.find(d => d.label.toLowerCase().includes('back'))?.id || devices[0].id;
         iniciarEscaneo();
       }
     }
-    
-    function iniciarEscaneo() {
-      if (isScanning || !selectedCameraId || !cameraEnabled) return;
-      
-      document.getElementById('reader').innerHTML = '';
-      qrCodeReader = new Html5Qrcode('reader');
-      
-      qrCodeReader.start(
-        selectedCameraId,
-        { fps: 10, qrbox: 250 },
-        (decodedText) => {
-          document.getElementById('id').value = decodedText.trim();
-          buscarColaborador(decodedText.trim());
-          mostrarToast('✅ QR detectado');
-        },
-        () => {}
-      ).then(() => {
-        isScanning = true;
-        actualizarEstadoQR('📷 Escaneando...');
-      }).catch(err => {
-        actualizarEstadoQR('❌ Error con cámara', true);
-      });
-    }
-    
-    function actualizarEstadoQR(msg, error) {
-      const el = document.getElementById('qr-status');
-      el.textContent = msg;
-      el.style.background = error ? '#ffebee' : '#e3f2fd';
-      el.style.color = error ? '#c62828' : '#1565c0';
-    }
-    
-    function reiniciarQR() {
-      detenerEscaneo();
-      if (selectedCameraId && cameraEnabled) setTimeout(iniciarEscaneo, 500);
-    }
+  }).catch(() => actualizarEstadoQR('❌ Error al detectar cámaras', true));
+}
 
-    // ============================================
-    // FUNCIONES DE BÚSQUEDA Y REGISTRO (ORIGINALES)
-    // ============================================
-    async function buscarColaborador(id) {
-      if (!id.trim()) return ocultarInfoColaborador();
-      
-      mostrarBusqueda();
-      const resultado = await llamarAppsScript('buscarEstudiante', { id });
-      
-      if (resultado?.encontrado) {
-        collaboratorData = resultado.datos;
-        mostrarInfoColaborador(resultado.datos);
-        habilitarBotonRegistro();
-      } else {
-        ocultarInfoColaborador();
-        mostrarRespuesta(resultado?.mensaje || 'No encontrado', 'warning');
-        deshabilitarBotonRegistro();
-      }
-    }
-    
-    function mostrarBusqueda() {
-      document.getElementById('employee-info').style.display = 'block';
-      document.getElementById('employee-name').innerHTML = '<div class="loading"></div> Buscando...';
-    }
-    
-    function mostrarInfoColaborador(d) {
-      document.getElementById('employee-name').textContent = d.nombre || '-';
-      document.getElementById('employee-area').textContent = d.area || '-';
-      document.getElementById('employee-position').textContent = d.cargo || '-';
-    }
-    
-    function ocultarInfoColaborador() {
-      document.getElementById('employee-info').style.display = 'none';
-      collaboratorData = null;
-    }
-    
-    function habilitarBotonRegistro() {
-      document.getElementById('btn-submit').disabled = false;
-    }
-    
-    function deshabilitarBotonRegistro() {
+function mostrarSelectorCamara(devices) {
+  const sel = document.getElementById('camera-select');
+  sel.innerHTML = '<option value="">Seleccione cámara...</option>';
+  devices.forEach((d, i) => {
+    const o = document.createElement('option');
+    o.value = d.id;
+    o.textContent = d.label.toLowerCase().includes('back') ? '📷 Cámara Trasera' : `📱 Cámara ${i+1}`;
+    sel.appendChild(o);
+  });
+  sel.style.display = 'block';
+  sel.onchange = function() { if (this.value) { selectedCameraId = this.value; reiniciarQR(); } };
+  const rear = devices.find(d => d.label.toLowerCase().includes('back'));
+  if (rear) { sel.value = rear.id; selectedCameraId = rear.id; iniciarEscaneo(); }
+}
+
+function iniciarEscaneo() {
+  if (isScanning || !selectedCameraId || !cameraEnabled) return;
+  document.getElementById('reader').innerHTML = '';
+  qrCodeReader = new Html5Qrcode('reader');
+  qrCodeReader.start(selectedCameraId, { fps: 10, qrbox: 220 },
+    (text) => {
+      document.getElementById('id').value = text.trim();
+      buscarEstudiante(text.trim());
+      mostrarToast('✅ QR detectado');
+    }, () => {}
+  ).then(() => { isScanning = true; actualizarEstadoQR('📷 Escaneando...'); })
+   .catch(() => actualizarEstadoQR('❌ Error con cámara', true));
+}
+
+function actualizarEstadoQR(msg, error) {
+  const el = document.getElementById('qr-status');
+  el.textContent = msg;
+  el.style.background = error ? 'rgba(239,68,68,0.1)' : 'rgba(59,130,246,0.1)';
+  el.style.color = error ? '#f87171' : '#93c5fd';
+}
+
+function reiniciarQR() {
+  detenerEscaneo();
+  if (selectedCameraId && cameraEnabled) setTimeout(iniciarEscaneo, 500);
+}
+
+// ============================================================
+// BÚSQUEDA Y REGISTRO ASISTENCIA
+// ============================================================
+async function buscarEstudiante(id) {
+  if (!id.trim()) return ocultarInfoEstudiante();
+  mostrarBusqueda();
+  const res = await llamarAppsScript('buscarEstudiante', { id });
+  if (res?.encontrado) {
+    studentData = res.datos;
+    mostrarInfoEstudiante(res.datos);
+    document.getElementById('btn-submit').disabled = false;
+  } else {
+    ocultarInfoEstudiante();
+    mostrarRespuesta(res?.mensaje || 'No encontrado', 'warning');
+    document.getElementById('btn-submit').disabled = true;
+  }
+}
+
+function mostrarBusqueda() {
+  document.getElementById('employee-info').style.display = 'block';
+  document.getElementById('employee-name').innerHTML = '<span class="loading"></span>';
+  document.getElementById('employee-area').textContent = '-';
+  document.getElementById('employee-position').textContent = '-';
+}
+
+function mostrarInfoEstudiante(d) {
+  document.getElementById('employee-name').textContent = d.nombre || '-';
+  document.getElementById('employee-area').textContent = d.area || '-';
+  document.getElementById('employee-position').textContent = d.cargo || '-';
+}
+
+function ocultarInfoEstudiante() {
+  document.getElementById('employee-info').style.display = 'none';
+  studentData = null;
+}
+
+function mostrarRespuesta(msg, tipo) {
+  const r = document.getElementById('respuesta');
+  r.textContent = msg; r.className = 'respuesta ' + tipo; r.style.display = 'block';
+  if (tipo === 'success') setTimeout(() => r.style.display = 'none', 5000);
+}
+
+async function enviarFormulario(e) {
+  e.preventDefault();
+  if (!studentData) return mostrarRespuesta('ID no válido', 'error');
+  const btn = document.getElementById('btn-submit');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<span class="loading"></span> Registrando...';
+  btn.disabled = true;
+  const res = await llamarAppsScript('registrarAsistencia', {
+    id: document.getElementById('id').value.trim(),
+    nombre: studentData.nombre, area: studentData.area,
+    cargo: studentData.cargo, telefono: studentData.telefono || '',
+    estado: document.getElementById('estado').value,
+    idDispositivo: generarIdDispositivo()
+  });
+  btn.innerHTML = orig;
+  if (res?.exito) {
+    mostrarRespuesta(res.mensaje, 'success');
+    mostrarToast('✅ Registro exitoso', 'success');
+    document.getElementById('formulario').reset();
+    ocultarInfoEstudiante();
+    btn.disabled = true;
+    cargarUltimosRegistros();
+  } else {
+    mostrarRespuesta(res?.mensaje || 'Error', 'error');
+    mostrarToast(res?.mensaje || 'Error', 'error');
+    btn.disabled = false;
+  }
+}
+
+// ============================================================
+// ÚLTIMOS REGISTROS (panel asistencia)
+// ============================================================
+async function cargarUltimosRegistros() {
+  const res = await llamarAppsScript('obtenerUltimosRegistros', { limite: 8 });
+  const wrap = document.getElementById('ultimos-registros-wrap');
+  if (!res?.registros?.length) {
+    wrap.innerHTML = '<div class="empty-state"><span>📭</span><p>Sin registros hoy</p></div>';
+    return;
+  }
+  wrap.innerHTML = `<div class="table-wrap">
+    <table>
+      <thead><tr><th>Hora</th><th>Nombre</th><th>Estado</th></tr></thead>
+      <tbody>
+        ${res.registros.map(r => `
+          <tr>
+            <td class="recent-row-time">${r.hora}</td>
+            <td>${r.nombre}</td>
+            <td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+async function cargarDashboard() {
+  document.getElementById('stat-ingresos').textContent = '...';
+  document.getElementById('stat-salidas').textContent = '...';
+  document.getElementById('stat-unicos').textContent = '...';
+  document.getElementById('stat-total').textContent = '...';
+  document.getElementById('stat-usuarios-total').textContent = '...';
+
+  const [estadisticas, recientes, usuarios] = await Promise.all([
+    llamarAppsScript('obtenerEstadisticasHoy'),
+    llamarAppsScript('obtenerUltimosRegistros', { limite: 15 }),
+    llamarAppsScript('contarUsuarios')
+  ]);
+
+  if (estadisticas && !estadisticas.error) {
+    document.getElementById('stat-ingresos').textContent = estadisticas.ingresosHoy ?? 0;
+    document.getElementById('stat-salidas').textContent = estadisticas.salidasHoy ?? 0;
+    document.getElementById('stat-unicos').textContent = estadisticas.estudiantesUnicos ?? 0;
+    document.getElementById('stat-total').textContent = estadisticas.totalRegistros ?? 0;
+  }
+
+  if (usuarios && !usuarios.error) {
+    document.getElementById('stat-usuarios-total').textContent = usuarios.total ?? 0;
+  }
+
+  const wrap = document.getElementById('dash-registros-wrap');
+  if (recientes?.registros?.length) {
+    wrap.innerHTML = `<div class="table-wrap">
+      <table>
+        <thead><tr><th>Hora</th><th>ID</th><th>Nombre</th><th>Área</th><th>Estado</th></tr></thead>
+        <tbody>
+          ${recientes.registros.map(r => `
+            <tr>
+              <td class="recent-row-time">${r.hora}</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${r.id}</td>
+              <td>${r.nombre}</td>
+              <td>${r.area}</td>
+              <td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  } else {
+    wrap.innerHTML = '<div class="empty-state"><span>📭</span><p>Sin actividad hoy</p></div>';
+  }
+}
+
+// ============================================================
+// REGISTRAR NUEVO USUARIO
+// ============================================================
+async function registrarNuevoUsuario() {
+  const id = document.getElementById('nu-id').value.trim();
+  const nombres = document.getElementById('nu-nombres').value.trim();
+  const apellidos = document.getElementById('nu-apellidos').value.trim();
+  const grado = document.getElementById('nu-grado').value.trim();
+  const perfil = document.getElementById('nu-perfil').value.trim();
+  const telefono = document.getElementById('nu-telefono').value.trim();
+  const foto = document.getElementById('nu-foto').value.trim();
+
+  if (!id || !nombres || !apellidos || !grado) {
+    mostrarRespuestaEl('respuesta-usuario', '⚠️ ID, Nombres, Apellidos y Grado son obligatorios', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btn-registrar-usuario');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<span class="loading"></span> Guardando...';
+  btn.disabled = true;
+
+  const res = await llamarAppsScript('registrarNuevoUsuario', { id, nombres, apellidos, grado, perfil, telefono, foto });
+  btn.innerHTML = orig; btn.disabled = false;
+
+  if (res?.exito) {
+    mostrarRespuestaEl('respuesta-usuario', '✅ ' + res.mensaje, 'success');
+    mostrarToast('✅ Usuario registrado', 'success');
+    limpiarFormUsuario();
+  } else {
+    mostrarRespuestaEl('respuesta-usuario', '❌ ' + (res?.mensaje || 'Error al guardar'), 'error');
+    mostrarToast('❌ Error', 'error');
+  }
+}
+
+function limpiarFormUsuario() {
+  ['nu-id','nu-nombres','nu-apellidos','nu-grado','nu-perfil','nu-telefono','nu-foto'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+}
+
+async function buscarUsuarioAdmin() {
+  const id = document.getElementById('buscar-usuario-id').value.trim();
+  if (!id) return;
+  const wrap = document.getElementById('busqueda-resultado');
+  wrap.innerHTML = '<p style="color:var(--text-muted)">Buscando...</p>';
+  const res = await llamarAppsScript('buscarEstudiante', { id });
+  if (res?.encontrado) {
+    const d = res.datos;
+    wrap.innerHTML = `<div class="employee-info" style="display:block;">
+      <h4>👤 Usuario encontrado</h4>
+      <p>ID: <span class="val">${d.id}</span></p>
+      <p>Nombre: <span class="val">${d.nombre}</span></p>
+      <p>Área: <span class="val">${d.area}</span></p>
+      <p>Perfil: <span class="val">${d.cargo}</span></p>
+      <p>Teléfono: <span class="val">${d.telefono || '-'}</span></p>
+    </div>`;
+  } else {
+    wrap.innerHTML = `<div class="respuesta error" style="display:block;">❌ ${res?.mensaje || 'No encontrado'}</div>`;
+  }
+}
+
+// ============================================================
+// REPORTES
+// ============================================================
+async function cargarAreasEnFiltro() {
+  const res = await llamarAppsScript('listarGrados');
+  const sel = document.getElementById('rep-area');
+  if (res?.grados) {
+    sel.innerHTML = '<option value="">Todas las áreas</option>';
+    res.grados.forEach(g => sel.innerHTML += `<option value="${g}">${g}</option>`);
+  }
+  // Fechas default: mes actual
+  const hoy = new Date();
+  const ini = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  document.getElementById('rep-fecha-inicio').value = ini.toISOString().split('T')[0];
+  document.getElementById('rep-fecha-fin').value = hoy.toISOString().split('T')[0];
+}
+
+async function cargarReporte() {
+  const fechaIni = document.getElementById('rep-fecha-inicio').value;
+  const fechaFin = document.getElementById('rep-fecha-fin').value;
+  const idUsuario = document.getElementById('rep-id-usuario').value.trim();
+  const area = document.getElementById('rep-area').value;
+  const inclIngreso = document.getElementById('rep-ingreso').checked;
+  const inclSalida = document.getElementById('rep-salida').checked;
+
+  if (!fechaIni || !fechaFin) {
+    mostrarToast('⚠️ Selecciona un rango de fechas', 'warning');
+    return;
+  }
+
+  if (!inclIngreso && !inclSalida) {
+    mostrarToast('⚠️ Selecciona al menos un tipo (Ingreso/Salida)', 'warning');
+    return;
+  }
+
+  mostrarToast('🔍 Cargando reporte...', 'info');
+  const res = await llamarAppsScript('obtenerReporte', { fechaIni, fechaFin, idUsuario, area, inclIngreso, inclSalida });
+
+  if (res?.error || !res?.registros) {
+    mostrarToast('❌ Error al cargar reporte', 'error');
+    return;
+  }
+
+  reporteData = res.registros;
+  renderizarTablaReporte(reporteData);
+  document.getElementById('btn-exportar-excel').disabled = reporteData.length === 0;
+}
+
+function renderizarTablaReporte(registros) {
+  const card = document.getElementById('reporte-tabla-card');
+  const resumen = document.getElementById('reporte-resumen');
+  const tbody = document.getElementById('reporte-tbody');
+
+  if (!registros.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted)">Sin registros para los filtros seleccionados</td></tr>';
+    card.style.display = 'block';
+    resumen.style.display = 'none';
+    return;
+  }
+
+  // Estadísticas resumen
+  const ingresos = registros.filter(r => r.estado === 'INGRESO').length;
+  const salidas = registros.filter(r => r.estado === 'SALIDA').length;
+  const personas = new Set(registros.map(r => r.id)).size;
+  document.getElementById('rep-stat-total').textContent = registros.length;
+  document.getElementById('rep-stat-ingresos').textContent = ingresos;
+  document.getElementById('rep-stat-salidas').textContent = salidas;
+  document.getElementById('rep-stat-personas').textContent = personas;
+  resumen.style.display = 'flex';
+
+  tbody.innerHTML = registros.map((r, i) => `
+    <tr>
+      <td style="color:var(--text-muted);font-size:12px;">${i+1}</td>
+      <td class="recent-row-time">${r.fechaHora}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${r.id}</td>
+      <td>${r.nombre}</td>
+      <td>${r.area}</td>
+      <td>${r.perfil}</td>
+      <td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td>
+    </tr>`).join('');
+
+  card.style.display = 'block';
+  mostrarToast(`✅ ${registros.length} registros encontrados`, 'success');
+}
+
+function exportarExcel() {
+  if (!reporteData.length) return mostrarToast('⚠️ Sin datos para exportar', 'warning');
+
+  const ingresos = reporteData.filter(r => r.estado === 'INGRESO').length;
+  const salidas = reporteData.filter(r => r.estado === 'SALIDA').length;
+  const personas = new Set(reporteData.map(r => r.id)).size;
+
+  const fechaIni = document.getElementById('rep-fecha-inicio').value;
+  const fechaFin = document.getElementById('rep-fecha-fin').value;
+
+  const wb = XLSX.utils.book_new();
+
+  // Hoja principal de datos
+  const wsData = [
+    ['REPORTE DE ASISTENCIA - LA BASE COWORK'],
+    [`Período: ${fechaIni} al ${fechaFin}`],
+    [`Generado: ${new Date().toLocaleString('es-PE')}`],
+    [],
+    ['#', 'Fecha/Hora', 'ID', 'Nombre Completo', 'Área / Grado', 'Perfil / Cargo', 'Estado'],
+    ...reporteData.map((r, i) => [i+1, r.fechaHora, r.id, r.nombre, r.area, r.perfil, r.estado])
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+  // Ancho de columnas
+  ws['!cols'] = [
+    { wch: 5 }, { wch: 20 }, { wch: 12 }, { wch: 30 }, { wch: 20 }, { wch: 20 }, { wch: 10 }
+  ];
+
+  // Merge para el título
+  ws['!merges'] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 6 } },
+    { s: { r: 2, c: 0 }, e: { r: 2, c: 6 } }
+  ];
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Asistencia');
+
+  // Hoja de resumen
+  const wsResumen = XLSX.utils.aoa_to_sheet([
+    ['RESUMEN DEL REPORTE'],
+    [],
+    ['Indicador', 'Valor'],
+    ['Período', `${fechaIni} al ${fechaFin}`],
+    ['Total de Registros', reporteData.length],
+    ['Total Ingresos', ingresos],
+    ['Total Salidas', salidas],
+    ['Personas Únicas', personas],
+    ['Fecha de Generación', new Date().toLocaleString('es-PE')]
+  ]);
+
+  wsResumen['!cols'] = [{ wch: 25 }, { wch: 30 }];
+  XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen');
+
+  // Hoja por persona (si hay pocos IDs)
+  const personas_ids = [...new Set(reporteData.map(r => r.id))];
+  if (personas_ids.length <= 100) {
+    const resxPers = [['ID', 'Nombre', 'Área', 'Total Ingresos', 'Total Salidas', 'Total Registros']];
+    personas_ids.forEach(pid => {
+      const regs = reporteData.filter(r => r.id === pid);
+      const nombre = regs[0]?.nombre || '-';
+      const area = regs[0]?.area || '-';
+      const ing = regs.filter(r => r.estado === 'INGRESO').length;
+      const sal = regs.filter(r => r.estado === 'SALIDA').length;
+      resxPers.push([pid, nombre, area, ing, sal, ing + sal]);
+    });
+    const wsPers = XLSX.utils.aoa_to_sheet(resxPers);
+    wsPers['!cols'] = [{ wch:12 },{ wch:30 },{ wch:20 },{ wch:16 },{ wch:14 },{ wch:16 }];
+    XLSX.utils.book_append_sheet(wb, wsPers, 'Por Persona');
+  }
+
+  const fecha = new Date().toISOString().split('T')[0];
+  XLSX.writeFile(wb, `reporte_asistencia_${fecha}.xlsx`);
+  mostrarToast('📥 Excel descargado correctamente', 'success');
+}
+
+// ============================================================
+// CARNETS
+// ============================================================
+async function cargarGradosCarnets() {
+  const res = await llamarAppsScript('listarGrados');
+  const sel = document.getElementById('carnet-grado');
+  if (res?.grados) {
+    sel.innerHTML = '<option value="">Seleccione un grado...</option>';
+    res.grados.forEach(g => sel.innerHTML += `<option value="${g}">${g}</option>`);
+  }
+}
+
+async function generarCarnetIndividual() {
+  const id = document.getElementById('carnet-id').value.trim();
+  if (!id) return mostrarRespuestaEl('resp-carnet-ind', '⚠️ Ingrese ID', 'error');
+  const btn = document.getElementById('btn-carnet-ind');
+  btn.innerHTML = '<span class="loading"></span> Generando...'; btn.disabled = true;
+  setProg('ind', 30);
+  mostrarRespuestaEl('resp-carnet-ind', '📄 Generando carnet...', 'warning');
+  const res = await llamarAppsScript('generarCarnet', { id });
+  setProg('ind', 90);
+  btn.innerHTML = '📄 Generar PDF'; btn.disabled = false;
+  ocultarProg('ind');
+  if (res?.ok) {
+    descargarArchivo(res.data, res.filename);
+    mostrarRespuestaEl('resp-carnet-ind', '✅ Carnet generado y descargado', 'success');
+  } else {
+    mostrarRespuestaEl('resp-carnet-ind', '❌ ' + (res?.mensaje || 'Error'), 'error');
+  }
+}
+
+async function generarCarnetLote() {
+  const grado = document.getElementById('carnet-grado').value;
+  if (!grado) return mostrarRespuestaEl('resp-carnet-lote', '⚠️ Seleccione un grado', 'error');
+  const btn = document.getElementById('btn-carnet-lote');
+  btn.innerHTML = '<span class="loading"></span> Generando...'; btn.disabled = true;
+  setProg('lote', 20);
+  mostrarRespuestaEl('resp-carnet-lote', '📚 Generando lote...', 'warning');
+  const res = await llamarAppsScript('generarLote', { grado });
+  setProg('lote', 90);
+  btn.innerHTML = '📚 Generar Lote PDF'; btn.disabled = false;
+  ocultarProg('lote');
+  if (res?.ok) {
+    descargarArchivo(res.data, res.filename);
+    mostrarRespuestaEl('resp-carnet-lote', '✅ Carnets generados y descargados', 'success');
+  } else {
+    mostrarRespuestaEl('resp-carnet-lote', '❌ ' + (res?.mensaje || 'Error'), 'error');
+  }
+}
+
+function setProg(id, val) {
+  document.getElementById('prog-' + id).style.display = 'block';
+  document.getElementById('prog-' + id + '-fill').style.width = val + '%';
+}
+
+function ocultarProg(id) {
+  setTimeout(() => {
+    document.getElementById('prog-' + id).style.display = 'none';
+    document.getElementById('prog-' + id + '-fill').style.width = '0%';
+  }, 600);
+}
+
+// ============================================================
+// UTILIDADES
+// ============================================================
+function mostrarRespuestaEl(elId, msg, tipo) {
+  const el = document.getElementById(elId);
+  el.textContent = msg; el.className = 'respuesta ' + tipo; el.style.display = 'block';
+  if (tipo === 'success') setTimeout(() => el.style.display = 'none', 5000);
+}
+
+function descargarArchivo(base64, filename) {
+  try {
+    const d = base64.includes('base64,') ? base64.split('base64,')[1] : base64;
+    const link = document.createElement('a');
+    link.href = 'data:application/pdf;base64,' + d;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(() => document.body.removeChild(link), 100);
+    return true;
+  } catch (e) { mostrarToast('❌ Error al descargar', 'error'); return false; }
+}
+
+// ============================================================
+// INICIALIZACIÓN
+// ============================================================
+function iniciarAplicacion() {
+  document.getElementById('formulario').addEventListener('submit', enviarFormulario);
+
+  document.getElementById('id').addEventListener('input', function(e) {
+    clearTimeout(searchTimeout);
+    if (e.target.value.trim().length > 0) {
+      ocultarInfoEstudiante();
+      document.getElementById('btn-submit').disabled = true;
+      searchTimeout = setTimeout(() => buscarEstudiante(e.target.value.trim()), 800);
+    } else {
+      ocultarInfoEstudiante();
       document.getElementById('btn-submit').disabled = true;
     }
-    
-    function mostrarRespuesta(msg, tipo) {
-      const r = document.getElementById('respuesta');
-      r.textContent = msg;
-      r.className = tipo;
-      r.style.display = 'block';
-      if (tipo === 'success') setTimeout(() => r.style.display = 'none', 5000);
-    }
+  });
 
-    // ============================================
-    // FUNCIONES DE DESCARGA (ORIGINALES)
-    // ============================================
-    function descargarArchivo(base64, filename) {
-      try {
-        const base64Data = base64.includes('base64,') ? base64.split('base64,')[1] : base64;
-        const link = document.createElement('a');
-        link.href = 'data:application/pdf;base64,' + base64Data;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        setTimeout(() => document.body.removeChild(link), 100);
-        mostrarToast(`📥 Descargando: ${filename}`, 'success');
-        return true;
-      } catch (error) {
-        mostrarToast('❌ Error al descargar', 'error');
-        return false;
-      }
-    }
+  document.getElementById('camera-toggle').addEventListener('change', e => toggleCamera(e.target.checked));
 
-    async function cargarAreas() {
-      const res = await llamarAppsScript('listarGrados');
-      const select = document.getElementById('admin-area');
-      if (res?.grados) {
-        select.innerHTML = '<option value="">📌 Seleccione un área...</option>';
-        res.grados.forEach(g => select.innerHTML += `<option value="${g}">${g}</option>`);
-      }
-    }
+  setInterval(actualizarReloj, 1000);
+  actualizarReloj();
+  setTimeout(() => { if (cameraEnabled) cargarCamaras(); }, 800);
+  cargarUltimosRegistros();
+  generarIdDispositivo();
+}
 
-    // ============================================
-    // ENVÍO DE FORMULARIO (ORIGINAL)
-    // ============================================
-    async function enviarFormulario(e) {
-      e.preventDefault();
-      
-      if (!collaboratorData) return mostrarRespuesta('ID no válido', 'error');
-      
-      const btn = document.getElementById('btn-submit');
-      const original = btn.innerHTML;
-      btn.innerHTML = '<div class="loading"></div> Registrando...';
-      btn.disabled = true;
-      
-      const res = await llamarAppsScript('registrarAsistencia', {
-        id: document.getElementById('id').value.trim(),
-        nombre: collaboratorData.nombre,
-        area: collaboratorData.area,
-        cargo: collaboratorData.cargo,
-        telefono: collaboratorData.telefono || '',
-        estado: document.getElementById('estado').value,
-        idDispositivo: generarIdDispositivo()
-      });
-      
-      btn.innerHTML = original;
-      
-      if (res?.exito) {
-        mostrarRespuesta(res.mensaje, 'success');
-        mostrarToast('✅ Registro exitoso', 'success');
-        document.getElementById('formulario').reset();
-        ocultarInfoColaborador();
-        deshabilitarBotonRegistro();
-      } else {
-        mostrarRespuesta(res?.mensaje || 'Error', 'error');
-        habilitarBotonRegistro();
-      }
-    }
+// Enter en login
+document.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter' && document.getElementById('login-overlay').style.display !== 'none') {
+    verificarLogin();
+  }
+});
 
-    // ============================================
-    // NUEVAS FUNCIONES: GESTIÓN DE COLABORADORES
-    // ============================================
-    let colaboradores = [];
+window.onload = function() {
+  if (localStorage.getItem('auth_pip') === 'true') {
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('main-content').style.display = 'block';
+    iniciarAplicacion();
+  }
+};
 
-    async function cargarColaboradores() {
-      const res = await llamarAppsScript('listarColaboradores');
-      if (res.ok) {
-        colaboradores = res.data;
-        mostrarColaboradores(colaboradores);
-      } else {
-        mostrarToast('Error al cargar colaboradores', 'error');
-      }
-    }
-
-    function mostrarColaboradores(lista) {
-      const tbody = document.getElementById('colaboradores-body');
-      if (lista.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No hay colaboradores registrados</td></tr>';
-        return;
-      }
-      
-      let html = '';
-      lista.forEach(c => {
-        html += `
-          <tr>
-            <td>${c.id}</td>
-            <td>${c.nombres}</td>
-            <td>${c.apellidos}</td>
-            <td>${c.area}</td>
-            <td>${c.cargo || '-'}</td>
-            <td>${c.telefono || '-'}</td>
-            <td>
-              <button class="action-btn btn-edit" onclick="editarColaborador('${c.id}')">✏️</button>
-              <button class="action-btn btn-delete" onclick="eliminarColaborador('${c.id}')">🗑️</button>
-            </td>
-          </tr>
-        `;
-      });
-      tbody.innerHTML = html;
-    }
-
-    function filtrarColaboradores() {
-      const texto = document.getElementById('buscarColaborador').value.toLowerCase();
-      if (!texto) {
-        mostrarColaboradores(colaboradores);
-        return;
-      }
-      
-      const filtrados = colaboradores.filter(c => 
-        c.id.toLowerCase().includes(texto) ||
-        c.nombres.toLowerCase().includes(texto) ||
-        c.apellidos.toLowerCase().includes(texto) ||
-        c.area.toLowerCase().includes(texto)
-      );
-      mostrarColaboradores(filtrados);
-    }
-
-    function mostrarModalColaborador(colaborador = null) {
-      document.getElementById('modal-titulo').textContent = colaborador ? 'Editar Colaborador' : 'Nuevo Colaborador';
-      
-      if (colaborador) {
-        document.getElementById('colaborador-id-original').value = colaborador.id;
-        document.getElementById('colaborador-id').value = colaborador.id;
-        document.getElementById('colaborador-nombres').value = colaborador.nombres;
-        document.getElementById('colaborador-apellidos').value = colaborador.apellidos;
-        document.getElementById('colaborador-area').value = colaborador.area;
-        document.getElementById('colaborador-cargo').value = colaborador.cargo || '';
-        document.getElementById('colaborador-telefono').value = colaborador.telefono || '';
-        document.getElementById('colaborador-foto').value = colaborador.fotoUrl || '';
-        document.getElementById('colaborador-id').disabled = true;
-      } else {
-        document.getElementById('form-colaborador').reset();
-        document.getElementById('colaborador-id-original').value = '';
-        document.getElementById('colaborador-id').disabled = false;
-      }
-      
-      document.getElementById('modal-colaborador').classList.add('active');
-    }
-
-    function cerrarModalColaborador() {
-      document.getElementById('modal-colaborador').classList.remove('active');
-    }
-
-    async function guardarColaborador(e) {
-      e.preventDefault();
-      
-      const data = {
-        id: document.getElementById('colaborador-id').value.trim(),
-        nombres: document.getElementById('colaborador-nombres').value.trim(),
-        apellidos: document.getElementById('colaborador-apellidos').value.trim(),
-        area: document.getElementById('colaborador-area').value.trim(),
-        cargo: document.getElementById('colaborador-cargo').value.trim(),
-        telefono: document.getElementById('colaborador-telefono').value.trim(),
-        fotoUrl: document.getElementById('colaborador-foto').value.trim()
-      };
-      
-      const idOriginal = document.getElementById('colaborador-id-original').value;
-      let res;
-      
-      if (idOriginal) {
-        res = await llamarAppsScript('actualizarColaborador', data);
-      } else {
-        res = await llamarAppsScript('crearColaborador', data);
-      }
-      
-      if (res.ok) {
-        mostrarToast(res.mensaje, 'success');
-        cerrarModalColaborador();
-        cargarColaboradores();
-        cargarAreasParaFiltro();
-      } else {
-        mostrarToast(res.mensaje, 'error');
-      }
-    }
-
-    async function editarColaborador(id) {
-      const colaborador = colaboradores.find(c => c.id == id);
-      if (colaborador) {
-        mostrarModalColaborador(colaborador);
-      }
-    }
-
-    async function eliminarColaborador(id) {
-      if (!confirm('¿Está seguro de eliminar este colaborador?')) return;
-      
-      const res = await llamarAppsScript('eliminarColaborador', { id });
-      if (res.ok) {
-        mostrarToast(res.mensaje, 'success');
-        cargarColaboradores();
-        cargarAreasParaFiltro();
-      } else {
-        mostrarToast(res.mensaje, 'error');
-      }
-    }
-
-    // ============================================
-    // NUEVAS FUNCIONES: REPORTES
-    // ============================================
-    async function cargarAreasParaFiltro() {
-      const res = await llamarAppsScript('listarGrados');
-      if (res?.grados) {
-        const select = document.getElementById('filtroArea');
-        select.innerHTML = '<option value="">Todas las áreas</option>';
-        res.grados.forEach(g => {
-          select.innerHTML += `<option value="${g}">${g}</option>`;
-        });
-        
-        const selectAdmin = document.getElementById('admin-area');
-        if (selectAdmin) {
-          selectAdmin.innerHTML = '<option value="">📌 Seleccione un área...</option>';
-          res.grados.forEach(g => selectAdmin.innerHTML += `<option value="${g}">${g}</option>`);
-        }
-      }
-    }
-
-    async function cargarReporte() {
-      const filtros = {
-        fechaInicio: document.getElementById('fechaInicio').value,
-        fechaFin: document.getElementById('fechaFin').value,
-        area: document.getElementById('filtroArea').value,
-        estado: document.getElementById('filtroEstado').value
-      };
-      
-      const res = await llamarAppsScript('obtenerReporte', { filtros });
-      
-      if (res.ok) {
-        mostrarReporte(res.data);
-        actualizarEstadisticas(res.data);
-      } else {
-        mostrarToast('Error al cargar reporte', 'error');
-      }
-    }
-
-    function mostrarReporte(data) {
-      const tbody = document.getElementById('reporte-body');
-      
-      if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No hay registros</td></tr>';
-        return;
-      }
-      
-      let html = '';
-      data.forEach(r => {
-        html += `
-          <tr>
-            <td>${r.fecha}</td>
-            <td>${r.hora}</td>
-            <td>${r.id}</td>
-            <td>${r.nombre}</td>
-            <td>${r.area}</td>
-            <td>${r.cargo || '-'}</td>
-            <td>
-              <span class="estado-badge ${r.estado === 'INGRESO' ? 'estado-ingreso' : 'estado-salida'}">
-                ${r.estado}
-              </span>
-            </td>
-            <td>${r.dispositivo.substring(0, 8)}...</td>
-          </tr>
-        `;
-      });
-      tbody.innerHTML = html;
-    }
-
-    function actualizarEstadisticas(data) {
-      const total = data.length;
-      const ingresos = data.filter(r => r.estado === 'INGRESO').length;
-      const salidas = data.filter(r => r.estado === 'SALIDA').length;
-      const colaboradoresUnicos = new Set(data.map(r => r.id)).size;
-      
-      document.getElementById('total-registros').textContent = total;
-      document.getElementById('total-ingresos').textContent = ingresos;
-      document.getElementById('total-salidas').textContent = salidas;
-      document.getElementById('colaboradores-unicos').textContent = colaboradoresUnicos;
-    }
-
-    async function exportarReporte() {
-      const filtros = {
-        fechaInicio: document.getElementById('fechaInicio').value,
-        fechaFin: document.getElementById('fechaFin').value,
-        area: document.getElementById('filtroArea').value,
-        estado: document.getElementById('filtroEstado').value
-      };
-      
-      const res = await llamarAppsScript('exportarReporte', { filtros });
-      
-      if (res.ok) {
-        const link = document.createElement('a');
-        link.href = 'data:text/csv;base64,' + res.data;
-        link.download = res.filename;
-        link.click();
-        mostrarToast('Reporte exportado', 'success');
-      } else {
-        mostrarToast('Error al exportar', 'error');
-      }
-    }
-
-    // ============================================
-    // INICIALIZACIÓN
-    // ============================================
-    function iniciarAplicacion() {
-      document.getElementById('formulario').addEventListener('submit', enviarFormulario);
-      
-      document.getElementById('id').addEventListener('input', function(e) {
-        clearTimeout(searchTimeout);
-        if (e.target.value.trim().length > 0) {
-          ocultarInfoColaborador();
-          deshabilitarBotonRegistro();
-          searchTimeout = setTimeout(() => buscarColaborador(e.target.value.trim()), 800);
-        }
-      });
-      
-      document.getElementById('camera-toggle').addEventListener('change', e => toggleCamera(e.target.checked));
-      document.getElementById('admin-toggle').addEventListener('click', function() {
-        const body = document.getElementById('admin-body');
-        body.style.display = body.style.display === 'none' ? 'block' : 'none';
-        if (body.style.display === 'block') cargarAreas();
-      });
-      
-      document.getElementById('admin-generar-id').addEventListener('click', async function() {
-        const id = document.getElementById('admin-id').value.trim();
-        if (!id) return mostrarAdminEstado('⚠️ Ingrese ID', 'error');
-        
-        mostrarAdminEstado('📄 Generando...', 'info');
-        const res = await llamarAppsScript('generarCarnet', { id });
-        
-        if (res?.ok) {
-          mostrarAdminEstado('✅ Descargando...', 'success');
-          descargarArchivo(res.data, res.filename);
-          setTimeout(() => document.getElementById('admin-status').style.display = 'none', 3000);
-        } else {
-          mostrarAdminEstado(res?.mensaje || '❌ Error', 'error');
-        }
-      });
-      
-      document.getElementById('admin-generar-lote').addEventListener('click', async function() {
-        const area = document.getElementById('admin-area').value;
-        if (!area) return mostrarAdminEstado('⚠️ Seleccione área', 'error');
-        
-        mostrarAdminEstado('📚 Generando lote...', 'info');
-        const res = await llamarAppsScript('generarLote', { grado: area });
-        
-        if (res?.ok) {
-          mostrarAdminEstado('✅ Descargando...', 'success');
-          descargarArchivo(res.data, res.filename);
-          setTimeout(() => document.getElementById('admin-status').style.display = 'none', 3000);
-        } else {
-          mostrarAdminEstado(res?.mensaje || '❌ Error', 'error');
-        }
-      });
-      
-      setInterval(actualizarReloj, 1000);
-      actualizarReloj();
-      setTimeout(() => { if (cameraEnabled) cargarCamaras(); }, 1000);
-      
-      generarIdDispositivo();
-    }
-    
-    function mostrarAdminEstado(msg, tipo) {
-      const s = document.getElementById('admin-status');
-      s.textContent = msg;
-      s.style.display = 'block';
-      s.className = 'admin-status admin-' + tipo;
-    }
-
-    // Permitir Enter en login
-    document.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter' && document.getElementById('login-overlay').style.display !== 'none') {
-        verificarLogin();
-      }
-    });
-
-    window.onload = function() {
-      if (localStorage.getItem('auth_pip') === 'true') {
-        document.getElementById('login-overlay').style.display = 'none';
-        document.getElementById('main-content').style.display = 'block';
-        iniciarAplicacion();
-      }
-    };
-    
-    window.onbeforeunload = function() {
-      detenerEscaneo();
-    };
-  </script>
+window.onbeforeunload = function() { detenerEscaneo(); };
+</script>
 </body>
 </html>
-
-
