@@ -9,17 +9,24 @@
     :root {
       --primary: #4CAF50;
       --primary-dark: #45a049;
+      --primary-light: #e8f5e9;
       --secondary: #2196F3;
       --secondary-dark: #1976D2;
-      --success: #d4edda;
+      --accent: #FF5722;
+      --success: #4CAF50;
+      --success-light: #d4edda;
       --success-text: #155724;
-      --error: #f8d7da;
+      --error: #f44336;
+      --error-light: #f8d7da;
       --error-text: #721c24;
-      --warning: #fff3cd;
+      --warning: #ff9800;
+      --warning-light: #fff3cd;
       --warning-text: #856404;
       --bg-main: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      --shadow: 0 4px 20px rgba(0,0,0,0.15);
-      --border-radius: 12px;
+      --shadow: 0 10px 40px rgba(0,0,0,0.2);
+      --shadow-sm: 0 4px 20px rgba(0,0,0,0.15);
+      --border-radius: 16px;
+      --border-radius-sm: 12px;
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -30,19 +37,215 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg-main);
       min-height: 100vh;
       padding: 10px;
       line-height: 1.5;
     }
 
+    /* ============================================
+       LOGIN MEJORADO - BONITO Y PRESENTABLE
+    ============================================ */
+    #login-overlay {
+      display: flex;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      animation: slideUpFade 0.6s ease-out;
+    }
+
+    @keyframes slideUpFade {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 40px 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: var(--transition);
+    }
+
+    .login-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .login-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
+    }
+
+    .login-icon span {
+      font-size: 40px;
+      filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));
+    }
+
+    .login-header h2 {
+      color: #333;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .login-header p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .login-form {
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-weight: 500;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 15px;
+      color: #999;
+      font-size: 18px;
+      transition: var(--transition);
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 15px 15px 15px 50px;
+      border: 2px solid #e0e0e0;
+      border-radius: 50px;
+      font-size: 16px;
+      transition: var(--transition);
+      background: white;
+      outline: none;
+    }
+
+    .input-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.1);
+    }
+
+    .input-group input:focus + .input-icon {
+      color: var(--primary);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+    }
+
+    .login-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(76, 175, 80, 0.4);
+    }
+
+    .login-btn:active {
+      transform: translateY(-1px);
+    }
+
+    .login-error {
+      background: var(--error-light);
+      color: var(--error-text);
+      padding: 12px 20px;
+      border-radius: 50px;
+      margin-top: 20px;
+      display: none;
+      text-align: center;
+      font-weight: 500;
+      border-left: 4px solid var(--error);
+      animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #888;
+      font-size: 12px;
+    }
+
+    /* ============================================
+       CONTENIDO PRINCIPAL
+    ============================================ */
     .container {
       max-width: min(500px, 100vw - 20px);
       margin: 0 auto;
       background: white;
       border-radius: var(--border-radius);
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow-sm);
       overflow: hidden;
       animation: slideIn 0.5s ease-out;
     }
@@ -86,6 +289,9 @@
       color: #2e7d32;
     }
 
+    /* ============================================
+       CÁMARA Y QR (IGUAL AL ORIGINAL)
+    ============================================ */
     .camera-toggle {
       background: #f8f9fa;
       border: 2px solid #e9ecef;
@@ -173,6 +379,20 @@
       display: none;
     }
 
+    .qr-status {
+      text-align: center;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: var(--border-radius);
+      background: #e3f2fd;
+      color: #1565c0;
+      display: none;
+      font-size: clamp(12px, 3vw, 14px);
+    }
+
+    /* ============================================
+       FORMULARIOS Y BOTONES
+    ============================================ */
     .form-group {
       margin-bottom: 20px;
     }
@@ -224,7 +444,7 @@
     .btn:hover:not(:disabled) {
       background: var(--primary-dark);
       transform: translateY(-2px);
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow-sm);
     }
 
     .btn:disabled {
@@ -289,19 +509,19 @@
     }
 
     .success {
-      background: var(--success);
+      background: var(--success-light);
       color: var(--success-text);
       border: 1px solid #c3e6cb;
     }
 
     .error {
-      background: var(--error);
+      background: var(--error-light);
       color: var(--error-text);
       border: 1px solid #f5c6cb;
     }
 
     .warning {
-      background: var(--warning);
+      background: var(--warning-light);
       color: var(--warning-text);
       border: 1px solid #ffeaa7;
     }
@@ -321,113 +541,8 @@
       100% { transform: rotate(360deg); }
     }
 
-    .qr-status {
-      text-align: center;
-      padding: 10px;
-      margin-bottom: 15px;
-      border-radius: var(--border-radius);
-      background: #e3f2fd;
-      color: #1565c0;
-      display: none;
-      font-size: clamp(12px, 3vw, 14px);
-    }
-
-    .admin-panel {
-      margin-top: 20px;
-      border: 2px solid #cbd5e1;
-      border-radius: var(--border-radius);
-      padding: 12px;
-      background: #f8fafc;
-    }
-
-    .admin-panel h4 {
-      font-size: clamp(14px, 4vw, 16px);
-      margin-bottom: 10px;
-      color: #1f2937;
-    }
-
-    .admin-status {
-      display: none;
-      margin-top: 10px;
-      padding: 10px;
-      border-radius: var(--border-radius);
-      font-size: clamp(12px, 3vw, 14px);
-      text-align: center;
-    }
-
-    .admin-success {
-      background: var(--success);
-      color: var(--success-text);
-      border: 1px solid #c3e6cb;
-    }
-
-    .admin-error {
-      background: var(--error);
-      color: var(--error-text);
-      border: 1px solid #f5c6cb;
-    }
-
-    .admin-info {
-      background: #d1ecf1;
-      color: #0c5460;
-      border: 1px solid #bee5eb;
-    }
-
-    .progress-bar {
-      width: 100%;
-      height: 20px;
-      background: #e9ecef;
-      border-radius: 10px;
-      overflow: hidden;
-      margin: 10px 0;
-      display: none;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: var(--primary);
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: white;
-      color: #333;
-      padding: 12px 24px;
-      border-radius: 50px;
-      box-shadow: var(--shadow);
-      z-index: 1000;
-      opacity: 0;
-      transition: all 0.3s ease;
-      font-weight: 500;
-    }
-
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
-
-    .toast.success {
-      background: var(--primary);
-      color: white;
-    }
-
-    .toast.error {
-      background: #dc3545;
-      color: white;
-    }
-
-    .toast.warning {
-      background: #ff9800;
-      color: white;
-    }
-
     /* ============================================
-       NUEVOS ESTILOS PARA GESTIÓN (SIN ALTERAR LOS EXISTENTES)
+       GESTIÓN DE COLABORADORES
     ============================================ */
     .gestion-tabs {
       display: flex;
@@ -464,6 +579,20 @@
 
     .gestion-section.active {
       display: block;
+    }
+
+    .admin-panel {
+      margin-top: 20px;
+      border: 2px solid #cbd5e1;
+      border-radius: var(--border-radius);
+      padding: 12px;
+      background: #f8fafc;
+    }
+
+    .admin-panel h4 {
+      font-size: clamp(14px, 4vw, 16px);
+      margin-bottom: 10px;
+      color: #1f2937;
     }
 
     .table-container {
@@ -508,12 +637,12 @@
     }
 
     .estado-ingreso {
-      background: var(--success);
+      background: var(--success-light);
       color: var(--success-text);
     }
 
     .estado-salida {
-      background: var(--warning);
+      background: var(--warning-light);
       color: var(--warning-text);
     }
 
@@ -639,15 +768,6 @@
       background: #c82333;
     }
 
-    .btn-view {
-      background: var(--primary);
-      color: white;
-    }
-
-    .btn-view:hover {
-      background: var(--primary-dark);
-    }
-
     .btn-export {
       background: #6c757d;
       color: white;
@@ -655,6 +775,86 @@
 
     .btn-export:hover {
       background: #5a6268;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background: #e9ecef;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 10px 0;
+      display: none;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: white;
+      color: #333;
+      padding: 12px 24px;
+      border-radius: 50px;
+      box-shadow: var(--shadow-sm);
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast.success {
+      background: var(--primary);
+      color: white;
+    }
+
+    .toast.error {
+      background: #dc3545;
+      color: white;
+    }
+
+    .toast.warning {
+      background: #ff9800;
+      color: white;
+    }
+
+    .admin-status {
+      display: none;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: var(--border-radius);
+      font-size: clamp(12px, 3vw, 14px);
+      text-align: center;
+    }
+
+    .admin-success {
+      background: var(--success-light);
+      color: var(--success-text);
+      border: 1px solid #c3e6cb;
+    }
+
+    .admin-error {
+      background: var(--error-light);
+      color: var(--error-text);
+      border: 1px solid #f5c6cb;
+    }
+
+    .admin-info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
     }
 
     @media (max-width: 480px) {
@@ -677,22 +877,62 @@
       .filter-input, .filter-select {
         width: 100%;
       }
+      
+      .login-card {
+        padding: 30px 20px;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- PANTALLA DE LOGIN -->
+  <!-- LOGIN BONITO -->
   <div id="login-overlay">
-    <div class="login-box">
-      <h2>🔐 CONTROL DE ASISTENCIA LA BASE COWORK</h2>
-      <input type="text" id="login-user" placeholder="Usuario" autocomplete="off" autofocus>
-      <input type="password" id="login-pass" placeholder="Contraseña">
-      <button onclick="verificarLogin()">Ingresar</button>
-      <p id="login-error" class="login-error">Usuario o contraseña incorrectos</p>
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-header">
+          <div class="login-icon">
+            <span>🔐</span>
+          </div>
+          <h2>Bienvenido</h2>
+          <p>Ingresa tus credenciales</p>
+        </div>
+        
+        <div class="login-form">
+          <div class="input-group">
+            <label>Usuario</label>
+            <div class="input-wrapper">
+              <span class="input-icon">👤</span>
+              <input type="text" id="login-user" placeholder="admin" autofocus>
+            </div>
+          </div>
+          
+          <div class="input-group">
+            <label>Contraseña</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔑</span>
+              <input type="password" id="login-pass" placeholder="••••••">
+            </div>
+          </div>
+          
+          <button class="login-btn" onclick="verificarLogin()">
+            <span>Ingresar</span>
+            <span>→</span>
+          </button>
+        </div>
+        
+        <div id="login-error" class="login-error">
+          ⚠️ Usuario o contraseña incorrectos
+        </div>
+        
+        <div class="login-footer">
+          <p>Sistema de Control de Asistencia v4.0</p>
+          <p>© 2026 - La Base Cowork</p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- CONTENIDO PRINCIPAL (protegido por login) -->
+  <!-- CONTENIDO PRINCIPAL -->
   <div class="container" id="main-content" style="display: none;">
     <div class="header">
       <h1>CONTROL DE ASISTENCIA</h1>
@@ -702,14 +942,14 @@
     <div class="content">
       <div class="time-display" id="reloj-tiempo">Cargando...</div>
       
-      <!-- PESTAÑAS DE GESTIÓN (NUEVO) -->
+      <!-- PESTAÑAS DE GESTIÓN -->
       <div class="gestion-tabs">
         <button class="gestion-tab active" onclick="cambiarSeccion('asistencia')">📱 Asistencia</button>
-        <button class="gestion-tab" onclick="cambiarSeccion('estudiantes')">👥 Estudiantes</button>
+        <button class="gestion-tab" onclick="cambiarSeccion('colaboradores')">👥 Colaboradores</button>
         <button class="gestion-tab" onclick="cambiarSeccion('reportes')">📊 Reportes</button>
       </div>
 
-      <!-- SECCIÓN ASISTENCIA (ORIGINAL) -->
+      <!-- SECCIÓN ASISTENCIA (ORIGINAL - QR FUNCIONAL) -->
       <div id="seccion-asistencia" class="gestion-section active">
         <div class="camera-toggle">
           <div class="toggle-wrapper">
@@ -747,8 +987,8 @@
           <div class="employee-info" id="employee-info">
             <h3>Información del Colaborador</h3>
             <p><strong>Nombre:</strong> <span id="employee-name" class="highlight">-</span></p>
-            <p><strong>Grado/Sección:</strong> <span id="employee-area" class="highlight">-</span></p>
-            <p><strong>Perfil:</strong> <span id="employee-position" class="highlight">-</span></p>
+            <p><strong>Área/Grado:</strong> <span id="employee-area" class="highlight">-</span></p>
+            <p><strong>Cargo/Perfil:</strong> <span id="employee-position" class="highlight">-</span></p>
           </div>
           
           <div class="form-group">
@@ -767,50 +1007,50 @@
         <div id="respuesta"></div>
       </div>
 
-      <!-- SECCIÓN GESTIÓN DE ESTUDIANTES (NUEVO) -->
-      <div id="seccion-estudiantes" class="gestion-section">
-        <h3 style="margin-bottom: 15px; color: var(--primary);">👥 Gestión de Estudiantes</h3>
+      <!-- SECCIÓN GESTIÓN DE COLABORADORES -->
+      <div id="seccion-colaboradores" class="gestion-section">
+        <h3 style="margin-bottom: 15px; color: var(--primary);">👥 Gestión de Colaboradores</h3>
         
-        <button class="btn" onclick="mostrarModalEstudiante()">
-          ➕ Nuevo Estudiante
+        <button class="btn" onclick="mostrarModalColaborador()">
+          ➕ Nuevo Colaborador
         </button>
         
         <div class="filter-bar">
-          <input type="text" class="filter-input" id="buscarEstudiante" 
-                 placeholder="🔍 Buscar por ID, nombre o grado..." onkeyup="filtrarEstudiantes()">
+          <input type="text" class="filter-input" id="buscarColaborador" 
+                 placeholder="🔍 Buscar por ID, nombre o área..." onkeyup="filtrarColaboradores()">
         </div>
         
         <div class="table-container">
-          <table id="tabla-estudiantes">
+          <table id="tabla-colaboradores">
             <thead>
               <tr>
                 <th>ID</th>
                 <th>Nombres</th>
                 <th>Apellidos</th>
-                <th>Grado/Sección</th>
-                <th>Perfil</th>
+                <th>Área/Grado</th>
+                <th>Cargo/Perfil</th>
                 <th>Teléfono</th>
                 <th>Acciones</th>
               </tr>
             </thead>
-            <tbody id="estudiantes-body">
+            <tbody id="colaboradores-body">
               <tr>
-                <td colspan="7" style="text-align: center;">Cargando estudiantes...</td>
+                <td colspan="7" style="text-align: center;">Cargando colaboradores...</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- SECCIÓN REPORTES (NUEVO) -->
+      <!-- SECCIÓN REPORTES -->
       <div id="seccion-reportes" class="gestion-section">
         <h3 style="margin-bottom: 15px; color: var(--primary);">📊 Reportes de Asistencia</h3>
         
         <div class="filter-bar">
           <input type="date" class="filter-input" id="fechaInicio">
           <input type="date" class="filter-input" id="fechaFin">
-          <select class="filter-select" id="filtroGrado">
-            <option value="">Todos los grados</option>
+          <select class="filter-select" id="filtroArea">
+            <option value="">Todas las áreas</option>
           </select>
           <select class="filter-select" id="filtroEstado">
             <option value="">Todos los estados</option>
@@ -835,8 +1075,8 @@
             <div class="label">Salidas</div>
           </div>
           <div class="stat-card">
-            <div class="number" id="estudiantes-unicos">0</div>
-            <div class="label">Estudiantes Únicos</div>
+            <div class="number" id="colaboradores-unicos">0</div>
+            <div class="label">Colaboradores Únicos</div>
           </div>
         </div>
         
@@ -848,8 +1088,8 @@
                 <th>Hora</th>
                 <th>ID</th>
                 <th>Nombre</th>
-                <th>Grado</th>
-                <th>Perfil</th>
+                <th>Área</th>
+                <th>Cargo</th>
                 <th>Estado</th>
                 <th>Dispositivo</th>
               </tr>
@@ -878,13 +1118,13 @@
           </button>
           
           <div class="form-group" style="margin-top: 15px;">
-            <label for="admin-grado">Grado/Sección:</label>
-            <select id="admin-grado">
-              <option value="">Cargando grados...</option>
+            <label for="admin-area">Área/Grado:</label>
+            <select id="admin-area">
+              <option value="">Cargando áreas...</option>
             </select>
           </div>
           <button type="button" class="btn" id="admin-generar-lote">
-            📚 Generar Carnets por Grado
+            📚 Generar Carnets por Área
           </button>
           
           <div class="progress-bar" id="progress-bar">
@@ -902,66 +1142,67 @@
     </div>
   </div>
 
-  <!-- MODAL PARA ESTUDIANTES (NUEVO) -->
-  <div id="modal-estudiante" class="modal">
+  <!-- MODAL PARA COLABORADORES -->
+  <div id="modal-colaborador" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 id="modal-titulo">Nuevo Estudiante</h3>
-        <button class="close-btn" onclick="cerrarModalEstudiante()">&times;</button>
+        <h3 id="modal-titulo">Nuevo Colaborador</h3>
+        <button class="close-btn" onclick="cerrarModalColaborador()">&times;</button>
       </div>
       
-      <form id="form-estudiante" onsubmit="guardarEstudiante(event)">
-        <input type="hidden" id="estudiante-id-original">
+      <form id="form-colaborador" onsubmit="guardarColaborador(event)">
+        <input type="hidden" id="colaborador-id-original">
         
         <div class="form-group">
           <label>ID *</label>
-          <input type="text" id="estudiante-id" required class="filter-input">
+          <input type="text" id="colaborador-id" required class="filter-input" placeholder="ID único">
+          <small style="color: #666;">El ID no se puede repetir</small>
         </div>
         
         <div class="form-group">
           <label>Nombres *</label>
-          <input type="text" id="estudiante-nombres" required class="filter-input">
+          <input type="text" id="colaborador-nombres" required class="filter-input">
         </div>
         
         <div class="form-group">
           <label>Apellidos *</label>
-          <input type="text" id="estudiante-apellidos" required class="filter-input">
+          <input type="text" id="colaborador-apellidos" required class="filter-input">
         </div>
         
         <div class="form-group">
-          <label>Grado/Sección *</label>
-          <input type="text" id="estudiante-grado" required class="filter-input" 
-                 placeholder="Ej: 5to A">
+          <label>Área/Grado *</label>
+          <input type="text" id="colaborador-area" required class="filter-input" 
+                 placeholder="Ej: Ventas / 5to A">
         </div>
         
         <div class="form-group">
-          <label>Perfil</label>
-          <input type="text" id="estudiante-perfil" class="filter-input" 
-                 placeholder="Ej: Estudiante">
+          <label>Cargo/Perfil</label>
+          <input type="text" id="colaborador-cargo" class="filter-input" 
+                 placeholder="Ej: Supervisor / Estudiante">
         </div>
         
         <div class="form-group">
           <label>Teléfono</label>
-          <input type="text" id="estudiante-telefono" class="filter-input" 
+          <input type="text" id="colaborador-telefono" class="filter-input" 
                  placeholder="Ej: 987654321">
         </div>
         
         <div class="form-group">
           <label>URL de Foto (opcional)</label>
-          <input type="url" id="estudiante-foto" class="filter-input" 
+          <input type="url" id="colaborador-foto" class="filter-input" 
                  placeholder="https://...">
         </div>
         
         <div style="display: flex; gap: 10px; margin-top: 20px;">
           <button type="submit" class="btn" style="flex: 1;">Guardar</button>
           <button type="button" class="btn btn-secondary" style="flex: 1;" 
-                  onclick="cerrarModalEstudiante()">Cancelar</button>
+                  onclick="cerrarModalColaborador()">Cancelar</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Toast para notificaciones -->
+  <!-- Toast -->
   <div id="toast" class="toast"></div>
 
   <script>
@@ -969,11 +1210,11 @@
     // CONFIGURACIÓN
     // ============================================
     const CONFIG = {
-      APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxxNz9FhBV3ybKs8CMow5mc1PusG2AybD6_POwWvsUR813pNC60OFS_VDzbpzGs24k/exec', // ¡CAMBIA ESTO!
+      APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxxNz9FhBV3ybKs8CMow5mc1PusG2AybD6_POwWvsUR813pNC60OFS_VDzbpzGs24k/exec',
       USUARIO: 'admin',
       CONTRASEÑA: 'pip2026',
       TIEMPO_TOAST: 3000,
-      VERSION: '4.0.0'
+      VERSION: '4.0.0-colaboradores'
     };
 
     // ============================================
@@ -982,16 +1223,28 @@
     function verificarLogin() {
       const user = document.getElementById('login-user').value.trim();
       const pass = document.getElementById('login-pass').value.trim();
+      const errorEl = document.getElementById('login-error');
       
       if (user === CONFIG.USUARIO && pass === CONFIG.CONTRASEÑA) {
+        const btn = event?.target || document.querySelector('.login-btn');
+        btn.innerHTML = '<span>✓ Acceso concedido</span>';
+        
         localStorage.setItem('auth_pip', 'true');
-        document.getElementById('login-overlay').style.display = 'none';
-        document.getElementById('main-content').style.display = 'block';
-        mostrarToast('¡Bienvenido al sistema!', 'success');
-        iniciarAplicacion();
+        
+        setTimeout(() => {
+          document.getElementById('login-overlay').style.display = 'none';
+          document.getElementById('main-content').style.display = 'block';
+          mostrarToast('¡Bienvenido al sistema!', 'success');
+          iniciarAplicacion();
+        }, 500);
       } else {
-        document.getElementById('login-error').style.display = 'block';
+        errorEl.style.display = 'block';
         document.getElementById('login-pass').value = '';
+        document.getElementById('login-user').focus();
+        
+        setTimeout(() => {
+          errorEl.style.display = 'none';
+        }, 3000);
       }
     }
 
@@ -1064,31 +1317,6 @@
     }
 
     // ============================================
-    // CAMBIAR SECCIONES
-    // ============================================
-    function cambiarSeccion(seccion) {
-      document.querySelectorAll('.gestion-tab').forEach(tab => tab.classList.remove('active'));
-      document.querySelectorAll('.gestion-section').forEach(section => section.classList.remove('active'));
-      
-      if (seccion === 'asistencia') {
-        document.querySelectorAll('.gestion-tab')[0].classList.add('active');
-        document.getElementById('seccion-asistencia').classList.add('active');
-      } else if (seccion === 'estudiantes') {
-        document.querySelectorAll('.gestion-tab')[1].classList.add('active');
-        document.getElementById('seccion-estudiantes').classList.add('active');
-        cargarEstudiantes();
-      } else if (seccion === 'reportes') {
-        document.querySelectorAll('.gestion-tab')[2].classList.add('active');
-        document.getElementById('seccion-reportes').classList.add('active');
-        cargarGradosParaFiltro();
-        const hoy = new Date();
-        const primero = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-        document.getElementById('fechaInicio').value = primero.toISOString().split('T')[0];
-        document.getElementById('fechaFin').value = hoy.toISOString().split('T')[0];
-      }
-    }
-
-    // ============================================
     // GENERAR ID ÚNICO DEL DISPOSITIVO
     // ============================================
     function generarIdDispositivo() {
@@ -1119,14 +1347,29 @@
     }
 
     // ============================================
-    // VARIABLES GLOBALES
+    // CAMBIAR SECCIONES
     // ============================================
-    let qrCodeReader = null;
-    let isScanning = false;
-    let searchTimeout = null;
-    let studentData = null;
-    let selectedCameraId = null;
-    let cameraEnabled = true;
+    function cambiarSeccion(seccion) {
+      document.querySelectorAll('.gestion-tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.gestion-section').forEach(section => section.classList.remove('active'));
+      
+      if (seccion === 'asistencia') {
+        document.querySelectorAll('.gestion-tab')[0].classList.add('active');
+        document.getElementById('seccion-asistencia').classList.add('active');
+      } else if (seccion === 'colaboradores') {
+        document.querySelectorAll('.gestion-tab')[1].classList.add('active');
+        document.getElementById('seccion-colaboradores').classList.add('active');
+        cargarColaboradores();
+      } else if (seccion === 'reportes') {
+        document.querySelectorAll('.gestion-tab')[2].classList.add('active');
+        document.getElementById('seccion-reportes').classList.add('active');
+        cargarAreasParaFiltro();
+        const hoy = new Date();
+        const primero = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+        document.getElementById('fechaInicio').value = primero.toISOString().split('T')[0];
+        document.getElementById('fechaFin').value = hoy.toISOString().split('T')[0];
+      }
+    }
 
     // ============================================
     // FUNCIONES DE TIEMPO
@@ -1140,8 +1383,15 @@
     }
 
     // ============================================
-    // FUNCIONES DE CÁMARA Y QR
+    // FUNCIONES DE CÁMARA Y QR (IGUAL AL ORIGINAL)
     // ============================================
+    let qrCodeReader = null;
+    let isScanning = false;
+    let searchTimeout = null;
+    let collaboratorData = null;
+    let selectedCameraId = null;
+    let cameraEnabled = true;
+
     function esMobile() {
       return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     }
@@ -1234,7 +1484,7 @@
         { fps: 10, qrbox: 250 },
         (decodedText) => {
           document.getElementById('id').value = decodedText.trim();
-          buscarEstudiante(decodedText.trim());
+          buscarColaborador(decodedText.trim());
           mostrarToast('✅ QR detectado');
         },
         () => {}
@@ -1259,20 +1509,20 @@
     }
 
     // ============================================
-    // FUNCIONES DE BÚSQUEDA Y REGISTRO (ORIGINALES)
+    // FUNCIONES DE BÚSQUEDA Y REGISTRO
     // ============================================
-    async function buscarEstudiante(id) {
-      if (!id.trim()) return ocultarInfoEstudiante();
+    async function buscarColaborador(id) {
+      if (!id.trim()) return ocultarInfoColaborador();
       
       mostrarBusqueda();
       const resultado = await llamarAppsScript('buscarEstudiante', { id });
       
       if (resultado?.encontrado) {
-        studentData = resultado.datos;
-        mostrarInfoEstudiante(resultado.datos);
+        collaboratorData = resultado.datos;
+        mostrarInfoColaborador(resultado.datos);
         habilitarBotonRegistro();
       } else {
-        ocultarInfoEstudiante();
+        ocultarInfoColaborador();
         mostrarRespuesta(resultado?.mensaje || 'No encontrado', 'warning');
         deshabilitarBotonRegistro();
       }
@@ -1283,15 +1533,15 @@
       document.getElementById('employee-name').innerHTML = '<div class="loading"></div> Buscando...';
     }
     
-    function mostrarInfoEstudiante(d) {
+    function mostrarInfoColaborador(d) {
       document.getElementById('employee-name').textContent = d.nombre || '-';
       document.getElementById('employee-area').textContent = d.area || '-';
       document.getElementById('employee-position').textContent = d.cargo || '-';
     }
     
-    function ocultarInfoEstudiante() {
+    function ocultarInfoColaborador() {
       document.getElementById('employee-info').style.display = 'none';
-      studentData = null;
+      collaboratorData = null;
     }
     
     function habilitarBotonRegistro() {
@@ -1311,7 +1561,7 @@
     }
 
     // ============================================
-    // FUNCIONES DE DESCARGA (ORIGINALES)
+    // FUNCIONES DE DESCARGA
     // ============================================
     function descargarArchivo(base64, filename) {
       try {
@@ -1330,22 +1580,22 @@
       }
     }
 
-    async function cargarGrados() {
+    async function cargarAreas() {
       const res = await llamarAppsScript('listarGrados');
-      const select = document.getElementById('admin-grado');
+      const select = document.getElementById('admin-area');
       if (res?.grados) {
-        select.innerHTML = '<option value="">📌 Seleccione un grado...</option>';
+        select.innerHTML = '<option value="">📌 Seleccione un área...</option>';
         res.grados.forEach(g => select.innerHTML += `<option value="${g}">${g}</option>`);
       }
     }
 
     // ============================================
-    // ENVÍO DE FORMULARIO (ORIGINAL)
+    // ENVÍO DE FORMULARIO
     // ============================================
     async function enviarFormulario(e) {
       e.preventDefault();
       
-      if (!studentData) return mostrarRespuesta('ID no válido', 'error');
+      if (!collaboratorData) return mostrarRespuesta('ID no válido', 'error');
       
       const btn = document.getElementById('btn-submit');
       const original = btn.innerHTML;
@@ -1354,10 +1604,10 @@
       
       const res = await llamarAppsScript('registrarAsistencia', {
         id: document.getElementById('id').value.trim(),
-        nombre: studentData.nombre,
-        area: studentData.area,
-        cargo: studentData.cargo,
-        telefono: studentData.telefono || '',
+        nombre: collaboratorData.nombre,
+        area: collaboratorData.area,
+        cargo: collaboratorData.cargo,
+        telefono: collaboratorData.telefono || '',
         estado: document.getElementById('estado').value,
         idDispositivo: generarIdDispositivo()
       });
@@ -1368,7 +1618,7 @@
         mostrarRespuesta(res.mensaje, 'success');
         mostrarToast('✅ Registro exitoso', 'success');
         document.getElementById('formulario').reset();
-        ocultarInfoEstudiante();
+        ocultarInfoColaborador();
         deshabilitarBotonRegistro();
       } else {
         mostrarRespuesta(res?.mensaje || 'Error', 'error');
@@ -1377,40 +1627,40 @@
     }
 
     // ============================================
-    // NUEVAS FUNCIONES: GESTIÓN DE ESTUDIANTES
+    // GESTIÓN DE COLABORADORES
     // ============================================
-    let estudiantes = [];
+    let colaboradores = [];
 
-    async function cargarEstudiantes() {
+    async function cargarColaboradores() {
       const res = await llamarAppsScript('listarEstudiantes');
       if (res.ok) {
-        estudiantes = res.data;
-        mostrarEstudiantes(estudiantes);
+        colaboradores = res.data;
+        mostrarColaboradores(colaboradores);
       } else {
-        mostrarToast('Error al cargar estudiantes', 'error');
+        mostrarToast('Error al cargar colaboradores', 'error');
       }
     }
 
-    function mostrarEstudiantes(lista) {
-      const tbody = document.getElementById('estudiantes-body');
+    function mostrarColaboradores(lista) {
+      const tbody = document.getElementById('colaboradores-body');
       if (lista.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No hay estudiantes registrados</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No hay colaboradores registrados</td></tr>';
         return;
       }
       
       let html = '';
-      lista.forEach(e => {
+      lista.forEach(c => {
         html += `
           <tr>
-            <td>${e.id}</td>
-            <td>${e.nombres}</td>
-            <td>${e.apellidos}</td>
-            <td>${e.grado}</td>
-            <td>${e.perfil || '-'}</td>
-            <td>${e.telefono || '-'}</td>
+            <td>${c.id}</td>
+            <td>${c.nombres}</td>
+            <td>${c.apellidos}</td>
+            <td>${c.grado}</td>
+            <td>${c.perfil || '-'}</td>
+            <td>${c.telefono || '-'}</td>
             <td>
-              <button class="action-btn btn-edit" onclick="editarEstudiante('${e.id}')">✏️</button>
-              <button class="action-btn btn-delete" onclick="eliminarEstudiante('${e.id}')">🗑️</button>
+              <button class="action-btn btn-edit" onclick="editarColaborador('${c.id}')">✏️</button>
+              <button class="action-btn btn-delete" onclick="eliminarColaborador('${c.id}')">🗑️</button>
             </td>
           </tr>
         `;
@@ -1418,62 +1668,62 @@
       tbody.innerHTML = html;
     }
 
-    function filtrarEstudiantes() {
-      const texto = document.getElementById('buscarEstudiante').value.toLowerCase();
+    function filtrarColaboradores() {
+      const texto = document.getElementById('buscarColaborador').value.toLowerCase();
       if (!texto) {
-        mostrarEstudiantes(estudiantes);
+        mostrarColaboradores(colaboradores);
         return;
       }
       
-      const filtrados = estudiantes.filter(e => 
-        e.id.toLowerCase().includes(texto) ||
-        e.nombres.toLowerCase().includes(texto) ||
-        e.apellidos.toLowerCase().includes(texto) ||
-        e.grado.toLowerCase().includes(texto)
+      const filtrados = colaboradores.filter(c => 
+        c.id.toLowerCase().includes(texto) ||
+        c.nombres.toLowerCase().includes(texto) ||
+        c.apellidos.toLowerCase().includes(texto) ||
+        c.grado.toLowerCase().includes(texto)
       );
-      mostrarEstudiantes(filtrados);
+      mostrarColaboradores(filtrados);
     }
 
-    function mostrarModalEstudiante(estudiante = null) {
-      document.getElementById('modal-titulo').textContent = estudiante ? 'Editar Estudiante' : 'Nuevo Estudiante';
+    function mostrarModalColaborador(colaborador = null) {
+      document.getElementById('modal-titulo').textContent = colaborador ? 'Editar Colaborador' : 'Nuevo Colaborador';
       
-      if (estudiante) {
-        document.getElementById('estudiante-id-original').value = estudiante.id;
-        document.getElementById('estudiante-id').value = estudiante.id;
-        document.getElementById('estudiante-nombres').value = estudiante.nombres;
-        document.getElementById('estudiante-apellidos').value = estudiante.apellidos;
-        document.getElementById('estudiante-grado').value = estudiante.grado;
-        document.getElementById('estudiante-perfil').value = estudiante.perfil || '';
-        document.getElementById('estudiante-telefono').value = estudiante.telefono || '';
-        document.getElementById('estudiante-foto').value = estudiante.fotoUrl || '';
-        document.getElementById('estudiante-id').disabled = true;
+      if (colaborador) {
+        document.getElementById('colaborador-id-original').value = colaborador.id;
+        document.getElementById('colaborador-id').value = colaborador.id;
+        document.getElementById('colaborador-nombres').value = colaborador.nombres;
+        document.getElementById('colaborador-apellidos').value = colaborador.apellidos;
+        document.getElementById('colaborador-area').value = colaborador.grado;
+        document.getElementById('colaborador-cargo').value = colaborador.perfil || '';
+        document.getElementById('colaborador-telefono').value = colaborador.telefono || '';
+        document.getElementById('colaborador-foto').value = colaborador.fotoUrl || '';
+        document.getElementById('colaborador-id').disabled = true;
       } else {
-        document.getElementById('form-estudiante').reset();
-        document.getElementById('estudiante-id-original').value = '';
-        document.getElementById('estudiante-id').disabled = false;
+        document.getElementById('form-colaborador').reset();
+        document.getElementById('colaborador-id-original').value = '';
+        document.getElementById('colaborador-id').disabled = false;
       }
       
-      document.getElementById('modal-estudiante').classList.add('active');
+      document.getElementById('modal-colaborador').classList.add('active');
     }
 
-    function cerrarModalEstudiante() {
-      document.getElementById('modal-estudiante').classList.remove('active');
+    function cerrarModalColaborador() {
+      document.getElementById('modal-colaborador').classList.remove('active');
     }
 
-    async function guardarEstudiante(e) {
+    async function guardarColaborador(e) {
       e.preventDefault();
       
       const data = {
-        id: document.getElementById('estudiante-id').value.trim(),
-        nombres: document.getElementById('estudiante-nombres').value.trim(),
-        apellidos: document.getElementById('estudiante-apellidos').value.trim(),
-        grado: document.getElementById('estudiante-grado').value.trim(),
-        perfil: document.getElementById('estudiante-perfil').value.trim(),
-        telefono: document.getElementById('estudiante-telefono').value.trim(),
-        fotoUrl: document.getElementById('estudiante-foto').value.trim()
+        id: document.getElementById('colaborador-id').value.trim(),
+        nombres: document.getElementById('colaborador-nombres').value.trim(),
+        apellidos: document.getElementById('colaborador-apellidos').value.trim(),
+        grado: document.getElementById('colaborador-area').value.trim(),
+        perfil: document.getElementById('colaborador-cargo').value.trim(),
+        telefono: document.getElementById('colaborador-telefono').value.trim(),
+        fotoUrl: document.getElementById('colaborador-foto').value.trim()
       };
       
-      const idOriginal = document.getElementById('estudiante-id-original').value;
+      const idOriginal = document.getElementById('colaborador-id-original').value;
       let res;
       
       if (idOriginal) {
@@ -1484,45 +1734,51 @@
       
       if (res.ok) {
         mostrarToast(res.mensaje, 'success');
-        cerrarModalEstudiante();
-        cargarEstudiantes();
-        cargarGradosParaFiltro();
+        cerrarModalColaborador();
+        cargarColaboradores();
+        cargarAreasParaFiltro();
       } else {
         mostrarToast(res.mensaje, 'error');
       }
     }
 
-    async function editarEstudiante(id) {
-      const estudiante = estudiantes.find(e => e.id == id);
-      if (estudiante) {
-        mostrarModalEstudiante(estudiante);
+    async function editarColaborador(id) {
+      const colaborador = colaboradores.find(c => c.id == id);
+      if (colaborador) {
+        mostrarModalColaborador(colaborador);
       }
     }
 
-    async function eliminarEstudiante(id) {
-      if (!confirm('¿Está seguro de eliminar este estudiante?')) return;
+    async function eliminarColaborador(id) {
+      if (!confirm('¿Está seguro de eliminar este colaborador?')) return;
       
       const res = await llamarAppsScript('eliminarEstudiante', { id });
       if (res.ok) {
         mostrarToast(res.mensaje, 'success');
-        cargarEstudiantes();
-        cargarGradosParaFiltro();
+        cargarColaboradores();
+        cargarAreasParaFiltro();
       } else {
         mostrarToast(res.mensaje, 'error');
       }
     }
 
     // ============================================
-    // NUEVAS FUNCIONES: REPORTES
+    // REPORTES
     // ============================================
-    async function cargarGradosParaFiltro() {
+    async function cargarAreasParaFiltro() {
       const res = await llamarAppsScript('listarGrados');
       if (res?.grados) {
-        const select = document.getElementById('filtroGrado');
-        select.innerHTML = '<option value="">Todos los grados</option>';
+        const select = document.getElementById('filtroArea');
+        select.innerHTML = '<option value="">Todas las áreas</option>';
         res.grados.forEach(g => {
           select.innerHTML += `<option value="${g}">${g}</option>`;
         });
+        
+        const selectAdmin = document.getElementById('admin-area');
+        if (selectAdmin) {
+          selectAdmin.innerHTML = '<option value="">📌 Seleccione un área...</option>';
+          res.grados.forEach(g => selectAdmin.innerHTML += `<option value="${g}">${g}</option>`);
+        }
       }
     }
 
@@ -1530,7 +1786,7 @@
       const filtros = {
         fechaInicio: document.getElementById('fechaInicio').value,
         fechaFin: document.getElementById('fechaFin').value,
-        grado: document.getElementById('filtroGrado').value,
+        grado: document.getElementById('filtroArea').value,
         estado: document.getElementById('filtroEstado').value
       };
       
@@ -1578,19 +1834,19 @@
       const total = data.length;
       const ingresos = data.filter(r => r.estado === 'INGRESO').length;
       const salidas = data.filter(r => r.estado === 'SALIDA').length;
-      const estudiantesUnicos = new Set(data.map(r => r.id)).size;
+      const colaboradoresUnicos = new Set(data.map(r => r.id)).size;
       
       document.getElementById('total-registros').textContent = total;
       document.getElementById('total-ingresos').textContent = ingresos;
       document.getElementById('total-salidas').textContent = salidas;
-      document.getElementById('estudiantes-unicos').textContent = estudiantesUnicos;
+      document.getElementById('colaboradores-unicos').textContent = colaboradoresUnicos;
     }
 
     async function exportarReporte() {
       const filtros = {
         fechaInicio: document.getElementById('fechaInicio').value,
         fechaFin: document.getElementById('fechaFin').value,
-        grado: document.getElementById('filtroGrado').value,
+        grado: document.getElementById('filtroArea').value,
         estado: document.getElementById('filtroEstado').value
       };
       
@@ -1616,9 +1872,9 @@
       document.getElementById('id').addEventListener('input', function(e) {
         clearTimeout(searchTimeout);
         if (e.target.value.trim().length > 0) {
-          ocultarInfoEstudiante();
+          ocultarInfoColaborador();
           deshabilitarBotonRegistro();
-          searchTimeout = setTimeout(() => buscarEstudiante(e.target.value.trim()), 800);
+          searchTimeout = setTimeout(() => buscarColaborador(e.target.value.trim()), 800);
         }
       });
       
@@ -1626,7 +1882,7 @@
       document.getElementById('admin-toggle').addEventListener('click', function() {
         const body = document.getElementById('admin-body');
         body.style.display = body.style.display === 'none' ? 'block' : 'none';
-        if (body.style.display === 'block') cargarGrados();
+        if (body.style.display === 'block') cargarAreas();
       });
       
       document.getElementById('admin-generar-id').addEventListener('click', async function() {
@@ -1646,11 +1902,11 @@
       });
       
       document.getElementById('admin-generar-lote').addEventListener('click', async function() {
-        const grado = document.getElementById('admin-grado').value;
-        if (!grado) return mostrarAdminEstado('⚠️ Seleccione grado', 'error');
+        const area = document.getElementById('admin-area').value;
+        if (!area) return mostrarAdminEstado('⚠️ Seleccione área', 'error');
         
         mostrarAdminEstado('📚 Generando lote...', 'info');
-        const res = await llamarAppsScript('generarLote', { grado });
+        const res = await llamarAppsScript('generarLote', { grado: area });
         
         if (res?.ok) {
           mostrarAdminEstado('✅ Descargando...', 'success');
@@ -1675,6 +1931,13 @@
       s.className = 'admin-status admin-' + tipo;
     }
 
+    // Permitir Enter en login
+    document.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && document.getElementById('login-overlay').style.display !== 'none') {
+        verificarLogin();
+      }
+    });
+
     window.onload = function() {
       if (localStorage.getItem('auth_pip') === 'true') {
         document.getElementById('login-overlay').style.display = 'none';
@@ -1689,4 +1952,3 @@
   </script>
 </body>
 </html>
-
