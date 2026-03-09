@@ -9,17 +9,24 @@
     :root {
       --primary: #4CAF50;
       --primary-dark: #45a049;
+      --primary-light: #e8f5e9;
       --secondary: #2196F3;
       --secondary-dark: #1976D2;
-      --success: #d4edda;
+      --accent: #FF5722;
+      --success: #4CAF50;
+      --success-light: #d4edda;
       --success-text: #155724;
-      --error: #f8d7da;
+      --error: #f44336;
+      --error-light: #f8d7da;
       --error-text: #721c24;
-      --warning: #fff3cd;
+      --warning: #ff9800;
+      --warning-light: #fff3cd;
       --warning-text: #856404;
       --bg-main: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      --shadow: 0 4px 20px rgba(0,0,0,0.15);
-      --border-radius: 12px;
+      --shadow: 0 10px 40px rgba(0,0,0,0.2);
+      --shadow-sm: 0 4px 20px rgba(0,0,0,0.15);
+      --border-radius: 16px;
+      --border-radius-sm: 12px;
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -30,19 +37,264 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg-main);
       min-height: 100vh;
       padding: 10px;
       line-height: 1.5;
     }
 
+    /* ============================================
+       LOGIN MEJORADO - MUCHO MÁS ATRACTIVO
+    ============================================ */
+    #login-overlay {
+      display: flex;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      animation: slideUpFade 0.6s ease-out;
+    }
+
+    @keyframes slideUpFade {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 40px 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: var(--transition);
+    }
+
+    .login-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .login-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
+    }
+
+    .login-icon span {
+      font-size: 40px;
+      filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));
+    }
+
+    .login-header h2 {
+      color: #333;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .login-header p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .login-form {
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-weight: 500;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 15px;
+      color: #999;
+      font-size: 18px;
+      transition: var(--transition);
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 15px 15px 15px 50px;
+      border: 2px solid #e0e0e0;
+      border-radius: 50px;
+      font-size: 16px;
+      transition: var(--transition);
+      background: white;
+      outline: none;
+    }
+
+    .input-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.1);
+    }
+
+    .input-group input:focus + .input-icon {
+      color: var(--primary);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+    }
+
+    .login-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(76, 175, 80, 0.4);
+    }
+
+    .login-btn:active {
+      transform: translateY(-1px);
+    }
+
+    .login-error {
+      background: var(--error-light);
+      color: var(--error-text);
+      padding: 12px 20px;
+      border-radius: 50px;
+      margin-top: 20px;
+      display: none;
+      text-align: center;
+      font-weight: 500;
+      border-left: 4px solid var(--error);
+      animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #888;
+      font-size: 12px;
+    }
+
+    .login-footer a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .login-footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Decoración de fondo */
+    .login-decoration {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .decoration-circle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+    }
+
+    .circle1 {
+      width: 300px;
+      height: 300px;
+      top: -100px;
+      right: -100px;
+    }
+
+    .circle2 {
+      width: 200px;
+      height: 200px;
+      bottom: -50px;
+      left: -50px;
+    }
+
+    .circle3 {
+      width: 150px;
+      height: 150px;
+      bottom: 50px;
+      right: 50px;
+    }
+
+    /* ============================================
+       ESTILOS DEL CONTENIDO PRINCIPAL (sin cambios)
+    ============================================ */
     .container {
       max-width: min(500px, 100vw - 20px);
       margin: 0 auto;
       background: white;
       border-radius: var(--border-radius);
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow-sm);
       overflow: hidden;
       animation: slideIn 0.5s ease-out;
     }
@@ -224,7 +476,7 @@
     .btn:hover:not(:disabled) {
       background: var(--primary-dark);
       transform: translateY(-2px);
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow-sm);
     }
 
     .btn:disabled {
@@ -289,19 +541,19 @@
     }
 
     .success {
-      background: var(--success);
+      background: var(--success-light);
       color: var(--success-text);
       border: 1px solid #c3e6cb;
     }
 
     .error {
-      background: var(--error);
+      background: var(--error-light);
       color: var(--error-text);
       border: 1px solid #f5c6cb;
     }
 
     .warning {
-      background: var(--warning);
+      background: var(--warning-light);
       color: var(--warning-text);
       border: 1px solid #ffeaa7;
     }
@@ -356,14 +608,14 @@
     }
 
     .admin-success {
-      background: #d4edda;
-      color: #155724;
+      background: var(--success-light);
+      color: var(--success-text);
       border: 1px solid #c3e6cb;
     }
 
     .admin-error {
-      background: #f8d7da;
-      color: #721c24;
+      background: var(--error-light);
+      color: var(--error-text);
       border: 1px solid #f5c6cb;
     }
 
@@ -399,7 +651,7 @@
       color: #333;
       padding: 12px 24px;
       border-radius: 50px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: var(--shadow-sm);
       z-index: 1000;
       opacity: 0;
       transition: all 0.3s ease;
@@ -412,17 +664,17 @@
     }
 
     .toast.success {
-      background: #4CAF50;
+      background: var(--success);
       color: white;
     }
 
     .toast.error {
-      background: #f44336;
+      background: var(--error);
       color: white;
     }
 
     .toast.warning {
-      background: #ff9800;
+      background: var(--warning);
       color: white;
     }
 
@@ -438,28 +690,71 @@
       .toggle-wrapper {
         justify-content: center;
       }
-    }
 
-    @media (min-width: 768px) {
-      .container {
-        margin-top: 20px;
+      .login-card {
+        padding: 30px 20px;
       }
     }
   </style>
 </head>
 <body>
-  <!-- PANTALLA DE LOGIN -->
+  <!-- ============================================
+       PANTALLA DE LOGIN MEJORADA
+  ============================================ -->
   <div id="login-overlay">
-    <div class="login-box">
-      <h2>🔐 CONTROL DE ASISTENCIA LA BASE COWORK</h2>
-      <input type="text" id="login-user" placeholder="Usuario" autocomplete="off" autofocus>
-      <input type="password" id="login-pass" placeholder="Contraseña">
-      <button onclick="verificarLogin()">Ingresar</button>
-      <p id="login-error" class="login-error">Usuario o contraseña incorrectos</p>
+    <!-- Decoración de fondo -->
+    <div class="login-decoration">
+      <div class="decoration-circle circle1"></div>
+      <div class="decoration-circle circle2"></div>
+      <div class="decoration-circle circle3"></div>
+    </div>
+    
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-header">
+          <div class="login-icon">
+            <span>🔐</span>
+          </div>
+          <h2>Bienvenido</h2>
+          <p>Ingresa tus credenciales para continuar</p>
+        </div>
+        
+        <div class="login-form">
+          <div class="input-group">
+            <label for="login-user">Usuario</label>
+            <div class="input-wrapper">
+              <span class="input-icon">👤</span>
+              <input type="text" id="login-user" placeholder="Ingresa tu usuario" autocomplete="off" autofocus>
+            </div>
+          </div>
+          
+          <div class="input-group">
+            <label for="login-pass">Contraseña</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔑</span>
+              <input type="password" id="login-pass" placeholder="Ingresa tu contraseña">
+            </div>
+          </div>
+          
+          <button class="login-btn" onclick="verificarLogin()">
+            <span>Ingresar</span>
+            <span>→</span>
+          </button>
+        </div>
+        
+        <div id="login-error" class="login-error">
+          ⚠️ Usuario o contraseña incorrectos
+        </div>
+        
+        <div class="login-footer">
+          <p>Sistema de Control de Asistencia v3.0</p>
+          <p>© 2026 - La Base Cowork</p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- CONTENIDO PRINCIPAL (protegido por login) -->
+  <!-- CONTENIDO PRINCIPAL (protegido por login) - SIN CAMBIOS -->
   <div class="container" id="main-content" style="display: none;">
     <div class="header">
       <h1>CONTROL DE ASISTENCIA</h1>
@@ -529,7 +824,6 @@
         <div id="admin-body" style="display: none;">
           <h4>Generar Carnets</h4>
           
-          <!-- Generar por ID -->
           <div class="form-group">
             <label for="admin-id">ID del Colaborador:</label>
             <input type="text" id="admin-id" placeholder="Ej: 2024001">
@@ -538,7 +832,6 @@
             📄 Generar Carnet Individual
           </button>
           
-          <!-- Generar por Grado -->
           <div class="form-group" style="margin-top: 15px;">
             <label for="admin-grado">Grado/Sección:</label>
             <select id="admin-grado">
@@ -549,24 +842,20 @@
             📚 Generar Carnets por Grado
           </button>
           
-          <!-- Barra de progreso -->
           <div class="progress-bar" id="progress-bar">
             <div class="progress-fill" id="progress-fill"></div>
           </div>
           
-          <!-- Estado del admin -->
           <div id="admin-status" class="admin-status"></div>
         </div>
       </div>
 
-      <!-- Botón de Cerrar Sesión -->
       <button type="button" class="btn btn-logout" onclick="cerrarSesion()">
         🚪 Cerrar Sesión
       </button>
     </div>
   </div>
 
-  <!-- Toast para notificaciones -->
   <div id="toast" class="toast"></div>
 
   <script>
@@ -574,25 +863,19 @@
     // CONFIGURACIÓN - ¡CAMBIA ESTOS VALORES!
     // ============================================
     const CONFIG = {
-      // URL de tu Apps Script (CAMBIA ESTO por la URL que obtienes al publicar)
       APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxxNz9FhBV3ybKs8CMow5mc1PusG2AybD6_POwWvsUR813pNC60OFS_VDzbpzGs24k/exec',
-      
-      // Credenciales de login (cámbialas por las que quieras)
       USUARIO: 'admin',
       CONTRASEÑA: 'pip2026',
-      
-      // Configuración de la app
       TIEMPO_TOAST: 3000,
       VERSION: '3.0.0-seguro'
     };
 
     // ============================================
-    // GENERAR ID ÚNICO DEL DISPOSITIVO (NUEVA SEGURIDAD)
+    // GENERAR ID ÚNICO DEL DISPOSITIVO
     // ============================================
     function generarIdDispositivo() {
       let deviceId = localStorage.getItem('device_id');
       if (!deviceId) {
-        // Crear un ID único basado en características del navegador
         const nav = navigator;
         const screen = window.screen;
         const componentes = [
@@ -605,7 +888,6 @@
           nav.platform || 'unknown'
         ].join('|');
         
-        // Generar hash simple
         let hash = 0;
         for (let i = 0; i < componentes.length; i++) {
           hash = ((hash << 5) - hash) + componentes.charCodeAt(i);
@@ -614,33 +896,47 @@
         
         deviceId = 'dev_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36);
         localStorage.setItem('device_id', deviceId);
-        console.log('🆔 Nuevo ID de dispositivo generado:', deviceId);
       }
       return deviceId;
     }
 
     // ============================================
-    // SISTEMA DE LOGIN
+    // SISTEMA DE LOGIN (con efecto visual mejorado)
     // ============================================
     function verificarLogin() {
       const user = document.getElementById('login-user').value.trim();
       const pass = document.getElementById('login-pass').value.trim();
+      const errorEl = document.getElementById('login-error');
       
       if (user === CONFIG.USUARIO && pass === CONFIG.CONTRASEÑA) {
+        // Animación de éxito
+        const btn = event?.target || document.querySelector('.login-btn');
+        btn.innerHTML = '<span>✓ Acceso concedido</span>';
+        
         localStorage.setItem('auth_pip', 'true');
-        document.getElementById('login-overlay').style.display = 'none';
-        document.getElementById('main-content').style.display = 'block';
-        mostrarToast('¡Bienvenido al sistema!', 'success');
-        iniciarAplicacion();
+        
+        // Pequeña pausa para mostrar el éxito
+        setTimeout(() => {
+          document.getElementById('login-overlay').style.display = 'none';
+          document.getElementById('main-content').style.display = 'block';
+          mostrarToast('¡Bienvenido al sistema!', 'success');
+          iniciarAplicacion();
+        }, 500);
       } else {
-        document.getElementById('login-error').style.display = 'block';
+        // Mostrar error con animación
+        errorEl.style.display = 'block';
         document.getElementById('login-pass').value = '';
+        document.getElementById('login-user').focus();
+        
+        // Ocultar después de 3 segundos
+        setTimeout(() => {
+          errorEl.style.display = 'none';
+        }, 3000);
       }
     }
 
     function cerrarSesion() {
       localStorage.removeItem('auth_pip');
-      // Nota: NO eliminamos device_id para mantener consistencia
       mostrarToast('Sesión cerrada', 'warning');
       setTimeout(() => location.reload(), 1000);
     }
@@ -660,8 +956,6 @@
     // ============================================
     async function llamarAppsScript(funcion, parametros = {}) {
       try {
-        console.log(`📡 Llamando: ${funcion}`);
-        
         if (funcion.includes('generar')) mostrarProgreso(30);
         
         const url = new URL(CONFIG.APPS_SCRIPT_URL);
@@ -680,7 +974,6 @@
         if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
         
         const texto = await respuesta.text();
-        console.log('📥 Respuesta:', texto);
         
         if (funcion.includes('generar')) {
           mostrarProgreso(80);
@@ -689,7 +982,6 @@
         
         return JSON.parse(texto);
       } catch (error) {
-        console.error('❌ Error:', error);
         ocultarProgreso();
         return { error: true, mensaje: error.message };
       }
@@ -929,7 +1221,7 @@
     }
 
     // ============================================
-    // ENVÍO DE FORMULARIO (MODIFICADO CON SEGURIDAD)
+    // ENVÍO DE FORMULARIO
     // ============================================
     async function enviarFormulario(e) {
       e.preventDefault();
@@ -941,7 +1233,6 @@
       btn.innerHTML = '<div class="loading"></div> Registrando...';
       btn.disabled = true;
       
-      // ✅ NUEVO: Incluir ID del dispositivo para seguridad
       const res = await llamarAppsScript('registrarAsistencia', {
         id: document.getElementById('id').value.trim(),
         nombre: studentData.nombre,
@@ -949,7 +1240,7 @@
         cargo: studentData.cargo,
         telefono: studentData.telefono || '',
         estado: document.getElementById('estado').value,
-        idDispositivo: generarIdDispositivo() // 👈 Clave de seguridad
+        idDispositivo: generarIdDispositivo()
       });
       
       btn.innerHTML = original;
@@ -1025,7 +1316,6 @@
       actualizarReloj();
       setTimeout(() => { if (cameraEnabled) cargarCamaras(); }, 1000);
       
-      // Pre-generar ID de dispositivo al iniciar
       generarIdDispositivo();
     }
     
@@ -1035,6 +1325,15 @@
       s.style.display = 'block';
       s.className = 'admin-status admin-' + tipo;
     }
+
+    // Permitir Enter en el login
+    document.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        if (document.getElementById('login-overlay').style.display !== 'none') {
+          verificarLogin();
+        }
+      }
+    });
 
     window.onload = function() {
       if (localStorage.getItem('auth_pip') === 'true') {
