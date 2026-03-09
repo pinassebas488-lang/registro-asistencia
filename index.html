@@ -583,8 +583,41 @@
       
       // Configuración de la app
       TIEMPO_TOAST: 3000,
-      VERSION: '2.0.0-sin-estadisticas'
+      VERSION: '3.0.0-seguro'
     };
+
+    // ============================================
+    // GENERAR ID ÚNICO DEL DISPOSITIVO (NUEVA SEGURIDAD)
+    // ============================================
+    function generarIdDispositivo() {
+      let deviceId = localStorage.getItem('device_id');
+      if (!deviceId) {
+        // Crear un ID único basado en características del navegador
+        const nav = navigator;
+        const screen = window.screen;
+        const componentes = [
+          nav.userAgent,
+          nav.language,
+          screen.width,
+          screen.height,
+          nav.hardwareConcurrency || '1',
+          new Date().getTimezoneOffset(),
+          nav.platform || 'unknown'
+        ].join('|');
+        
+        // Generar hash simple
+        let hash = 0;
+        for (let i = 0; i < componentes.length; i++) {
+          hash = ((hash << 5) - hash) + componentes.charCodeAt(i);
+          hash |= 0;
+        }
+        
+        deviceId = 'dev_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36);
+        localStorage.setItem('device_id', deviceId);
+        console.log('🆔 Nuevo ID de dispositivo generado:', deviceId);
+      }
+      return deviceId;
+    }
 
     // ============================================
     // SISTEMA DE LOGIN
@@ -607,6 +640,7 @@
 
     function cerrarSesion() {
       localStorage.removeItem('auth_pip');
+      // Nota: NO eliminamos device_id para mantener consistencia
       mostrarToast('Sesión cerrada', 'warning');
       setTimeout(() => location.reload(), 1000);
     }
@@ -895,7 +929,7 @@
     }
 
     // ============================================
-    // ENVÍO DE FORMULARIO
+    // ENVÍO DE FORMULARIO (MODIFICADO CON SEGURIDAD)
     // ============================================
     async function enviarFormulario(e) {
       e.preventDefault();
@@ -907,13 +941,15 @@
       btn.innerHTML = '<div class="loading"></div> Registrando...';
       btn.disabled = true;
       
+      // ✅ NUEVO: Incluir ID del dispositivo para seguridad
       const res = await llamarAppsScript('registrarAsistencia', {
         id: document.getElementById('id').value.trim(),
         nombre: studentData.nombre,
         area: studentData.area,
         cargo: studentData.cargo,
         telefono: studentData.telefono || '',
-        estado: document.getElementById('estado').value
+        estado: document.getElementById('estado').value,
+        idDispositivo: generarIdDispositivo() // 👈 Clave de seguridad
       });
       
       btn.innerHTML = original;
@@ -926,6 +962,7 @@
         deshabilitarBotonRegistro();
       } else {
         mostrarRespuesta(res?.mensaje || 'Error', 'error');
+        mostrarToast(res?.mensaje || 'Error', 'error');
         habilitarBotonRegistro();
       }
     }
@@ -987,6 +1024,9 @@
       setInterval(actualizarReloj, 1000);
       actualizarReloj();
       setTimeout(() => { if (cameraEnabled) cargarCamaras(); }, 1000);
+      
+      // Pre-generar ID de dispositivo al iniciar
+      generarIdDispositivo();
     }
     
     function mostrarAdminEstado(msg, tipo) {
