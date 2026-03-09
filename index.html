@@ -45,7 +45,7 @@
     }
 
     /* ============================================
-       LOGIN MEJORADO - BONITO Y PRESENTABLE
+       LOGIN MEJORADO
     ============================================ */
     #login-overlay {
       display: flex;
@@ -237,8 +237,47 @@
       font-size: 12px;
     }
 
+    /* Decoración de fondo */
+    .login-decoration {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .decoration-circle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+    }
+
+    .circle1 {
+      width: 300px;
+      height: 300px;
+      top: -100px;
+      right: -100px;
+    }
+
+    .circle2 {
+      width: 200px;
+      height: 200px;
+      bottom: -50px;
+      left: -50px;
+    }
+
+    .circle3 {
+      width: 150px;
+      height: 150px;
+      bottom: 50px;
+      right: 50px;
+    }
+
     /* ============================================
-       CONTENIDO PRINCIPAL
+       ESTILOS DEL CONTENIDO PRINCIPAL
     ============================================ */
     .container {
       max-width: min(500px, 100vw - 20px);
@@ -290,7 +329,7 @@
     }
 
     /* ============================================
-       CÁMARA Y QR (IGUAL AL ORIGINAL)
+       CÁMARA Y QR
     ============================================ */
     .camera-toggle {
       background: #f8f9fa;
@@ -542,7 +581,7 @@
     }
 
     /* ============================================
-       GESTIÓN DE COLABORADORES
+       PESTAÑAS DE GESTIÓN
     ============================================ */
     .gestion-tabs {
       display: flex;
@@ -581,6 +620,9 @@
       display: block;
     }
 
+    /* ============================================
+       TABLAS Y REPORTES
+    ============================================ */
     .admin-panel {
       margin-top: 20px;
       border: 2px solid #cbd5e1;
@@ -885,8 +927,14 @@
   </style>
 </head>
 <body>
-  <!-- LOGIN BONITO -->
+  <!-- LOGIN -->
   <div id="login-overlay">
+    <div class="login-decoration">
+      <div class="decoration-circle circle1"></div>
+      <div class="decoration-circle circle2"></div>
+      <div class="decoration-circle circle3"></div>
+    </div>
+    
     <div class="login-container">
       <div class="login-card">
         <div class="login-header">
@@ -925,7 +973,7 @@
         </div>
         
         <div class="login-footer">
-          <p>Sistema de Control de Asistencia v4.0</p>
+          <p>Sistema de Control de Asistencia v5.0</p>
           <p>© 2026 - La Base Cowork</p>
         </div>
       </div>
@@ -949,7 +997,7 @@
         <button class="gestion-tab" onclick="cambiarSeccion('reportes')">📊 Reportes</button>
       </div>
 
-      <!-- SECCIÓN ASISTENCIA (ORIGINAL - QR FUNCIONAL) -->
+      <!-- SECCIÓN ASISTENCIA (ORIGINAL) -->
       <div id="seccion-asistencia" class="gestion-section active">
         <div class="camera-toggle">
           <div class="toggle-wrapper">
@@ -987,8 +1035,8 @@
           <div class="employee-info" id="employee-info">
             <h3>Información del Colaborador</h3>
             <p><strong>Nombre:</strong> <span id="employee-name" class="highlight">-</span></p>
-            <p><strong>Área/Grado:</strong> <span id="employee-area" class="highlight">-</span></p>
-            <p><strong>Cargo/Perfil:</strong> <span id="employee-position" class="highlight">-</span></p>
+            <p><strong>Área:</strong> <span id="employee-area" class="highlight">-</span></p>
+            <p><strong>Cargo:</strong> <span id="employee-position" class="highlight">-</span></p>
           </div>
           
           <div class="form-group">
@@ -1007,7 +1055,7 @@
         <div id="respuesta"></div>
       </div>
 
-      <!-- SECCIÓN GESTIÓN DE COLABORADORES -->
+      <!-- SECCIÓN GESTIÓN DE COLABORADORES (NUEVA) -->
       <div id="seccion-colaboradores" class="gestion-section">
         <h3 style="margin-bottom: 15px; color: var(--primary);">👥 Gestión de Colaboradores</h3>
         
@@ -1027,8 +1075,8 @@
                 <th>ID</th>
                 <th>Nombres</th>
                 <th>Apellidos</th>
-                <th>Área/Grado</th>
-                <th>Cargo/Perfil</th>
+                <th>Área</th>
+                <th>Cargo</th>
                 <th>Teléfono</th>
                 <th>Acciones</th>
               </tr>
@@ -1042,7 +1090,7 @@
         </div>
       </div>
 
-      <!-- SECCIÓN REPORTES -->
+      <!-- SECCIÓN REPORTES DE ASISTENCIA (NUEVA) -->
       <div id="seccion-reportes" class="gestion-section">
         <h3 style="margin-bottom: 15px; color: var(--primary);">📊 Reportes de Asistencia</h3>
         
@@ -1058,7 +1106,7 @@
             <option value="SALIDA">SALIDA</option>
           </select>
           <button class="btn btn-secondary" onclick="cargarReporte()" style="margin: 0;">Filtrar</button>
-          <button class="btn btn-export" onclick="exportarReporte()">📥 Exportar</button>
+          <button class="btn btn-export" onclick="exportarReporte()">📥 Exportar CSV</button>
         </div>
         
         <div class="stats-cards">
@@ -1118,7 +1166,7 @@
           </button>
           
           <div class="form-group" style="margin-top: 15px;">
-            <label for="admin-area">Área/Grado:</label>
+            <label for="admin-area">Área:</label>
             <select id="admin-area">
               <option value="">Cargando áreas...</option>
             </select>
@@ -1156,7 +1204,7 @@
         <div class="form-group">
           <label>ID *</label>
           <input type="text" id="colaborador-id" required class="filter-input" placeholder="ID único">
-          <small style="color: #666;">El ID no se puede repetir</small>
+          <small style="color: #666; display: block; margin-top: 5px;">⚠️ El ID no se puede repetir</small>
         </div>
         
         <div class="form-group">
@@ -1170,13 +1218,13 @@
         </div>
         
         <div class="form-group">
-          <label>Área/Grado *</label>
+          <label>Área *</label>
           <input type="text" id="colaborador-area" required class="filter-input" 
                  placeholder="Ej: Ventas / 5to A">
         </div>
         
         <div class="form-group">
-          <label>Cargo/Perfil</label>
+          <label>Cargo</label>
           <input type="text" id="colaborador-cargo" class="filter-input" 
                  placeholder="Ej: Supervisor / Estudiante">
         </div>
@@ -1210,11 +1258,11 @@
     // CONFIGURACIÓN
     // ============================================
     const CONFIG = {
-      APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxxNz9FhBV3ybKs8CMow5mc1PusG2AybD6_POwWvsUR813pNC60OFS_VDzbpzGs24k/exec',
+      APPS_SCRIPT_URL: 'URL_DE_TU_APPS_SCRIPT', // ¡CAMBIA ESTO!
       USUARIO: 'admin',
       CONTRASEÑA: 'pip2026',
       TIEMPO_TOAST: 3000,
-      VERSION: '4.0.0-colaboradores'
+      VERSION: '5.0.0-completo'
     };
 
     // ============================================
@@ -1383,7 +1431,7 @@
     }
 
     // ============================================
-    // FUNCIONES DE CÁMARA Y QR (IGUAL AL ORIGINAL)
+    // FUNCIONES DE CÁMARA Y QR (ORIGINALES)
     // ============================================
     let qrCodeReader = null;
     let isScanning = false;
@@ -1509,7 +1557,7 @@
     }
 
     // ============================================
-    // FUNCIONES DE BÚSQUEDA Y REGISTRO
+    // FUNCIONES DE BÚSQUEDA Y REGISTRO (ORIGINALES)
     // ============================================
     async function buscarColaborador(id) {
       if (!id.trim()) return ocultarInfoColaborador();
@@ -1561,7 +1609,7 @@
     }
 
     // ============================================
-    // FUNCIONES DE DESCARGA
+    // FUNCIONES DE DESCARGA (ORIGINALES)
     // ============================================
     function descargarArchivo(base64, filename) {
       try {
@@ -1590,7 +1638,7 @@
     }
 
     // ============================================
-    // ENVÍO DE FORMULARIO
+    // ENVÍO DE FORMULARIO (ORIGINAL)
     // ============================================
     async function enviarFormulario(e) {
       e.preventDefault();
@@ -1627,12 +1675,12 @@
     }
 
     // ============================================
-    // GESTIÓN DE COLABORADORES
+    // NUEVAS FUNCIONES: GESTIÓN DE COLABORADORES
     // ============================================
     let colaboradores = [];
 
     async function cargarColaboradores() {
-      const res = await llamarAppsScript('listarEstudiantes');
+      const res = await llamarAppsScript('listarColaboradores');
       if (res.ok) {
         colaboradores = res.data;
         mostrarColaboradores(colaboradores);
@@ -1655,8 +1703,8 @@
             <td>${c.id}</td>
             <td>${c.nombres}</td>
             <td>${c.apellidos}</td>
-            <td>${c.grado}</td>
-            <td>${c.perfil || '-'}</td>
+            <td>${c.area}</td>
+            <td>${c.cargo || '-'}</td>
             <td>${c.telefono || '-'}</td>
             <td>
               <button class="action-btn btn-edit" onclick="editarColaborador('${c.id}')">✏️</button>
@@ -1679,7 +1727,7 @@
         c.id.toLowerCase().includes(texto) ||
         c.nombres.toLowerCase().includes(texto) ||
         c.apellidos.toLowerCase().includes(texto) ||
-        c.grado.toLowerCase().includes(texto)
+        c.area.toLowerCase().includes(texto)
       );
       mostrarColaboradores(filtrados);
     }
@@ -1692,8 +1740,8 @@
         document.getElementById('colaborador-id').value = colaborador.id;
         document.getElementById('colaborador-nombres').value = colaborador.nombres;
         document.getElementById('colaborador-apellidos').value = colaborador.apellidos;
-        document.getElementById('colaborador-area').value = colaborador.grado;
-        document.getElementById('colaborador-cargo').value = colaborador.perfil || '';
+        document.getElementById('colaborador-area').value = colaborador.area;
+        document.getElementById('colaborador-cargo').value = colaborador.cargo || '';
         document.getElementById('colaborador-telefono').value = colaborador.telefono || '';
         document.getElementById('colaborador-foto').value = colaborador.fotoUrl || '';
         document.getElementById('colaborador-id').disabled = true;
@@ -1717,8 +1765,8 @@
         id: document.getElementById('colaborador-id').value.trim(),
         nombres: document.getElementById('colaborador-nombres').value.trim(),
         apellidos: document.getElementById('colaborador-apellidos').value.trim(),
-        grado: document.getElementById('colaborador-area').value.trim(),
-        perfil: document.getElementById('colaborador-cargo').value.trim(),
+        area: document.getElementById('colaborador-area').value.trim(),
+        cargo: document.getElementById('colaborador-cargo').value.trim(),
         telefono: document.getElementById('colaborador-telefono').value.trim(),
         fotoUrl: document.getElementById('colaborador-foto').value.trim()
       };
@@ -1727,9 +1775,9 @@
       let res;
       
       if (idOriginal) {
-        res = await llamarAppsScript('actualizarEstudiante', data);
+        res = await llamarAppsScript('actualizarColaborador', data);
       } else {
-        res = await llamarAppsScript('crearEstudiante', data);
+        res = await llamarAppsScript('crearColaborador', data);
       }
       
       if (res.ok) {
@@ -1752,7 +1800,7 @@
     async function eliminarColaborador(id) {
       if (!confirm('¿Está seguro de eliminar este colaborador?')) return;
       
-      const res = await llamarAppsScript('eliminarEstudiante', { id });
+      const res = await llamarAppsScript('eliminarColaborador', { id });
       if (res.ok) {
         mostrarToast(res.mensaje, 'success');
         cargarColaboradores();
@@ -1763,7 +1811,7 @@
     }
 
     // ============================================
-    // REPORTES
+    // NUEVAS FUNCIONES: REPORTES
     // ============================================
     async function cargarAreasParaFiltro() {
       const res = await llamarAppsScript('listarGrados');
@@ -1786,7 +1834,7 @@
       const filtros = {
         fechaInicio: document.getElementById('fechaInicio').value,
         fechaFin: document.getElementById('fechaFin').value,
-        grado: document.getElementById('filtroArea').value,
+        area: document.getElementById('filtroArea').value,
         estado: document.getElementById('filtroEstado').value
       };
       
@@ -1816,8 +1864,8 @@
             <td>${r.hora}</td>
             <td>${r.id}</td>
             <td>${r.nombre}</td>
-            <td>${r.grado}</td>
-            <td>${r.perfil || '-'}</td>
+            <td>${r.area}</td>
+            <td>${r.cargo || '-'}</td>
             <td>
               <span class="estado-badge ${r.estado === 'INGRESO' ? 'estado-ingreso' : 'estado-salida'}">
                 ${r.estado}
@@ -1846,7 +1894,7 @@
       const filtros = {
         fechaInicio: document.getElementById('fechaInicio').value,
         fechaFin: document.getElementById('fechaFin').value,
-        grado: document.getElementById('filtroArea').value,
+        area: document.getElementById('filtroArea').value,
         estado: document.getElementById('filtroEstado').value
       };
       
