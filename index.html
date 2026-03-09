@@ -5,29 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>CONTROL DE ASISTENCIA LA BASE COWORK</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       --primary: #4CAF50;
       --primary-dark: #45a049;
-      --primary-light: #e8f5e9;
       --secondary: #2196F3;
       --secondary-dark: #1976D2;
-      --accent: #FF5722;
-      --success: #4CAF50;
-      --success-light: #d4edda;
+      --success: #d4edda;
       --success-text: #155724;
-      --error: #f44336;
-      --error-light: #f8d7da;
+      --error: #f8d7da;
       --error-text: #721c24;
-      --warning: #ff9800;
-      --warning-light: #fff3cd;
+      --warning: #fff3cd;
       --warning-text: #856404;
       --bg-main: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      --shadow: 0 10px 40px rgba(0,0,0,0.2);
-      --shadow-sm: 0 4px 20px rgba(0,0,0,0.15);
-      --border-radius: 16px;
-      --border-radius-sm: 12px;
+      --shadow: 0 4px 20px rgba(0,0,0,0.15);
+      --border-radius: 12px;
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -38,262 +30,448 @@
     }
 
     body {
-      font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: var(--bg-main);
       min-height: 100vh;
       padding: 10px;
       line-height: 1.5;
     }
 
-    /* ============================================
-       LOGIN MEJORADO
-    ============================================ */
-    #login-overlay {
-      display: flex;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-      backdrop-filter: blur(5px);
-    }
-
-    .login-container {
-      width: 100%;
-      max-width: 420px;
-      padding: 20px;
-      animation: slideUpFade 0.6s ease-out;
-    }
-
-    @keyframes slideUpFade {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .login-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 24px;
-      padding: 40px 30px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      transition: var(--transition);
-    }
-
-    .login-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
-    }
-
-    .login-header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .login-icon {
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
-    }
-
-    .login-icon span {
-      font-size: 40px;
-      filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));
-    }
-
-    .login-header h2 {
-      color: #333;
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .login-header p {
-      color: #666;
-      font-size: 14px;
-    }
-
-    .login-form {
-      margin-bottom: 20px;
-    }
-
-    .input-group {
-      margin-bottom: 20px;
-    }
-
-    .input-group label {
-      display: block;
-      margin-bottom: 8px;
-      color: #555;
-      font-weight: 500;
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .input-icon {
-      position: absolute;
-      left: 15px;
-      color: #999;
-      font-size: 18px;
-      transition: var(--transition);
-    }
-
-    .input-group input {
-      width: 100%;
-      padding: 15px 15px 15px 50px;
-      border: 2px solid #e0e0e0;
-      border-radius: 50px;
-      font-size: 16px;
-      transition: var(--transition);
+    .container {
+      max-width: min(500px, 100vw - 20px);
+      margin: 0 auto;
       background: white;
-      outline: none;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      animation: slideIn 0.5s ease-out;
     }
 
-    .input-group input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.1);
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .input-group input:focus + .input-icon {
-      color: var(--primary);
-    }
-
-    .login-btn {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    .header {
+      background: var(--primary);
       color: white;
-      border: none;
-      border-radius: 50px;
-      font-size: 18px;
+      padding: clamp(15px, 4vw, 25px);
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: clamp(18px, 5vw, 24px);
       font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
+      margin-bottom: 5px;
+    }
+
+    .header p {
+      font-size: clamp(12px, 3vw, 14px);
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: clamp(15px, 5vw, 30px);
+    }
+
+    .time-display {
+      background: linear-gradient(45deg, #e8f5e8, #f0fff0);
+      border: 2px solid var(--primary);
+      border-radius: var(--border-radius);
+      padding: 15px;
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: clamp(14px, 4vw, 18px);
+      font-weight: 600;
+      color: #2e7d32;
+    }
+
+    .camera-toggle {
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: var(--border-radius);
+      padding: 15px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .toggle-wrapper {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+      margin-bottom: 10px;
+      flex-wrap: wrap;
     }
 
-    .login-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 30px rgba(76, 175, 80, 0.4);
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 28px;
     }
 
-    .login-btn:active {
-      transform: translateY(-1px);
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
     }
 
-    .login-error {
-      background: var(--error-light);
-      color: var(--error-text);
-      padding: 12px 20px;
-      border-radius: 50px;
-      margin-top: 20px;
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: var(--transition);
+      border-radius: 28px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: var(--transition);
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--primary);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+
+    .camera-controls {
       display: none;
-      text-align: center;
-      font-weight: 500;
-      border-left: 4px solid var(--error);
-      animation: shake 0.5s ease-in-out;
+      margin-bottom: 15px;
     }
 
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-5px); }
-      40%, 80% { transform: translateX(5px); }
-    }
-
-    .login-footer {
-      text-align: center;
-      margin-top: 20px;
-      color: #888;
-      font-size: 12px;
-    }
-
-    /* ============================================
-       MENÚ PRINCIPAL CON TABS
-    ============================================ */
-    .main-tabs {
-      display: flex;
-      background: white;
-      border-radius: var(--border-radius) var(--border-radius) 0 0;
-      overflow: hidden;
-      border-bottom: 2px solid #e0e0e0;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 15px;
-      background: #f5f5f5;
-      border: none;
+    .camera-select select {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #ddd;
+      border-radius: var(--border-radius);
       font-size: 14px;
+      background: white;
+    }
+
+    #reader {
+      width: 100%;
+      max-width: min(300px, 90vw);
+      margin: 0 auto 20px;
+      border: 2px dashed #ddd;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      display: none;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
       font-weight: 600;
-      color: #666;
+      color: #333;
+      font-size: clamp(14px, 3.5vw, 16px);
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: clamp(10px, 3vw, 14px);
+      border: 2px solid #ddd;
+      border-radius: var(--border-radius);
+      font-size: clamp(14px, 4vw, 16px);
+      transition: var(--transition);
+      background: white;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    }
+
+    .btn {
+      width: 100%;
+      padding: clamp(12px, 3vw, 16px);
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: clamp(14px, 4vw, 16px);
+      font-weight: 600;
       cursor: pointer;
       transition: var(--transition);
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
     }
 
-    .tab-btn.active {
+    .btn:hover:not(:disabled) {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      background: var(--secondary);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--secondary-dark);
+    }
+
+    .btn-logout {
+      background: #dc3545;
+      margin-top: 10px;
+    }
+
+    .btn-logout:hover:not(:disabled) {
+      background: #c82333;
+    }
+
+    .employee-info {
+      background: linear-gradient(45deg, #f8f9fa, #ffffff);
+      border: 2px solid var(--primary);
+      border-radius: var(--border-radius);
+      padding: 15px;
+      margin-bottom: 20px;
+      display: none;
+      box-shadow: 0 2px 10px rgba(76, 175, 80, 0.1);
+    }
+
+    .employee-info h3 {
+      color: var(--primary);
+      margin-bottom: 10px;
+      font-size: clamp(16px, 4vw, 18px);
+    }
+
+    .employee-info p {
+      margin: 5px 0;
+      color: #6c757d;
+      font-size: clamp(13px, 3vw, 14px);
+    }
+
+    .employee-info .highlight {
+      font-weight: 600;
+      color: #495057;
+    }
+
+    #respuesta {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: var(--border-radius);
+      text-align: center;
+      font-weight: 600;
+      display: none;
+      font-size: clamp(13px, 3.5vw, 15px);
+    }
+
+    .success {
+      background: var(--success);
+      color: var(--success-text);
+      border: 1px solid #c3e6cb;
+    }
+
+    .error {
+      background: var(--error);
+      color: var(--error-text);
+      border: 1px solid #f5c6cb;
+    }
+
+    .warning {
+      background: var(--warning);
+      color: var(--warning-text);
+      border: 1px solid #ffeaa7;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .qr-status {
+      text-align: center;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: var(--border-radius);
+      background: #e3f2fd;
+      color: #1565c0;
+      display: none;
+      font-size: clamp(12px, 3vw, 14px);
+    }
+
+    .admin-panel {
+      margin-top: 20px;
+      border: 2px solid #cbd5e1;
+      border-radius: var(--border-radius);
+      padding: 12px;
+      background: #f8fafc;
+    }
+
+    .admin-panel h4 {
+      font-size: clamp(14px, 4vw, 16px);
+      margin-bottom: 10px;
+      color: #1f2937;
+    }
+
+    .admin-status {
+      display: none;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: var(--border-radius);
+      font-size: clamp(12px, 3vw, 14px);
+      text-align: center;
+    }
+
+    .admin-success {
+      background: var(--success);
+      color: var(--success-text);
+      border: 1px solid #c3e6cb;
+    }
+
+    .admin-error {
+      background: var(--error);
+      color: var(--error-text);
+      border: 1px solid #f5c6cb;
+    }
+
+    .admin-info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background: #e9ecef;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 10px 0;
+      display: none;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
       background: white;
+      color: #333;
+      padding: 12px 24px;
+      border-radius: 50px;
+      box-shadow: var(--shadow);
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast.success {
+      background: var(--primary);
+      color: white;
+    }
+
+    .toast.error {
+      background: #dc3545;
+      color: white;
+    }
+
+    .toast.warning {
+      background: #ff9800;
+      color: white;
+    }
+
+    /* ============================================
+       NUEVOS ESTILOS PARA GESTIÓN (SIN ALTERAR LOS EXISTENTES)
+    ============================================ */
+    .gestion-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 10px;
+    }
+
+    .gestion-tab {
+      padding: 10px 20px;
+      background: none;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      color: #666;
+      cursor: pointer;
+      border-radius: var(--border-radius) var(--border-radius) 0 0;
+      transition: var(--transition);
+    }
+
+    .gestion-tab.active {
       color: var(--primary);
       border-bottom: 3px solid var(--primary);
     }
 
-    .tab-btn:hover {
-      background: #e0e0e0;
+    .gestion-tab:hover {
+      color: var(--primary-dark);
     }
 
-    .tab-content {
+    .gestion-section {
       display: none;
-      background: white;
-      padding: 20px;
     }
 
-    .tab-content.active {
+    .gestion-section.active {
       display: block;
     }
 
-    /* ============================================
-       ESTILOS DE TABLAS Y REPORTES
-    ============================================ */
     .table-container {
       overflow-x: auto;
       max-height: 400px;
       overflow-y: auto;
       border: 1px solid #e0e0e0;
-      border-radius: var(--border-radius-sm);
+      border-radius: var(--border-radius);
       margin: 20px 0;
     }
 
@@ -330,12 +508,12 @@
     }
 
     .estado-ingreso {
-      background: var(--success-light);
+      background: var(--success);
       color: var(--success-text);
     }
 
     .estado-salida {
-      background: var(--warning-light);
+      background: var(--warning);
       color: var(--warning-text);
     }
 
@@ -352,14 +530,14 @@
       min-width: 150px;
       padding: 10px;
       border: 2px solid #e0e0e0;
-      border-radius: var(--border-radius-sm);
+      border-radius: var(--border-radius);
       font-size: 14px;
     }
 
     .filter-select {
       padding: 10px;
       border: 2px solid #e0e0e0;
-      border-radius: var(--border-radius-sm);
+      border-radius: var(--border-radius);
       font-size: 14px;
       background: white;
     }
@@ -372,9 +550,9 @@
     }
 
     .stat-card {
-      background: linear-gradient(135deg, #f8f9fa, #ffffff);
+      background: linear-gradient(45deg, #f8f9fa, #ffffff);
       border: 1px solid #e0e0e0;
-      border-radius: var(--border-radius-sm);
+      border-radius: var(--border-radius);
       padding: 15px;
       text-align: center;
     }
@@ -434,12 +612,13 @@
     }
 
     .action-btn {
-      padding: 8px 12px;
+      padding: 6px 10px;
       border: none;
-      border-radius: var(--border-radius-sm);
+      border-radius: var(--border-radius);
       cursor: pointer;
       font-size: 12px;
       margin: 0 2px;
+      transition: var(--transition);
     }
 
     .btn-edit {
@@ -447,9 +626,17 @@
       color: white;
     }
 
+    .btn-edit:hover {
+      background: var(--secondary-dark);
+    }
+
     .btn-delete {
-      background: var(--error);
+      background: #dc3545;
       color: white;
+    }
+
+    .btn-delete:hover {
+      background: #c82333;
     }
 
     .btn-view {
@@ -457,12 +644,32 @@
       color: white;
     }
 
+    .btn-view:hover {
+      background: var(--primary-dark);
+    }
+
     .btn-export {
-      background: var(--accent);
+      background: #6c757d;
       color: white;
     }
 
-    @media (max-width: 768px) {
+    .btn-export:hover {
+      background: #5a6268;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 5px;
+      }
+      
+      .content {
+        padding: 15px;
+      }
+      
+      .toggle-wrapper {
+        justify-content: center;
+      }
+      
       .filter-bar {
         flex-direction: column;
       }
@@ -474,73 +681,36 @@
   </style>
 </head>
 <body>
-  <!-- LOGIN -->
+  <!-- PANTALLA DE LOGIN -->
   <div id="login-overlay">
-    <div class="login-container">
-      <div class="login-card">
-        <div class="login-header">
-          <div class="login-icon">
-            <span>🔐</span>
-          </div>
-          <h2>Bienvenido</h2>
-          <p>Ingresa tus credenciales</p>
-        </div>
-        
-        <div class="login-form">
-          <div class="input-group">
-            <label>Usuario</label>
-            <div class="input-wrapper">
-              <span class="input-icon">👤</span>
-              <input type="text" id="login-user" placeholder="admin" autofocus>
-            </div>
-          </div>
-          
-          <div class="input-group">
-            <label>Contraseña</label>
-            <div class="input-wrapper">
-              <span class="input-icon">🔑</span>
-              <input type="password" id="login-pass" placeholder="••••••">
-            </div>
-          </div>
-          
-          <button class="login-btn" onclick="verificarLogin()">
-            <span>Ingresar</span>
-            <span>→</span>
-          </button>
-        </div>
-        
-        <div id="login-error" class="login-error">
-          ⚠️ Usuario o contraseña incorrectos
-        </div>
-      </div>
+    <div class="login-box">
+      <h2>🔐 CONTROL DE ASISTENCIA LA BASE COWORK</h2>
+      <input type="text" id="login-user" placeholder="Usuario" autocomplete="off" autofocus>
+      <input type="password" id="login-pass" placeholder="Contraseña">
+      <button onclick="verificarLogin()">Ingresar</button>
+      <p id="login-error" class="login-error">Usuario o contraseña incorrectos</p>
     </div>
   </div>
 
-  <!-- CONTENIDO PRINCIPAL -->
+  <!-- CONTENIDO PRINCIPAL (protegido por login) -->
   <div class="container" id="main-content" style="display: none;">
     <div class="header">
       <h1>CONTROL DE ASISTENCIA</h1>
-      <p>Sistema de Gestión Educativa</p>
+      <p>Escanea tu código QR o ingresa tu ID</p>
     </div>
     
-    <!-- TABS DE NAVEGACIÓN -->
-    <div class="main-tabs">
-      <button class="tab-btn active" onclick="cambiarTab('asistencia')">
-        📱 Registrar Asistencia
-      </button>
-      <button class="tab-btn" onclick="cambiarTab('estudiantes')">
-        👥 Gestión de Estudiantes
-      </button>
-      <button class="tab-btn" onclick="cambiarTab('reportes')">
-        📊 Reportes de Asistencia
-      </button>
-    </div>
+    <div class="content">
+      <div class="time-display" id="reloj-tiempo">Cargando...</div>
+      
+      <!-- PESTAÑAS DE GESTIÓN (NUEVO) -->
+      <div class="gestion-tabs">
+        <button class="gestion-tab active" onclick="cambiarSeccion('asistencia')">📱 Asistencia</button>
+        <button class="gestion-tab" onclick="cambiarSeccion('estudiantes')">👥 Estudiantes</button>
+        <button class="gestion-tab" onclick="cambiarSeccion('reportes')">📊 Reportes</button>
+      </div>
 
-    <!-- TAB 1: REGISTRO DE ASISTENCIA (ORIGINAL) -->
-    <div id="tab-asistencia" class="tab-content active">
-      <div class="content">
-        <div class="time-display" id="reloj-tiempo">Cargando...</div>
-        
+      <!-- SECCIÓN ASISTENCIA (ORIGINAL) -->
+      <div id="seccion-asistencia" class="gestion-section active">
         <div class="camera-toggle">
           <div class="toggle-wrapper">
             <span>Cámara:</span>
@@ -556,31 +726,33 @@
         
         <div class="camera-controls" id="camera-controls">
           <div class="camera-select">
-            <select id="camera-select"></select>
+            <select id="camera-select">
+              <option value="">Seleccione una cámara...</option>
+            </select>
           </div>
         </div>
         
         <div id="reader"></div>
         
-        <button class="btn btn-secondary" id="reiniciar-btn" onclick="reiniciarQR()" style="display: none;">
+        <button type="button" class="btn btn-secondary" id="reiniciar-btn" onclick="reiniciarQR()" style="display: none;">
           Reiniciar Escáner
         </button>
         
         <form id="formulario">
           <div class="form-group">
-            <label>ID del Estudiante:</label>
-            <input type="text" id="id" required placeholder="Ingrese ID">
+            <label for="id">ID del Colaborador:</label>
+            <input type="text" id="id" required placeholder="Ingrese su ID">
           </div>
           
           <div class="employee-info" id="employee-info">
-            <h3>Información del Estudiante</h3>
-            <p><strong>Nombre:</strong> <span id="employee-name">-</span></p>
-            <p><strong>Grado/Sección:</strong> <span id="employee-area">-</span></p>
-            <p><strong>Perfil:</strong> <span id="employee-position">-</span></p>
+            <h3>Información del Colaborador</h3>
+            <p><strong>Nombre:</strong> <span id="employee-name" class="highlight">-</span></p>
+            <p><strong>Grado/Sección:</strong> <span id="employee-area" class="highlight">-</span></p>
+            <p><strong>Perfil:</strong> <span id="employee-position" class="highlight">-</span></p>
           </div>
           
           <div class="form-group">
-            <label>Estado:</label>
+            <label for="estado">Estado:</label>
             <select id="estado" required>
               <option value="INGRESO">INGRESO</option>
               <option value="SALIDA">SALIDA</option>
@@ -594,12 +766,10 @@
         
         <div id="respuesta"></div>
       </div>
-    </div>
 
-    <!-- TAB 2: GESTIÓN DE ESTUDIANTES -->
-    <div id="tab-estudiantes" class="tab-content">
-      <div class="content">
-        <h2 style="margin-bottom: 20px;">👥 Gestión de Estudiantes</h2>
+      <!-- SECCIÓN GESTIÓN DE ESTUDIANTES (NUEVO) -->
+      <div id="seccion-estudiantes" class="gestion-section">
+        <h3 style="margin-bottom: 15px; color: var(--primary);">👥 Gestión de Estudiantes</h3>
         
         <button class="btn" onclick="mostrarModalEstudiante()">
           ➕ Nuevo Estudiante
@@ -631,19 +801,14 @@
           </table>
         </div>
       </div>
-    </div>
 
-    <!-- TAB 3: REPORTES DE ASISTENCIA -->
-    <div id="tab-reportes" class="tab-content">
-      <div class="content">
-        <h2 style="margin-bottom: 20px;">📊 Reportes de Asistencia</h2>
+      <!-- SECCIÓN REPORTES (NUEVO) -->
+      <div id="seccion-reportes" class="gestion-section">
+        <h3 style="margin-bottom: 15px; color: var(--primary);">📊 Reportes de Asistencia</h3>
         
-        <!-- Filtros -->
         <div class="filter-bar">
-          <input type="date" class="filter-input" id="fechaInicio" 
-                 value="<?= date('Y-m-01') ?>">
-          <input type="date" class="filter-input" id="fechaFin" 
-                 value="<?= date('Y-m-d') ?>">
+          <input type="date" class="filter-input" id="fechaInicio">
+          <input type="date" class="filter-input" id="fechaFin">
           <select class="filter-select" id="filtroGrado">
             <option value="">Todos los grados</option>
           </select>
@@ -652,14 +817,11 @@
             <option value="INGRESO">INGRESO</option>
             <option value="SALIDA">SALIDA</option>
           </select>
-          <button class="btn" onclick="cargarReporte()">Filtrar</button>
-          <button class="btn btn-export" onclick="exportarReporte()">
-            📥 Exportar CSV
-          </button>
+          <button class="btn btn-secondary" onclick="cargarReporte()" style="margin: 0;">Filtrar</button>
+          <button class="btn btn-export" onclick="exportarReporte()">📥 Exportar</button>
         </div>
         
-        <!-- Estadísticas -->
-        <div class="stats-cards" id="stats-reporte">
+        <div class="stats-cards">
           <div class="stat-card">
             <div class="number" id="total-registros">0</div>
             <div class="label">Total Registros</div>
@@ -678,7 +840,6 @@
           </div>
         </div>
         
-        <!-- Tabla de reporte -->
         <div class="table-container">
           <table id="tabla-reporte">
             <thead>
@@ -701,15 +862,47 @@
           </table>
         </div>
       </div>
-    </div>
 
-    <!-- Botón de Cerrar Sesión -->
-    <button class="btn btn-logout" onclick="cerrarSesion()" style="margin: 20px;">
-      🚪 Cerrar Sesión
-    </button>
+      <!-- PANEL ADMINISTRADOR (ORIGINAL) -->
+      <div class="admin-panel">
+        <button type="button" class="btn btn-secondary" id="admin-toggle">📋 Panel Administrador</button>
+        <div id="admin-body" style="display: none;">
+          <h4>Generar Carnets</h4>
+          
+          <div class="form-group">
+            <label for="admin-id">ID del Colaborador:</label>
+            <input type="text" id="admin-id" placeholder="Ej: 2024001">
+          </div>
+          <button type="button" class="btn" id="admin-generar-id">
+            📄 Generar Carnet Individual
+          </button>
+          
+          <div class="form-group" style="margin-top: 15px;">
+            <label for="admin-grado">Grado/Sección:</label>
+            <select id="admin-grado">
+              <option value="">Cargando grados...</option>
+            </select>
+          </div>
+          <button type="button" class="btn" id="admin-generar-lote">
+            📚 Generar Carnets por Grado
+          </button>
+          
+          <div class="progress-bar" id="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          
+          <div id="admin-status" class="admin-status"></div>
+        </div>
+      </div>
+
+      <!-- Botón de Cerrar Sesión -->
+      <button type="button" class="btn btn-logout" onclick="cerrarSesion()">
+        🚪 Cerrar Sesión
+      </button>
+    </div>
   </div>
 
-  <!-- MODAL PARA ESTUDIANTES -->
+  <!-- MODAL PARA ESTUDIANTES (NUEVO) -->
   <div id="modal-estudiante" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -768,56 +961,20 @@
     </div>
   </div>
 
-  <!-- Toast -->
+  <!-- Toast para notificaciones -->
   <div id="toast" class="toast"></div>
 
   <script>
+    // ============================================
     // CONFIGURACIÓN
+    // ============================================
     const CONFIG = {
       APPS_SCRIPT_URL: 'URL_DE_TU_APPS_SCRIPT', // ¡CAMBIA ESTO!
       USUARIO: 'admin',
       CONTRASEÑA: 'pip2026',
       TIEMPO_TOAST: 3000,
-      VERSION: '4.0.0-gestion'
+      VERSION: '4.0.0'
     };
-
-    // ============================================
-    // FUNCIONES DE UTILIDAD
-    // ============================================
-    function mostrarToast(mensaje, tipo = 'info') {
-      const toast = document.getElementById('toast');
-      toast.textContent = mensaje;
-      toast.className = 'toast show ' + tipo;
-      setTimeout(() => toast.className = 'toast', CONFIG.TIEMPO_TOAST);
-    }
-
-    async function llamarAppsScript(funcion, parametros = {}) {
-      try {
-        const url = new URL(CONFIG.APPS_SCRIPT_URL);
-        url.searchParams.append('funcion', funcion);
-        url.searchParams.append('datos', JSON.stringify(parametros));
-        
-        const respuesta = await fetch(url.toString(), {
-          method: 'GET',
-          mode: 'cors'
-        });
-        
-        const texto = await respuesta.text();
-        return JSON.parse(texto);
-      } catch (error) {
-        console.error('Error:', error);
-        return { error: true, mensaje: error.message };
-      }
-    }
-
-    function generarIdDispositivo() {
-      let deviceId = localStorage.getItem('device_id');
-      if (!deviceId) {
-        deviceId = 'dev_' + Math.random().toString(36).substring(2) + '_' + Date.now();
-        localStorage.setItem('device_id', deviceId);
-      }
-      return deviceId;
-    }
 
     // ============================================
     // SISTEMA DE LOGIN
@@ -830,40 +987,100 @@
         localStorage.setItem('auth_pip', 'true');
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
-        mostrarToast('¡Bienvenido!', 'success');
+        mostrarToast('¡Bienvenido al sistema!', 'success');
         iniciarAplicacion();
       } else {
         document.getElementById('login-error').style.display = 'block';
-        setTimeout(() => {
-          document.getElementById('login-error').style.display = 'none';
-        }, 3000);
+        document.getElementById('login-pass').value = '';
       }
     }
 
     function cerrarSesion() {
       localStorage.removeItem('auth_pip');
-      location.reload();
+      mostrarToast('Sesión cerrada', 'warning');
+      setTimeout(() => location.reload(), 1000);
     }
 
     // ============================================
-    // CAMBIAR TABS
+    // SISTEMA DE TOAST
     // ============================================
-    function cambiarTab(tab) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    function mostrarToast(mensaje, tipo = 'info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = mensaje;
+      toast.className = 'toast show ' + tipo;
+      setTimeout(() => toast.className = 'toast', CONFIG.TIEMPO_TOAST);
+    }
+
+    // ============================================
+    // COMUNICACIÓN CON APPS SCRIPT
+    // ============================================
+    async function llamarAppsScript(funcion, parametros = {}) {
+      try {
+        console.log(`📡 Llamando: ${funcion}`);
+        
+        if (funcion.includes('generar')) mostrarProgreso(30);
+        
+        const url = new URL(CONFIG.APPS_SCRIPT_URL);
+        url.searchParams.append('funcion', funcion);
+        url.searchParams.append('datos', JSON.stringify(parametros));
+        
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), 30000);
+        
+        const respuesta = await fetch(url.toString(), {
+          method: 'GET',
+          mode: 'cors',
+          signal: controller.signal
+        });
+        
+        if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+        
+        const texto = await respuesta.text();
+        console.log('📥 Respuesta:', texto);
+        
+        if (funcion.includes('generar')) {
+          mostrarProgreso(80);
+          setTimeout(() => ocultarProgreso(), 500);
+        }
+        
+        return JSON.parse(texto);
+      } catch (error) {
+        console.error('❌ Error:', error);
+        ocultarProgreso();
+        return { error: true, mensaje: error.message };
+      }
+    }
+
+    function mostrarProgreso(p) {
+      document.getElementById('progress-bar').style.display = 'block';
+      document.getElementById('progress-fill').style.width = p + '%';
+    }
+
+    function ocultarProgreso() {
+      setTimeout(() => {
+        document.getElementById('progress-bar').style.display = 'none';
+        document.getElementById('progress-fill').style.width = '0%';
+      }, 500);
+    }
+
+    // ============================================
+    // CAMBIAR SECCIONES
+    // ============================================
+    function cambiarSeccion(seccion) {
+      document.querySelectorAll('.gestion-tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.gestion-section').forEach(section => section.classList.remove('active'));
       
-      if (tab === 'asistencia') {
-        document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        document.getElementById('tab-asistencia').classList.add('active');
-      } else if (tab === 'estudiantes') {
-        document.querySelectorAll('.tab-btn')[1].classList.add('active');
-        document.getElementById('tab-estudiantes').classList.add('active');
+      if (seccion === 'asistencia') {
+        document.querySelectorAll('.gestion-tab')[0].classList.add('active');
+        document.getElementById('seccion-asistencia').classList.add('active');
+      } else if (seccion === 'estudiantes') {
+        document.querySelectorAll('.gestion-tab')[1].classList.add('active');
+        document.getElementById('seccion-estudiantes').classList.add('active');
         cargarEstudiantes();
-      } else if (tab === 'reportes') {
-        document.querySelectorAll('.tab-btn')[2].classList.add('active');
-        document.getElementById('tab-reportes').classList.add('active');
+      } else if (seccion === 'reportes') {
+        document.querySelectorAll('.gestion-tab')[2].classList.add('active');
+        document.getElementById('seccion-reportes').classList.add('active');
         cargarGradosParaFiltro();
-        // Fechas por defecto: mes actual
         const hoy = new Date();
         const primero = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
         document.getElementById('fechaInicio').value = primero.toISOString().split('T')[0];
@@ -872,7 +1089,37 @@
     }
 
     // ============================================
-    // FUNCIONES DE ASISTENCIA (ORIGINALES)
+    // GENERAR ID ÚNICO DEL DISPOSITIVO
+    // ============================================
+    function generarIdDispositivo() {
+      let deviceId = localStorage.getItem('device_id');
+      if (!deviceId) {
+        const nav = navigator;
+        const screen = window.screen;
+        const componentes = [
+          nav.userAgent,
+          nav.language,
+          screen.width,
+          screen.height,
+          nav.hardwareConcurrency || '1',
+          new Date().getTimezoneOffset(),
+          nav.platform || 'unknown'
+        ].join('|');
+        
+        let hash = 0;
+        for (let i = 0; i < componentes.length; i++) {
+          hash = ((hash << 5) - hash) + componentes.charCodeAt(i);
+          hash |= 0;
+        }
+        
+        deviceId = 'dev_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36);
+        localStorage.setItem('device_id', deviceId);
+      }
+      return deviceId;
+    }
+
+    // ============================================
+    // VARIABLES GLOBALES
     // ============================================
     let qrCodeReader = null;
     let isScanning = false;
@@ -881,6 +1128,9 @@
     let selectedCameraId = null;
     let cameraEnabled = true;
 
+    // ============================================
+    // FUNCIONES DE TIEMPO
+    // ============================================
     function actualizarReloj() {
       const ahora = new Date();
       document.getElementById('reloj-tiempo').innerHTML = `
@@ -889,6 +1139,9 @@
       `;
     }
 
+    // ============================================
+    // FUNCIONES DE CÁMARA Y QR
+    // ============================================
     function esMobile() {
       return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     }
@@ -1005,6 +1258,9 @@
       if (selectedCameraId && cameraEnabled) setTimeout(iniciarEscaneo, 500);
     }
 
+    // ============================================
+    // FUNCIONES DE BÚSQUEDA Y REGISTRO (ORIGINALES)
+    // ============================================
     async function buscarEstudiante(id) {
       if (!id.trim()) return ocultarInfoEstudiante();
       
@@ -1054,6 +1310,38 @@
       if (tipo === 'success') setTimeout(() => r.style.display = 'none', 5000);
     }
 
+    // ============================================
+    // FUNCIONES DE DESCARGA (ORIGINALES)
+    // ============================================
+    function descargarArchivo(base64, filename) {
+      try {
+        const base64Data = base64.includes('base64,') ? base64.split('base64,')[1] : base64;
+        const link = document.createElement('a');
+        link.href = 'data:application/pdf;base64,' + base64Data;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(() => document.body.removeChild(link), 100);
+        mostrarToast(`📥 Descargando: ${filename}`, 'success');
+        return true;
+      } catch (error) {
+        mostrarToast('❌ Error al descargar', 'error');
+        return false;
+      }
+    }
+
+    async function cargarGrados() {
+      const res = await llamarAppsScript('listarGrados');
+      const select = document.getElementById('admin-grado');
+      if (res?.grados) {
+        select.innerHTML = '<option value="">📌 Seleccione un grado...</option>';
+        res.grados.forEach(g => select.innerHTML += `<option value="${g}">${g}</option>`);
+      }
+    }
+
+    // ============================================
+    // ENVÍO DE FORMULARIO (ORIGINAL)
+    // ============================================
     async function enviarFormulario(e) {
       e.preventDefault();
       
@@ -1084,13 +1372,12 @@
         deshabilitarBotonRegistro();
       } else {
         mostrarRespuesta(res?.mensaje || 'Error', 'error');
-        mostrarToast(res?.mensaje || 'Error', 'error');
         habilitarBotonRegistro();
       }
     }
 
     // ============================================
-    // GESTIÓN DE ESTUDIANTES
+    // NUEVAS FUNCIONES: GESTIÓN DE ESTUDIANTES
     // ============================================
     let estudiantes = [];
 
@@ -1122,8 +1409,8 @@
             <td>${e.perfil || '-'}</td>
             <td>${e.telefono || '-'}</td>
             <td>
-              <button class="action-btn btn-edit" onclick="editarEstudiante('${e.id}')">✏️ Editar</button>
-              <button class="action-btn btn-delete" onclick="eliminarEstudiante('${e.id}')">🗑️ Eliminar</button>
+              <button class="action-btn btn-edit" onclick="editarEstudiante('${e.id}')">✏️</button>
+              <button class="action-btn btn-delete" onclick="eliminarEstudiante('${e.id}')">🗑️</button>
             </td>
           </tr>
         `;
@@ -1199,7 +1486,7 @@
         mostrarToast(res.mensaje, 'success');
         cerrarModalEstudiante();
         cargarEstudiantes();
-        cargarGradosParaFiltro(); // Actualizar grados en filtros
+        cargarGradosParaFiltro();
       } else {
         mostrarToast(res.mensaje, 'error');
       }
@@ -1226,7 +1513,7 @@
     }
 
     // ============================================
-    // REPORTES DE ASISTENCIA
+    // NUEVAS FUNCIONES: REPORTES
     // ============================================
     async function cargarGradosParaFiltro() {
       const res = await llamarAppsScript('listarGrados');
@@ -1324,7 +1611,6 @@
     // INICIALIZACIÓN
     // ============================================
     function iniciarAplicacion() {
-      // Configurar asistencia
       document.getElementById('formulario').addEventListener('submit', enviarFormulario);
       
       document.getElementById('id').addEventListener('input', function(e) {
@@ -1337,28 +1623,57 @@
       });
       
       document.getElementById('camera-toggle').addEventListener('change', e => toggleCamera(e.target.checked));
+      document.getElementById('admin-toggle').addEventListener('click', function() {
+        const body = document.getElementById('admin-body');
+        body.style.display = body.style.display === 'none' ? 'block' : 'none';
+        if (body.style.display === 'block') cargarGrados();
+      });
+      
+      document.getElementById('admin-generar-id').addEventListener('click', async function() {
+        const id = document.getElementById('admin-id').value.trim();
+        if (!id) return mostrarAdminEstado('⚠️ Ingrese ID', 'error');
+        
+        mostrarAdminEstado('📄 Generando...', 'info');
+        const res = await llamarAppsScript('generarCarnet', { id });
+        
+        if (res?.ok) {
+          mostrarAdminEstado('✅ Descargando...', 'success');
+          descargarArchivo(res.data, res.filename);
+          setTimeout(() => document.getElementById('admin-status').style.display = 'none', 3000);
+        } else {
+          mostrarAdminEstado(res?.mensaje || '❌ Error', 'error');
+        }
+      });
+      
+      document.getElementById('admin-generar-lote').addEventListener('click', async function() {
+        const grado = document.getElementById('admin-grado').value;
+        if (!grado) return mostrarAdminEstado('⚠️ Seleccione grado', 'error');
+        
+        mostrarAdminEstado('📚 Generando lote...', 'info');
+        const res = await llamarAppsScript('generarLote', { grado });
+        
+        if (res?.ok) {
+          mostrarAdminEstado('✅ Descargando...', 'success');
+          descargarArchivo(res.data, res.filename);
+          setTimeout(() => document.getElementById('admin-status').style.display = 'none', 3000);
+        } else {
+          mostrarAdminEstado(res?.mensaje || '❌ Error', 'error');
+        }
+      });
       
       setInterval(actualizarReloj, 1000);
       actualizarReloj();
       setTimeout(() => { if (cameraEnabled) cargarCamaras(); }, 1000);
       
-      // Precargar datos
       generarIdDispositivo();
-      
-      // Cargar estudiantes en segundo plano
-      setTimeout(() => {
-        if (document.getElementById('tab-estudiantes').classList.contains('active')) {
-          cargarEstudiantes();
-        }
-      }, 2000);
     }
-
-    // Login con Enter
-    document.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter' && document.getElementById('login-overlay').style.display !== 'none') {
-        verificarLogin();
-      }
-    });
+    
+    function mostrarAdminEstado(msg, tipo) {
+      const s = document.getElementById('admin-status');
+      s.textContent = msg;
+      s.style.display = 'block';
+      s.className = 'admin-status admin-' + tipo;
+    }
 
     window.onload = function() {
       if (localStorage.getItem('auth_pip') === 'true') {
