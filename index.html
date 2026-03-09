@@ -594,6 +594,7 @@
     // ============================================
     async function llamarAppsScript(funcion, parametros = {}) {
       try {
+        // Mostrar estado de carga
         console.log('Llamando a Apps Script:', funcion, parametros);
         
         // Construir URL con los parámetros
@@ -890,20 +891,13 @@
       status.style.color = esError ? '#b91c1c' : '#166534';
     }
 
-    function descargarPDF(base64, filename) {
-      try {
-        // Crear un enlace temporal para descargar el PDF
-        const link = document.createElement('a');
-        link.href = 'data:application/pdf;base64,' + base64;
-        link.download = filename || 'documento.pdf';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        return true;
-      } catch (error) {
-        console.error('Error al descargar PDF:', error);
-        return false;
-      }
+    function descargarArchivo(base64, filename, mimeType) {
+      const enlace = document.createElement('a');
+      enlace.href = 'data:' + mimeType + ';base64,' + base64;
+      enlace.download = filename;
+      document.body.appendChild(enlace);
+      enlace.click();
+      document.body.removeChild(enlace);
     }
 
     async function cargarGradosSecciones() {
@@ -918,9 +912,6 @@
           option.textContent = g;
           select.appendChild(option);
         });
-      } else {
-        console.error('Error cargando grados:', resultado);
-        mostrarAdminEstado('❌ Error cargando grados', true);
       }
     }
     
@@ -990,78 +981,33 @@
         body.style.display = body.style.display === 'none' ? 'block' : 'none';
       });
 
-      // ============================================
-      // FUNCIÓN PARA GENERAR CARNET INDIVIDUAL
-      // ============================================
       document.getElementById('admin-generar-id').addEventListener('click', async function() {
         const id = document.getElementById('admin-id').value.trim();
         if (!id) {
-          mostrarAdminEstado('❌ Ingrese un ID válido', true);
+          mostrarAdminEstado('Ingrese un ID válido', true);
           return;
         }
-        
-        mostrarAdminEstado('⏳ Generando PDF...', false);
-        
-        try {
-          // Llamar a Apps Script
-          const resultado = await llamarAppsScript('generarCarnet', { id: id });
-          
-          // Verificar que tenemos el PDF
-          if (resultado && resultado.ok && resultado.data) {
-            
-            // Descargar el PDF automáticamente
-            const descargado = descargarPDF(resultado.data, resultado.filename || 'carnet_' + id + '.pdf');
-            
-            if (descargado) {
-              mostrarAdminEstado('✅ PDF descargado correctamente', false);
-            } else {
-              mostrarAdminEstado('⚠️ Error al descargar', true);
-            }
-          } else {
-            mostrarAdminEstado(resultado?.mensaje || '❌ Error al generar PDF', true);
-          }
-        } catch (error) {
-          mostrarAdminEstado('❌ Error: ' + error.message, true);
+        mostrarAdminEstado('Generando PDF...', false);
+        const resultado = await llamarAppsScript('generarCarnet', { id: id });
+        if (resultado && resultado.ok) {
+          mostrarAdminEstado('PDF generado correctamente', false);
+        } else {
+          mostrarAdminEstado(resultado?.mensaje || 'Error al generar PDF', true);
         }
       });
 
-      // ============================================
-      // FUNCIÓN PARA GENERAR LOTE (TODOS LOS ESTUDIANTES DEL GRADO)
-      // ============================================
       document.getElementById('admin-generar-lote').addEventListener('click', async function() {
         const grado = document.getElementById('admin-grado').value;
         if (!grado) {
-          mostrarAdminEstado('❌ Seleccione un grado/sección', true);
+          mostrarAdminEstado('Seleccione un grado/sección', true);
           return;
         }
-        
-        mostrarAdminEstado('⏳ Generando lote de carnets...', false);
-        
-        try {
-          // Llamar a Apps Script
-          const resultado = await llamarAppsScript('generarLote', { grado: grado });
-          
-          // Verificar que tenemos el PDF
-          if (resultado && resultado.ok && resultado.data) {
-            
-            // Mostrar cuántos carnets se generaron
-            const cantidad = resultado.cantidad || 'varios';
-            mostrarAdminEstado(`✅ ${cantidad} carnets generados`, false);
-            
-            // Descargar el PDF automáticamente
-            const nombreArchivo = resultado.filename || 'carnets_' + grado.replace(/[^a-zA-Z0-9]/g, '_') + '.pdf';
-            const descargado = descargarPDF(resultado.data, nombreArchivo);
-            
-            if (descargado) {
-              mostrarAdminEstado(`✅ ${cantidad} carnets descargados correctamente`, false);
-            } else {
-              mostrarAdminEstado('⚠️ Error al descargar', true);
-            }
-          } else {
-            mostrarAdminEstado(resultado?.mensaje || '❌ Error al generar lote', true);
-          }
-        } catch (error) {
-          mostrarAdminEstado('❌ Error: ' + error.message, true);
+        mostrarAdminEstado('Generando lote...', false);
+        const resultado = await llamarAppsScript('generarLote', { grado: grado });
+        if (resultado && resultado.ok) {
+          mostrarAdminEstado('Lote generado correctamente', false);
+        } else {
+          mostrarAdminEstado(resultado?.mensaje || 'Error al generar lote', true);
         }
       });
 
@@ -1104,4 +1050,3 @@
   </script>
 </body>
 </html>
-
