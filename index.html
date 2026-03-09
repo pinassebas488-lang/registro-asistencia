@@ -918,6 +918,9 @@
           option.textContent = g;
           select.appendChild(option);
         });
+      } else {
+        console.error('Error cargando grados:', resultado);
+        mostrarAdminEstado('❌ Error cargando grados', true);
       }
     }
     
@@ -988,7 +991,7 @@
       });
 
       // ============================================
-      // FUNCIÓN ACTUALIZADA PARA GENERAR CARNET INDIVIDUAL (CON DESCARGA)
+      // FUNCIÓN PARA GENERAR CARNET INDIVIDUAL
       // ============================================
       document.getElementById('admin-generar-id').addEventListener('click', async function() {
         const id = document.getElementById('admin-id').value.trim();
@@ -1023,7 +1026,7 @@
       });
 
       // ============================================
-      // FUNCIÓN ACTUALIZADA PARA GENERAR LOTE (CON DESCARGA)
+      // FUNCIÓN PARA GENERAR LOTE (TODOS LOS ESTUDIANTES DEL GRADO)
       // ============================================
       document.getElementById('admin-generar-lote').addEventListener('click', async function() {
         const grado = document.getElementById('admin-grado').value;
@@ -1041,12 +1044,16 @@
           // Verificar que tenemos el PDF
           if (resultado && resultado.ok && resultado.data) {
             
+            // Mostrar cuántos carnets se generaron
+            const cantidad = resultado.cantidad || 'varios';
+            mostrarAdminEstado(`✅ ${cantidad} carnets generados`, false);
+            
             // Descargar el PDF automáticamente
             const nombreArchivo = resultado.filename || 'carnets_' + grado.replace(/[^a-zA-Z0-9]/g, '_') + '.pdf';
             const descargado = descargarPDF(resultado.data, nombreArchivo);
             
             if (descargado) {
-              mostrarAdminEstado('✅ Lote descargado correctamente', false);
+              mostrarAdminEstado(`✅ ${cantidad} carnets descargados correctamente`, false);
             } else {
               mostrarAdminEstado('⚠️ Error al descargar', true);
             }
@@ -1097,5 +1104,3 @@
   </script>
 </body>
 </html>
-
-
