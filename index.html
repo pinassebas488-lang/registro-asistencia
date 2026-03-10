@@ -156,6 +156,7 @@
     .dia-libre-panel textarea:focus{border-color:var(--warning);box-shadow:0 0 0 3px rgba(245,158,11,.15);}
     .dia-libre-panel textarea.valido{border-color:var(--success);}
     .dia-libre-counter{font-size:11px;color:var(--text-muted);margin-top:5px;text-align:right;}
+    .comentario-extra{font-size:12px;color:#93c5fd;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:help;}
 
     /* QR */
     .camera-toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
@@ -627,7 +628,7 @@
         <div class="card" id="reporte-tabla-card" style="display:none;">
           <div class="card-title">📋 Resultados</div>
           <div class="table-wrap">
-            <table><thead><tr><th>#</th><th>Fecha/Hora</th><th>ID</th><th>Nombre</th><th>Área</th><th>Cargo</th><th>Estado</th><th>Puntualidad</th><th>Detalle</th></tr></thead>
+            <table><thead><tr><th>#</th><th>Fecha/Hora</th><th>ID</th><th>Nombre</th><th>Área</th><th>Cargo</th><th>Estado</th><th>Puntualidad</th><th>Detalle</th><th>Comentario</th></tr></thead>
             <tbody id="reporte-tbody"></tbody></table>
           </div>
         </div>
@@ -1734,7 +1735,7 @@ async function cargarReporte(){
 
 function renderizarTablaReporte(registros){
   const card=document.getElementById('reporte-tabla-card');const res=document.getElementById('reporte-resumen');const tbody=document.getElementById('reporte-tbody');
-  if(!registros.length){tbody.innerHTML='<tr><td colspan="9" style="text-align:center;padding:26px;color:var(--text-muted)">Sin registros</td></tr>';card.style.display='block';res.style.display='none';return;}
+  if(!registros.length){tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:26px;color:var(--text-muted)">Sin registros</td></tr>';card.style.display='block';res.style.display='none';return;}
   const ing=registros.filter(r=>r.estado==='INGRESO').length;
   const sal=registros.filter(r=>r.estado==='SALIDA').length;
   const pers=new Set(registros.map(r=>r.id)).size;
@@ -1752,6 +1753,9 @@ function renderizarTablaReporte(registros){
     if(r.puntualidad==='tardanza')detalleMin=`<span style="color:#fcd34d;font-size:11px;">+${r.minutosDiff||0} min</span>`;
     else if(r.puntualidad==='anticipada')detalleMin=`<span style="color:#c4b5fd;font-size:11px;">-${r.minutosDiff||0} min</span>`;
     else if(r.puntualidad==='puntual')detalleMin=`<span style="color:#34d399;font-size:11px;">✓</span>`;
+    const comentarioCell = r.comentario
+      ? `<td><div class="comentario-extra" title="${r.comentario.replace(/"/g,'&quot;')}">💬 ${r.comentario}</div></td>`
+      : `<td style="color:var(--text-muted);font-size:12px;">—</td>`;
     return `<tr>
       <td style="color:var(--text-muted);font-size:12px;">${i+1}</td>
       <td class="recent-row-time">${r.fechaHora}</td>
@@ -1760,6 +1764,7 @@ function renderizarTablaReporte(registros){
       <td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td>
       <td>${badgePuntualidad(r.puntualidad)}</td>
       <td>${detalleMin}</td>
+      ${comentarioCell}
     </tr>`;
   }).join('');
   card.style.display='block';mostrarToast(`✅ ${registros.length} registros`,'success');
@@ -1779,14 +1784,14 @@ function exportarExcel(){
     ['REPORTE DE ASISTENCIA — FINACORP'],
     [`Período: ${fI} al ${fF}`],
     [`Generado: ${new Date().toLocaleString('es-PE')}`],[],
-    ['#','Fecha/Hora','ID','Nombre Completo','Área','Cargo','Estado','Puntualidad','Minutos Diff','Slot Horario'],
+    ['#','Fecha/Hora','ID','Nombre Completo','Área','Cargo','Estado','Puntualidad','Minutos Diff','Slot Horario','Comentario (Día Extra)'],
     ...reporteData.map((r,i)=>[i+1,r.fechaHora,r.id,r.nombre,r.area,r.perfil,r.estado,
-      r.puntualidad==='tardanza'?'TARDANZA':r.puntualidad==='anticipada'?'SALIDA ANTICIPADA':r.puntualidad==='puntual'?'PUNTUAL':'—',
+      r.puntualidad==='tardanza'?'TARDANZA':r.puntualidad==='anticipada'?'SALIDA ANTICIPADA':r.puntualidad==='puntual'?'PUNTUAL':r.puntualidad==='extraordinario'?'DÍA EXTRA':'—',
       r.puntualidad==='tardanza'?`+${r.minutosDiff||0}`:r.puntualidad==='anticipada'?`-${r.minutosDiff||0}`:'',
-      r.slotHorario||''])
+      r.slotHorario||'',r.comentario||''])
   ]);
-  ws['!cols']=[{wch:5},{wch:20},{wch:12},{wch:30},{wch:22},{wch:20},{wch:10},{wch:18},{wch:12},{wch:18}];
-  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:9}},{s:{r:1,c:0},e:{r:1,c:9}},{s:{r:2,c:0},e:{r:2,c:9}}];
+  ws['!cols']=[{wch:5},{wch:20},{wch:12},{wch:30},{wch:22},{wch:20},{wch:10},{wch:18},{wch:12},{wch:18},{wch:40}];
+  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:10}},{s:{r:1,c:0},e:{r:1,c:10}},{s:{r:2,c:0},e:{r:2,c:10}}];
   XLSX.utils.book_append_sheet(wb,ws,'Asistencia');
   const wsR=XLSX.utils.aoa_to_sheet([
     ['RESUMEN'],[],['Indicador','Valor'],['Período',`${fI} al ${fF}`],
