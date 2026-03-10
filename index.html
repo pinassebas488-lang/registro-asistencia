@@ -45,6 +45,17 @@
     .login-error{background:var(--error-light);color:var(--error-text);padding:10px 16px;border-radius:8px;margin-top:14px;display:none;text-align:center;font-size:13px;font-weight:600;animation:shake .4s ease;}
     @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
     .login-footer{text-align:center;margin-top:20px;color:var(--text-muted);font-size:11px;}
+    /* Modal crear contraseña admin primera vez */
+    #modal-crear-pass{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99999;align-items:center;justify-content:center;}
+    #modal-crear-pass.show{display:flex;}
+    .crear-pass-box{background:rgba(15,23,42,.98);border:1px solid rgba(16,185,129,.35);border-radius:24px;padding:40px 32px;max-width:420px;width:90%;box-shadow:0 0 80px rgba(16,185,129,.15),0 20px 60px rgba(0,0,0,.6);animation:loginIn .3s ease-out;}
+    .crear-pass-box h3{font-size:20px;font-weight:800;text-align:center;margin-bottom:6px;background:linear-gradient(135deg,var(--primary),#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .crear-pass-box p{font-size:13px;color:var(--text-muted);text-align:center;margin-bottom:24px;line-height:1.6;}
+    .crear-pass-box .login-input-group{margin-bottom:14px;}
+    .crear-pass-req{font-size:11px;color:var(--text-muted);margin-top:6px;display:flex;flex-direction:column;gap:3px;}
+    .crear-pass-req span{display:flex;align-items:center;gap:5px;}
+    .crear-pass-req span.ok{color:#34d399;}
+    .crear-pass-req span.fail{color:var(--text-muted);}
 
     /* LAYOUT */
     #main-content{display:none;}
@@ -334,11 +345,11 @@
         <label>Usuario</label>
         <div class="login-input-wrap"><span>👤</span><input type="text" id="login-user" placeholder="Tu usuario" autocomplete="off" autofocus></div>
       </div>
-      <div class="login-input-group">
+      <div class="login-input-group" id="pass-group">
         <label>Contraseña</label>
-        <div class="login-input-wrap"><span>🔑</span><input type="password" id="login-pass" placeholder="Tu contraseña"></div>
+        <div class="login-input-wrap"><span>🔑</span><input type="password" id="login-pass" placeholder="Tu contraseña" onkeydown="if(event.key==='Enter')verificarLogin()"></div>
       </div>
-      <button class="login-btn" onclick="verificarLogin()">Ingresar →</button>
+      <button class="login-btn" id="login-btn" onclick="verificarLogin()">Ingresar →</button>
       <div id="login-error" class="login-error">⚠️ Usuario o contraseña incorrectos</div>
       <div class="login-footer"><p>© 2026 Finacorp — v5.2</p></div>
     </div>
@@ -763,6 +774,31 @@
 
 <div id="toast" class="toast"></div>
 
+<!-- Modal: crear contraseña admin primera vez -->
+<div id="modal-crear-pass">
+  <div class="crear-pass-box">
+    <div style="font-size:40px;text-align:center;margin-bottom:12px;">🔐</div>
+    <h3>Bienvenido, Administrador</h3>
+    <p>Es tu primera vez ingresando.<br>Crea una contraseña segura para proteger tu cuenta.</p>
+    <div class="login-input-group">
+      <label>Nueva Contraseña</label>
+      <div class="login-input-wrap"><span>🔑</span><input type="password" id="cp-nueva" placeholder="Mínimo 6 caracteres" oninput="validarCrearPass()" onkeydown="if(event.key==='Enter')document.getElementById('cp-confirmar').focus()"></div>
+    </div>
+    <div class="login-input-group">
+      <label>Confirmar Contraseña</label>
+      <div class="login-input-wrap"><span>✅</span><input type="password" id="cp-confirmar" placeholder="Repite tu contraseña" oninput="validarCrearPass()" onkeydown="if(event.key==='Enter')confirmarCrearPass()"></div>
+    </div>
+    <div class="crear-pass-req" id="cp-requisitos">
+      <span id="cp-req-len" class="fail">✗ Al menos 6 caracteres</span>
+      <span id="cp-req-match" class="fail">✗ Las contraseñas coinciden</span>
+    </div>
+    <div style="margin-top:18px;">
+      <button class="login-btn" id="cp-btn" onclick="confirmarCrearPass()" disabled style="opacity:.5;cursor:not-allowed;">Crear Contraseña →</button>
+    </div>
+    <div id="cp-error" class="login-error" style="margin-top:12px;"></div>
+  </div>
+</div>
+
 <script>
 // ════════════════════════════════
 // CONFIG
@@ -770,7 +806,6 @@
 const CONFIG = {
   APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxxNz9FhBV3ybKs8CMow5mc1PusG2AybD6_POwWvsUR813pNC60OFS_VDzbpzGs24k/exec',
   ADMIN_USER: 'admin',
-  ADMIN_PASS: 'pip2026',
   TIEMPO_TOAST: 3500
 };
 
@@ -1210,32 +1245,102 @@ function badgePuntualidad(punct) {
 // LOGIN
 // ════════════════════════════════
 async function verificarLogin() {
-  const user=document.getElementById('login-user').value.trim();
-  const pass=document.getElementById('login-pass').value.trim();
-  const errEl=document.getElementById('login-error');
-  if(!user||!pass){errEl.style.display='block';setTimeout(()=>errEl.style.display='none',3000);return;}
-  // Admin: verificar en GS primero
-  if(user===CONFIG.ADMIN_USER){
-    try{
-      const resAdmin=await llamarAppsScript('verificarCredencial',{usuario:user,pass});
-      // GS respondió: si está ok entra, si no está ok la contraseña ya fue cambiada y es incorrecta
-      if(resAdmin?.ok){
-        iniciarSesion({usuario:user,nombre:'Administrador',rol:'admin',permisos:['asistencia','dashboard','personal','reportes','carnets','credenciales']});return;
+  const user   = document.getElementById('login-user').value.trim();
+  const pass   = document.getElementById('login-pass').value.trim();
+  const errEl  = document.getElementById('login-error');
+  const btn    = document.getElementById('login-btn');
+  if (!user) { mostrarErrorLogin('Ingresa tu usuario'); return; }
+
+  // ── ADMIN ──
+  if (user === CONFIG.ADMIN_USER) {
+    btn.textContent = 'Verificando...'; btn.disabled = true;
+    try {
+      const resAdmin = await llamarAppsScript('verificarCredencial', {usuario: user, pass});
+      btn.textContent = 'Ingresar →'; btn.disabled = false;
+      if (resAdmin?.ok) {
+        // Contraseña correcta → entrar
+        iniciarSesion({usuario:user,nombre:'Administrador',rol:'admin',permisos:['asistencia','dashboard','personal','reportes','carnets','credenciales']});
+        return;
       }
-      if(resAdmin && !resAdmin.ok){
-        // GS tiene registro del admin → contraseña incorrecta, no hacer fallback
-        mostrarErrorLogin('Usuario o contraseña incorrectos');return;
+      if (resAdmin && !resAdmin.ok) {
+        // GS tiene registro → contraseña incorrecta
+        mostrarErrorLogin('Contraseña incorrecta'); return;
       }
-    }catch(e){}
-    // GS no respondió o no tiene registro del admin todavía → usar contraseña por defecto
-    if(pass===CONFIG.ADMIN_PASS){iniciarSesion({usuario:user,nombre:'Administrador',rol:'admin',permisos:['asistencia','dashboard','personal','reportes','carnets','credenciales']});return;}
-    mostrarErrorLogin('Usuario o contraseña incorrectos');return;
+    } catch(e) { btn.textContent = 'Ingresar →'; btn.disabled = false; }
+
+    // GS no tiene registro del admin todavía → primera vez, mostrar modal crear contraseña
+    mostrarModalCrearPass();
+    return;
   }
-  const btn=document.querySelector('.login-btn');btn.textContent='Verificando...';
-  const res=await llamarAppsScript('verificarCredencial',{usuario:user,pass});
-  btn.textContent='Ingresar →';
-  if(res?.ok){iniciarSesion(res.datos);}
-  else{errEl.style.display='block';setTimeout(()=>errEl.style.display='none',3000);document.getElementById('login-pass').value='';}
+
+  // ── USUARIOS NORMALES ──
+  if (!pass) { mostrarErrorLogin('Ingresa tu contraseña'); return; }
+  btn.textContent = 'Verificando...'; btn.disabled = true;
+  const res = await llamarAppsScript('verificarCredencial', {usuario: user, pass});
+  btn.textContent = 'Ingresar →'; btn.disabled = false;
+  if (res?.ok) { iniciarSesion(res.datos); }
+  else { mostrarErrorLogin('Usuario o contraseña incorrectos'); document.getElementById('login-pass').value = ''; }
+}
+
+function mostrarErrorLogin(msg) {
+  const errEl = document.getElementById('login-error');
+  errEl.textContent = '⚠️ ' + msg;
+  errEl.style.display = 'block';
+  setTimeout(() => errEl.style.display = 'none', 3500);
+}
+
+// ────────────────────────────────────────────────
+// MODAL: Crear contraseña admin (primera vez)
+// ────────────────────────────────────────────────
+function mostrarModalCrearPass() {
+  document.getElementById('cp-nueva').value = '';
+  document.getElementById('cp-confirmar').value = '';
+  document.getElementById('cp-error').style.display = 'none';
+  document.getElementById('cp-btn').disabled = true;
+  document.getElementById('cp-btn').style.opacity = '.5';
+  document.getElementById('cp-btn').style.cursor = 'not-allowed';
+  document.getElementById('cp-req-len').className   = 'fail';
+  document.getElementById('cp-req-len').textContent  = '✗ Al menos 6 caracteres';
+  document.getElementById('cp-req-match').className  = 'fail';
+  document.getElementById('cp-req-match').textContent= '✗ Las contraseñas coinciden';
+  document.getElementById('modal-crear-pass').classList.add('show');
+  setTimeout(() => document.getElementById('cp-nueva').focus(), 200);
+}
+
+function validarCrearPass() {
+  const nueva     = document.getElementById('cp-nueva').value;
+  const confirmar = document.getElementById('cp-confirmar').value;
+  const lenOk     = nueva.length >= 6;
+  const matchOk   = nueva === confirmar && confirmar.length > 0;
+  const reqLen    = document.getElementById('cp-req-len');
+  const reqMatch  = document.getElementById('cp-req-match');
+  reqLen.className   = lenOk   ? 'ok' : 'fail';
+  reqLen.textContent  = lenOk   ? '✓ Al menos 6 caracteres' : '✗ Al menos 6 caracteres';
+  reqMatch.className  = matchOk ? 'ok' : 'fail';
+  reqMatch.textContent= matchOk ? '✓ Las contraseñas coinciden' : '✗ Las contraseñas coinciden';
+  const ok = lenOk && matchOk;
+  document.getElementById('cp-btn').disabled     = !ok;
+  document.getElementById('cp-btn').style.opacity = ok ? '1' : '.5';
+  document.getElementById('cp-btn').style.cursor  = ok ? 'pointer' : 'not-allowed';
+}
+
+async function confirmarCrearPass() {
+  const nueva = document.getElementById('cp-nueva').value.trim();
+  if (nueva.length < 6) return;
+  const btn = document.getElementById('cp-btn');
+  btn.textContent = 'Guardando...'; btn.disabled = true;
+  const res = await llamarAppsScript('guardarContrasenaAdmin', {passNueva: nueva});
+  if (res?.exito) {
+    document.getElementById('modal-crear-pass').classList.remove('show');
+    iniciarSesion({usuario:CONFIG.ADMIN_USER,nombre:'Administrador',rol:'admin',
+      permisos:['asistencia','dashboard','personal','reportes','carnets','credenciales']});
+    mostrarToast('🔐 Contraseña creada. ¡Bienvenido!', 'success');
+  } else {
+    const cpErr = document.getElementById('cp-error');
+    cpErr.textContent = '❌ ' + (res?.mensaje || 'Error al guardar');
+    cpErr.style.display = 'block';
+    btn.textContent = 'Crear Contraseña →'; btn.disabled = false;
+  }
 }
 
 function iniciarSesion(d) {
@@ -1909,7 +2014,6 @@ async function cambiarMiContrasena(){
       const chk=await llamarAppsScript('verificarCredencial',{usuario:CONFIG.ADMIN_USER,pass:actual});
       if(chk?.ok) passActualOk=true;
     }catch(e){}
-    if(!passActualOk && actual===CONFIG.ADMIN_PASS) passActualOk=true;
     if(!passActualOk){
       btn.innerHTML='🔑 Cambiar Contraseña';btn.disabled=false;
       mostrarRespuestaEl('respuesta-mipass','❌ Contraseña actual incorrecta','error');return;
@@ -1918,8 +2022,6 @@ async function cambiarMiContrasena(){
     const res=await llamarAppsScript('guardarContrasenaAdmin',{passNueva:nueva});
     btn.innerHTML='🔑 Cambiar Contraseña';btn.disabled=false;
     if(res?.exito){
-      // Actualizar el CONFIG en memoria para esta sesión
-      CONFIG.ADMIN_PASS=nueva;
       mostrarRespuestaEl('respuesta-mipass','✅ Contraseña del administrador actualizada correctamente','success');
       mostrarToast('✅ Contraseña actualizada','success');
       document.getElementById('mp-actual').value='';document.getElementById('mp-nueva').value='';document.getElementById('mp-confirmar').value='';
