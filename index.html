@@ -1320,6 +1320,18 @@ async function buscarColaborador(id){
     const jornLabels={ninguno:'Sin horario / Día libre',medio:'🌅 Medio tiempo',completo:'☀️ Tiempo completo'};
     document.getElementById('employee-jornada').textContent=jornLabels[horario.tipo]||'Sin horario';
 
+    // Bloquear si es día no laboral (solo si tiene horario v2 configurado)
+    const tieneHorarioV2 = res.datos.horario && res.datos.horario.version === 2 &&
+                           res.datos.horario.dias && Object.keys(res.datos.horario.dias).length > 0;
+    if (tieneHorarioV2 && horario.tipo === 'ninguno') {
+      const diasNombres={lunes:'Lunes',martes:'Martes',miercoles:'Miércoles',jueves:'Jueves',viernes:'Viernes',sabado:'Sábado',domingo:'Domingo'};
+      const diaHoy = diasNombres[diaHoyKey()] || diaHoyKey();
+      document.getElementById('btn-submit').disabled = true;
+      mostrarRespuesta(`🚫 Hoy (${diaHoy}) no es día laboral para ${res.datos.nombre}. No se puede registrar asistencia.`, 'error');
+      mostrarHorarioColaborador(horario);
+      return;
+    }
+
     mostrarHorarioColaborador(horario);
     recalcularPuntualidad();
   }else{
@@ -1343,6 +1355,15 @@ async function enviarFormulario(e){
   e.preventDefault();if(!staffData)return mostrarRespuesta('ID no válido','error');
   const estado=document.getElementById('estado').value;
   const horario=horarioHoyDeStaff(staffData);
+
+  // Doble verificación: bloquear si día no laboral y tiene horario v2
+  const tieneHorarioV2 = staffData.horario && staffData.horario.version === 2 &&
+                         staffData.horario.dias && Object.keys(staffData.horario.dias).length > 0;
+  if (tieneHorarioV2 && horario.tipo === 'ninguno') {
+    const diasNombres={lunes:'Lunes',martes:'Martes',miercoles:'Miércoles',jueves:'Jueves',viernes:'Viernes',sabado:'Sábado',domingo:'Domingo'};
+    const diaHoy = diasNombres[diaHoyKey()] || diaHoyKey();
+    return mostrarRespuesta(`🚫 Hoy (${diaHoy}) no es día laboral. No se puede registrar asistencia.`, 'error');
+  }
   const evalPunct=evaluarPuntualidad(horario,estado);
 
   const btn=document.getElementById('btn-submit');const orig=btn.innerHTML;
