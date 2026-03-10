@@ -1214,13 +1214,20 @@ async function verificarLogin() {
   const pass=document.getElementById('login-pass').value.trim();
   const errEl=document.getElementById('login-error');
   if(!user||!pass){errEl.style.display='block';setTimeout(()=>errEl.style.display='none',3000);return;}
-  // Admin: verificar primero en GS (por si cambió su contraseña), luego fallback a CONFIG
+  // Admin: verificar en GS primero
   if(user===CONFIG.ADMIN_USER){
     try{
       const resAdmin=await llamarAppsScript('verificarCredencial',{usuario:user,pass});
-      if(resAdmin?.ok){iniciarSesion({usuario:user,nombre:'Administrador',rol:'admin',permisos:['asistencia','dashboard','personal','reportes','carnets','credenciales']});return;}
+      // GS respondió: si está ok entra, si no está ok la contraseña ya fue cambiada y es incorrecta
+      if(resAdmin?.ok){
+        iniciarSesion({usuario:user,nombre:'Administrador',rol:'admin',permisos:['asistencia','dashboard','personal','reportes','carnets','credenciales']});return;
+      }
+      if(resAdmin && !resAdmin.ok){
+        // GS tiene registro del admin → contraseña incorrecta, no hacer fallback
+        mostrarErrorLogin('Usuario o contraseña incorrectos');return;
+      }
     }catch(e){}
-    // Fallback: contraseña hardcodeada si no existe en GS todavía
+    // GS no respondió o no tiene registro del admin todavía → usar contraseña por defecto
     if(pass===CONFIG.ADMIN_PASS){iniciarSesion({usuario:user,nombre:'Administrador',rol:'admin',permisos:['asistencia','dashboard','personal','reportes','carnets','credenciales']});return;}
     mostrarErrorLogin('Usuario o contraseña incorrectos');return;
   }
