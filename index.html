@@ -147,6 +147,15 @@
     .punct-alert.anticipada{background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);color:#c4b5fd;}
     .punct-alert.sin-horario{background:rgba(100,116,139,.1);border:1px solid rgba(100,116,139,.2);color:var(--text-muted);}
     .punct-alert.dia-libre{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#f87171;}
+    .dia-libre-panel{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.3);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;animation:fadeIn .3s ease;}
+    .dia-libre-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;}
+    .dia-libre-header span{font-size:22px;line-height:1;}
+    .dia-libre-header strong{display:block;font-size:13px;font-weight:700;color:#fcd34d;margin-bottom:2px;}
+    .dia-libre-header p{font-size:12px;color:var(--text-muted);margin:0;}
+    .dia-libre-panel textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:'Outfit',sans-serif;padding:10px 12px;outline:none;transition:var(--transition);}
+    .dia-libre-panel textarea:focus{border-color:var(--warning);box-shadow:0 0 0 3px rgba(245,158,11,.15);}
+    .dia-libre-panel textarea.valido{border-color:var(--success);}
+    .dia-libre-counter{font-size:11px;color:var(--text-muted);margin-top:5px;text-align:right;}
 
     /* QR */
     .camera-toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
@@ -416,6 +425,22 @@
 
                 <!-- Alerta de puntualidad -->
                 <div class="punct-alert" id="punct-alert"></div>
+
+                <!-- Panel comentario día no laboral -->
+                <div class="dia-libre-panel" id="dia-libre-panel" style="display:none;">
+                  <div class="dia-libre-header">
+                    <span>📅</span>
+                    <div>
+                      <strong>Hoy no es tu día laboral</strong>
+                      <p>Para registrar tu asistencia, explica el motivo de tu presencia.</p>
+                    </div>
+                  </div>
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label>Motivo de asistencia <span style="color:#f87171;">*</span></label>
+                    <textarea id="comentario-dia-libre" rows="3" placeholder="Ej: Recuperación de horas del día lunes, apoyo en cierre de mes, reunión urgente con cliente..." oninput="validarComentarioDiaLibre()" style="resize:vertical;min-height:72px;"></textarea>
+                    <div class="dia-libre-counter"><span id="comentario-chars">0</span> caracteres</div>
+                  </div>
+                </div>
 
                 <div class="form-group">
                   <label>Estado</label>
@@ -1172,10 +1197,11 @@ function ocultarPunctAlert() {
 }
 
 function badgePuntualidad(punct) {
-  if (!punct || punct==='sin_horario') return '<span class="badge badge-gray">—</span>';
-  if (punct==='puntual')   return '<span class="badge badge-green">✅ Puntual</span>';
-  if (punct==='tardanza')  return '<span class="badge badge-amber">⏰ Tardanza</span>';
-  if (punct==='anticipada')return '<span class="badge badge-purple">⚠️ Anticipada</span>';
+  if (!punct || punct==='sin_horario')  return '<span class="badge badge-gray">—</span>';
+  if (punct==='puntual')                return '<span class="badge badge-green">✅ Puntual</span>';
+  if (punct==='tardanza')               return '<span class="badge badge-amber">⏰ Tardanza</span>';
+  if (punct==='anticipada')             return '<span class="badge badge-purple">⚠️ Anticipada</span>';
+  if (punct==='extraordinario')         return '<span class="badge badge-blue">📅 Día Extra</span>';
   return '<span class="badge badge-gray">—</span>';
 }
 
@@ -1320,18 +1346,21 @@ async function buscarColaborador(id){
     const jornLabels={ninguno:'Sin horario / Día libre',medio:'🌅 Medio tiempo',completo:'☀️ Tiempo completo'};
     document.getElementById('employee-jornada').textContent=jornLabels[horario.tipo]||'Sin horario';
 
-    // Bloquear si es día no laboral (solo si tiene horario v2 configurado)
+    // Verificar si tiene horario v2 configurado y hoy es día libre
     const tieneHorarioV2 = res.datos.horario && res.datos.horario.version === 2 &&
                            res.datos.horario.dias && Object.keys(res.datos.horario.dias).length > 0;
-    if (tieneHorarioV2 && horario.tipo === 'ninguno') {
+    const esDiaLibre = tieneHorarioV2 && horario.tipo === 'ninguno';
+
+    if (esDiaLibre) {
       const diasNombres={lunes:'Lunes',martes:'Martes',miercoles:'Miércoles',jueves:'Jueves',viernes:'Viernes',sabado:'Sábado',domingo:'Domingo'};
       const diaHoy = diasNombres[diaHoyKey()] || diaHoyKey();
-      document.getElementById('btn-submit').disabled = true;
-      mostrarRespuesta(`🚫 Hoy (${diaHoy}) no es día laboral para ${res.datos.nombre}. No se puede registrar asistencia.`, 'error');
+      document.getElementById('employee-jornada').textContent = `📅 ${diaHoy} — Día no laboral`;
+      mostrarPanelDiaLibre(true);
       mostrarHorarioColaborador(horario);
       return;
     }
 
+    mostrarPanelDiaLibre(false);
     mostrarHorarioColaborador(horario);
     recalcularPuntualidad();
   }else{
@@ -1345,6 +1374,8 @@ function ocultarInfoColaborador(){
   document.getElementById('employee-info').style.display='none';
   document.getElementById('schedule-info').style.display='none';
   document.getElementById('today-schedule-panel').style.display='none';
+  document.getElementById('dia-libre-panel').style.display='none';
+  document.getElementById('comentario-dia-libre').value='';
   ocultarPunctAlert();
   staffData=null;
 }
@@ -1356,13 +1387,17 @@ async function enviarFormulario(e){
   const estado=document.getElementById('estado').value;
   const horario=horarioHoyDeStaff(staffData);
 
-  // Doble verificación: bloquear si día no laboral y tiene horario v2
+  // Verificar si es día libre y necesita comentario
   const tieneHorarioV2 = staffData.horario && staffData.horario.version === 2 &&
                          staffData.horario.dias && Object.keys(staffData.horario.dias).length > 0;
-  if (tieneHorarioV2 && horario.tipo === 'ninguno') {
-    const diasNombres={lunes:'Lunes',martes:'Martes',miercoles:'Miércoles',jueves:'Jueves',viernes:'Viernes',sabado:'Sábado',domingo:'Domingo'};
-    const diaHoy = diasNombres[diaHoyKey()] || diaHoyKey();
-    return mostrarRespuesta(`🚫 Hoy (${diaHoy}) no es día laboral. No se puede registrar asistencia.`, 'error');
+  const esDiaLibre = tieneHorarioV2 && horario.tipo === 'ninguno';
+  let comentarioDiaLibre = '';
+  if (esDiaLibre) {
+    comentarioDiaLibre = (document.getElementById('comentario-dia-libre').value || '').trim();
+    if (!comentarioDiaLibre) {
+      document.getElementById('comentario-dia-libre').focus();
+      return mostrarRespuesta('⚠️ Debes escribir el motivo de tu asistencia para poder registrar.', 'error');
+    }
   }
   const evalPunct=evaluarPuntualidad(horario,estado);
 
@@ -1373,7 +1408,8 @@ async function enviarFormulario(e){
     nombre:staffData.nombre,area:staffData.area,cargo:staffData.cargo,
     telefono:staffData.telefono||'',estado,
     idDispositivo:generarIdDispositivo(),
-    puntualidad:evalPunct.estado,minutosDiff:evalPunct.minutos,slotHorario:evalPunct.slot||''
+    puntualidad:evalPunct.estado,minutosDiff:evalPunct.minutos,slotHorario:evalPunct.slot||'',
+    comentario:comentarioDiaLibre
   });
   btn.innerHTML=orig;
   if(res?.exito){
@@ -1382,7 +1418,7 @@ async function enviarFormulario(e){
     if(evalPunct.estado==='anticipada')msg+=` — ⚠️ Salida anticipada: ${evalPunct.minutos} min`;
     mostrarRespuesta(msg,evalPunct.estado==='puntual'||evalPunct.estado==='sin_horario'?'success':'warning');
     mostrarToast(evalPunct.estado==='tardanza'?'⏰ Registrado con tardanza':evalPunct.estado==='anticipada'?'⚠️ Salida anticipada':'✅ Registro exitoso',evalPunct.estado==='puntual'||evalPunct.estado==='sin_horario'?'success':'warning');
-    document.getElementById('formulario').reset();ocultarInfoColaborador();btn.disabled=true;cargarUltimosRegistros();
+    document.getElementById('formulario').reset();document.getElementById('comentario-dia-libre').value='';mostrarPanelDiaLibre(false);ocultarInfoColaborador();btn.disabled=true;cargarUltimosRegistros();
   }else{
     mostrarRespuesta(res?.mensaje||'Error','error');mostrarToast(res?.mensaje||'Error','error');btn.disabled=false;
   }
@@ -1875,6 +1911,41 @@ window.onload=function(){
 };
 
 window.onbeforeunload=function(){detenerEscaneo();};
+
+// ════════════════════════════════════════════════════════════
+// DÍA LIBRE - PANEL DE COMENTARIO
+// ════════════════════════════════════════════════════════════
+
+function mostrarPanelDiaLibre(mostrar) {
+  const panel = document.getElementById('dia-libre-panel');
+  const btn   = document.getElementById('btn-submit');
+  if (mostrar) {
+    panel.style.display = 'block';
+    document.getElementById('comentario-dia-libre').value = '';
+    document.getElementById('comentario-chars').textContent = '0';
+    btn.disabled = true;
+    btn.textContent = '📝 Escribe el motivo para registrar';
+  } else {
+    panel.style.display = 'none';
+  }
+}
+
+function validarComentarioDiaLibre() {
+  const ta    = document.getElementById('comentario-dia-libre');
+  const chars = document.getElementById('comentario-chars');
+  const btn   = document.getElementById('btn-submit');
+  const texto = ta.value.trim();
+  chars.textContent = texto.length;
+  if (texto.length >= 10) {
+    ta.classList.add('valido');
+    btn.disabled = false;
+    btn.innerHTML = '✅ Registrar Asistencia <small style="opacity:.7;font-size:11px;">(día no laboral)</small>';
+  } else {
+    ta.classList.remove('valido');
+    btn.disabled = true;
+    btn.textContent = `📝 Escribe al menos ${10 - texto.length} caracteres más`;
+  }
+}
 </script>
 </body>
 </html>
