@@ -112,6 +112,11 @@
     .form-group input:disabled{opacity:.4;cursor:not-allowed;}
     .form-group select option{background:var(--surface2);}
 
+    /* ── CAMPO ID SOLO-QR ── */
+    .id-qr-only{position:relative;}
+    .id-qr-only input{padding-right:90px;cursor:not-allowed;opacity:.6;background:var(--surface2)!important;border-color:rgba(16,185,129,.2)!important;}
+    .id-qr-badge{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#34d399;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;pointer-events:none;letter-spacing:.3px;}
+
     /* BOTONES */
     .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;transition:var(--transition);}
     .btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important;}
@@ -220,13 +225,9 @@
     .checkbox-item input[type=checkbox]{width:14px;height:14px;accent-color:var(--primary);cursor:pointer;}
     .checkbox-item span{font-size:13px;color:var(--text);font-weight:500;}
 
-    /* ════════════════════════════════════════════
-       HORARIOS POR DÍAS — NUEVA SECCIÓN
-       ════════════════════════════════════════════ */
+    /* HORARIOS POR DÍAS */
     .schedule-section{background:rgba(59,130,246,.04);border:1px solid rgba(59,130,246,.2);border-radius:var(--radius-sm);padding:14px;margin-top:10px;}
     .schedule-section-title{font-size:12px;font-weight:700;color:#93c5fd;margin-bottom:12px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px;}
-
-    /* Selector de días */
     .days-selector{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
     .day-toggle{position:relative;}
     .day-toggle input[type=checkbox]{position:absolute;opacity:0;width:0;height:0;}
@@ -237,8 +238,6 @@
     .day-toggle input:checked + label .day-abbr{color:var(--primary);}
     .day-toggle input:checked + label .day-num{color:#34d399;}
     .day-toggle label:hover{border-color:var(--primary);background:rgba(16,185,129,.06);}
-
-    /* Acordeón por día */
     .day-schedule-list{display:flex;flex-direction:column;gap:8px;}
     .day-schedule-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;transition:var(--transition);}
     .day-schedule-item.day-off{opacity:.45;}
@@ -256,16 +255,12 @@
     .day-schedule-chevron.open{transform:rotate(180deg);}
     .day-schedule-body{display:none;padding:0 12px 12px;border-top:1px solid var(--border);}
     .day-schedule-body.open{display:block;}
-
-    /* Tipo de jornada por día */
     .day-type-row{display:flex;gap:6px;margin:10px 0 10px;}
     .day-type-btn{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;transition:var(--transition);font-family:'Outfit',sans-serif;}
     .day-type-btn:hover{border-color:var(--primary);color:var(--text);}
     .day-type-btn.active-libre{background:rgba(100,116,139,.15);border-color:rgba(100,116,139,.4);color:var(--text-muted);}
     .day-type-btn.active-medio{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.4);color:#93c5fd;}
     .day-type-btn.active-completo{background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.4);color:#34d399;}
-
-    /* Inputs de hora por día */
     .day-times-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
     .day-time-input{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;}
     .day-time-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted);margin-bottom:4px;display:flex;align-items:center;gap:4px;}
@@ -273,8 +268,6 @@
     .day-time-input input[type=time]{width:100%;padding:5px 8px;background:transparent;border:none;color:var(--text);font-size:14px;font-family:'JetBrains Mono',monospace;outline:none;}
     .day-time-note{font-size:10px;color:var(--text-muted);margin-top:3px;}
     .day-divider{grid-column:1/-1;border:none;border-top:1px dashed var(--border);}
-
-    /* Panel resumen horario en registro */
     .today-schedule-panel{background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.15);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:10px;display:none;}
     .today-schedule-panel h5{color:#34d399;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
     .today-slots-row{display:flex;gap:6px;flex-wrap:wrap;}
@@ -339,7 +332,7 @@
       <div class="login-logo">
         <div class="login-logo-icon">🏦</div>
         <h2>Finacorp</h2>
-        <p>Sistema de Control de Asistencia v5.2</p>
+        <p>Sistema de Control de Asistencia v5.3</p>
       </div>
       <div class="login-input-group">
         <label>Usuario</label>
@@ -351,7 +344,7 @@
       </div>
       <button class="login-btn" id="login-btn" onclick="verificarLogin()">Ingresar →</button>
       <div id="login-error" class="login-error">⚠️ Usuario o contraseña incorrectos</div>
-      <div class="login-footer"><p>© 2026 Finacorp — v5.2</p></div>
+      <div class="login-footer"><p>© 2026 Finacorp — v5.3</p></div>
     </div>
   </div>
 </div>
@@ -409,9 +402,13 @@
             <div class="card">
               <div class="card-title">✏️ Registro</div>
               <form id="formulario">
+                <!-- ══ CAMBIO 1: ID solo lectura, solo por QR ══ -->
                 <div class="form-group">
-                  <label>ID del Colaborador</label>
-                  <input type="text" id="id" required placeholder="Ingrese ID o escanee QR">
+                  <label>ID del Colaborador <span style="color:#34d399;font-size:10px;font-weight:700;">— Solo QR</span></label>
+                  <div class="id-qr-only">
+                    <input type="text" id="id" required placeholder="Escanea el QR del colaborador" readonly tabindex="-1">
+                    <span class="id-qr-badge">📷 QR</span>
+                  </div>
                 </div>
 
                 <!-- Info colaborador -->
@@ -519,24 +516,16 @@
               <div class="schedule-section">
                 <div class="schedule-section-title">📅 Horario Laboral por Día</div>
                 <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Selecciona los días que trabaja el colaborador y configura el horario de cada día de forma independiente.</p>
-
-                <!-- Selector rápido de días -->
                 <div style="margin-bottom:12px;">
                   <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:8px;">Días laborales</div>
-                  <div class="days-selector" id="days-selector">
-                    <!-- Se renderiza via JS -->
-                  </div>
+                  <div class="days-selector" id="days-selector"></div>
                   <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
                     <button type="button" class="btn btn-ghost btn-sm" onclick="marcarDiasLaborales()">LUN–VIE</button>
                     <button type="button" class="btn btn-ghost btn-sm" onclick="marcarTodosLosDias()">Todos</button>
                     <button type="button" class="btn btn-ghost btn-sm" onclick="desmarcarTodos()">Ninguno</button>
                   </div>
                 </div>
-
-                <!-- Lista de configuración por día -->
-                <div class="day-schedule-list" id="day-schedule-list">
-                  <!-- Se renderiza via JS -->
-                </div>
+                <div class="day-schedule-list" id="day-schedule-list"></div>
               </div>
 
               <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
@@ -591,14 +580,10 @@
             <div class="table-wrap">
               <table>
                 <thead>
-                  <tr>
-                    <th>#</th><th>ID</th><th>Nombre Completo</th><th>Área</th><th>Cargo</th><th>Días Laborales</th><th>Estado</th><th>Acciones</th>
-                  </tr>
+                  <tr><th>#</th><th>ID</th><th>Nombre Completo</th><th>Área</th><th>Cargo</th><th>Días Laborales</th><th>Estado</th><th>Acciones</th></tr>
                 </thead>
                 <tbody id="lista-personal-tbody">
-                  <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-muted);">
-                    <div class="empty-state"><span>⏳</span><p>Cargando personal...</p></div>
-                  </td></tr>
+                  <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-muted);"><div class="empty-state"><span>⏳</span><p>Cargando personal...</p></div></td></tr>
                 </tbody>
               </table>
             </div>
@@ -818,6 +803,12 @@ let modoEdicionPersonal=false, modoEdicionCred=false;
 let qrCodeReader=null, isScanning=false, searchTimeout=null;
 let staffData=null, selectedCameraId=null, cameraEnabled=true;
 
+// ══════════════════════════════════════════════════════════════════════
+// CAMBIO 2: Variable global para datos de edición de personal
+// Evita que JSON.stringify dentro del onclick pierda objetos complejos
+// ══════════════════════════════════════════════════════════════════════
+let _datosEdicionPersonal = null;
+
 // ════════════════════════════════════════════════════════════════════════
 // SISTEMA DE HORARIOS POR DÍA
 // ════════════════════════════════════════════════════════════════════════
@@ -832,14 +823,12 @@ const DIAS = [
   { key:'domingo',   abbr:'Dom', num:'Do' }
 ];
 
-// Día actual en formato key
 function diaHoyKey() {
   const keys = ['domingo','lunes','martes','miercoles','jueves','viernes','sabado'];
   return keys[new Date().getDay()];
 }
 
-// Estado del formulario de horarios
-let horarioDias = {}; // { lunes: { activo:true, tipo:'completo', entrada1:'08:00', salida1:'13:00', entrada2:'14:00', salida2:'18:00' }, ... }
+let horarioDias = {};
 
 function initHorarioDias() {
   horarioDias = {};
@@ -848,7 +837,6 @@ function initHorarioDias() {
   });
 }
 
-// Renderiza el selector de días y la lista de configuración
 function renderizarSelectorDias() {
   const selector = document.getElementById('days-selector');
   const lista = document.getElementById('day-schedule-list');
@@ -873,7 +861,6 @@ function renderDayItem(d) {
   const badgeClass = tipo === 'completo' ? 'completo' : tipo === 'medio' ? 'medio' : 'libre';
   const badgeText  = tipo === 'completo' ? '☀️ Completo' : tipo === 'medio' ? '🌅 Medio' : '🚫 No trabaja';
   const dotClass   = dia.activo ? 'active' : '';
-
   const timeSummary = dia.activo && tipo !== 'libre' ? resumenHorarioDia(dia) : '';
 
   return `<div class="day-schedule-item ${!dia.activo ? 'day-off' : ''}" id="day-item-${d.key}">
@@ -972,19 +959,17 @@ function setDayType(key, tipo) {
   horarioDias[key].tipo = tipo;
   horarioDias[key].activo = tipo !== 'libre';
   renderizarSelectorDias();
-  // Reabrir acordeón del día editado
   setTimeout(() => {
     const body = document.getElementById('body-' + key);
     const chevron = document.getElementById('chevron-' + key);
-    if (body) { body.classList.add('open'); }
-    if (chevron) { chevron.classList.add('open'); }
+    if (body) body.classList.add('open');
+    if (chevron) chevron.classList.add('open');
   }, 20);
 }
 
 function updateDayTime(key, campo, valor) {
   if (!horarioDias[key]) return;
   horarioDias[key][campo] = valor;
-  // Actualizar resumen en el header sin re-renderizar todo
   const dia = document.getElementById('day-item-' + key);
   if (!dia) return;
   const meta = dia.querySelector('.day-schedule-meta span:first-child');
@@ -1010,30 +995,24 @@ function desmarcarTodos() {
   renderizarSelectorDias();
 }
 
-// Serializar horario para guardar en Sheets
 function serializarHorario() {
   return JSON.stringify({ version: 2, dias: horarioDias });
 }
 
-// Deserializar horario desde Sheets y cargar en el formulario
 function deserializarHorario(raw) {
   initHorarioDias();
   if (!raw) return;
   try {
     const h = typeof raw === 'string' ? JSON.parse(raw) : raw;
-    // Formato nuevo: { version:2, dias:{...} }
     if (h.version === 2 && h.dias) {
       DIAS.forEach(d => {
         if (h.dias[d.key]) {
           horarioDias[d.key] = { ...horarioDias[d.key], ...h.dias[d.key] };
         }
       });
-    }
-    // Compatibilidad con formato antiguo v1 (tipo global)
-    else if (h.tipo && h.tipo !== 'ninguno') {
-      // Convertir formato viejo a nuevo: aplicar a lun-vie
-      const diaLaborales = ['lunes','martes','miercoles','jueves','viernes'];
-      diaLaborales.forEach(key => {
+    } else if (h.tipo && h.tipo !== 'ninguno') {
+      const diasLaborales = ['lunes','martes','miercoles','jueves','viernes'];
+      diasLaborales.forEach(key => {
         horarioDias[key] = {
           activo: true,
           tipo: h.tipo === 'medio' ? 'medio' : 'completo',
@@ -1047,32 +1026,22 @@ function deserializarHorario(raw) {
   } catch(e) {}
 }
 
-// Obtener horario del día actual para evaluación de puntualidad
 function horarioHoy() {
   const key = diaHoyKey();
   const dia = horarioDias[key];
   if (!dia || !dia.activo || dia.tipo === 'libre') return { tipo: 'ninguno' };
-  return {
-    tipo:     dia.tipo,
-    entrada1: dia.entrada1 || '',
-    salida1:  dia.salida1  || '',
-    entrada2: dia.entrada2 || '',
-    salida2:  dia.salida2  || ''
-  };
+  return { tipo: dia.tipo, entrada1: dia.entrada1||'', salida1: dia.salida1||'', entrada2: dia.entrada2||'', salida2: dia.salida2||'' };
 }
 
-// Obtener horario de hoy a partir del objeto staffData (colaborador encontrado)
 function horarioHoyDeStaff(staff) {
   if (!staff || !staff.horario) return { tipo: 'ninguno' };
   const h = staff.horario;
-  // Formato nuevo v2
   if (h.version === 2 && h.dias) {
     const key = diaHoyKey();
     const dia = h.dias[key];
     if (!dia || !dia.activo || dia.tipo === 'libre') return { tipo: 'ninguno' };
     return { tipo: dia.tipo, entrada1: dia.entrada1||'', salida1: dia.salida1||'', entrada2: dia.entrada2||'', salida2: dia.salida2||'' };
   }
-  // Compatibilidad v1
   if (h.tipo && h.tipo !== 'ninguno') return h;
   return { tipo: 'ninguno' };
 }
@@ -1147,7 +1116,6 @@ function mostrarHorarioColaborador(horario) {
     return;
   }
 
-  // Panel "Horario de hoy"
   const slots = [];
   if (horario.tipo === 'medio') {
     if (horario.entrada1) slots.push({ label:'Entrada', hora:horario.entrada1, key:'entrada1' });
@@ -1170,7 +1138,6 @@ function mostrarHorarioColaborador(horario) {
       ${s.label}: <b>${s.hora}</b>
     </div>`).join('');
 
-  // Panel slot activo
   const slotInfo = slots.find(s => s.key === slotActivo);
   if (slotInfo) {
     panel.style.display = 'block';
@@ -1197,16 +1164,14 @@ function mostrarPunctAlert(eval_, estado, horario) {
   const el = document.getElementById('punct-alert');
   el.style.display = 'flex';
   if (eval_.estado === 'sin_horario') {
-    // Verificar si es día libre
     const key = diaHoyKey();
     const esStaff = staffData?.horario?.version === 2;
     const diaConf = esStaff ? staffData.horario.dias?.[key] : null;
     const esDiaLibre = esStaff && (!diaConf || !diaConf.activo || diaConf.tipo === 'libre');
     if (esDiaLibre) {
       el.className = 'punct-alert dia-libre';
-      const diasKeys = ['domingo','lunes','martes','miercoles','jueves','viernes','sabado'];
-      const diaHoy   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'][new Date().getDay()];
-      el.innerHTML   = `📅 <b>${diaHoy} no es día laborable</b> para este colaborador`;
+      const diaHoy = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'][new Date().getDay()];
+      el.innerHTML = `📅 <b>${diaHoy} no es día laborable</b> para este colaborador`;
     } else {
       el.className = 'punct-alert sin-horario';
       el.innerHTML = '📋 Sin horario configurado — se registrará sin evaluación de puntualidad';
@@ -1247,33 +1212,24 @@ function badgePuntualidad(punct) {
 async function verificarLogin() {
   const user   = document.getElementById('login-user').value.trim();
   const pass   = document.getElementById('login-pass').value.trim();
-  const errEl  = document.getElementById('login-error');
   const btn    = document.getElementById('login-btn');
   if (!user) { mostrarErrorLogin('Ingresa tu usuario'); return; }
 
-  // ── ADMIN ──
   if (user === CONFIG.ADMIN_USER) {
     btn.textContent = 'Verificando...'; btn.disabled = true;
     try {
       const resAdmin = await llamarAppsScript('verificarCredencial', {usuario: user, pass});
       btn.textContent = 'Ingresar →'; btn.disabled = false;
       if (resAdmin?.ok) {
-        // Contraseña correcta → entrar
         iniciarSesion({usuario:user,nombre:'Administrador',rol:'admin',permisos:['asistencia','dashboard','personal','reportes','carnets','credenciales']});
         return;
       }
-      if (resAdmin && !resAdmin.ok) {
-        // GS tiene registro → contraseña incorrecta
-        mostrarErrorLogin('Contraseña incorrecta'); return;
-      }
+      if (resAdmin && !resAdmin.ok) { mostrarErrorLogin('Contraseña incorrecta'); return; }
     } catch(e) { btn.textContent = 'Ingresar →'; btn.disabled = false; }
-
-    // GS no tiene registro del admin todavía → primera vez, mostrar modal crear contraseña
     mostrarModalCrearPass();
     return;
   }
 
-  // ── USUARIOS NORMALES ──
   if (!pass) { mostrarErrorLogin('Ingresa tu contraseña'); return; }
   btn.textContent = 'Verificando...'; btn.disabled = true;
   const res = await llamarAppsScript('verificarCredencial', {usuario: user, pass});
@@ -1289,9 +1245,6 @@ function mostrarErrorLogin(msg) {
   setTimeout(() => errEl.style.display = 'none', 3500);
 }
 
-// ────────────────────────────────────────────────
-// MODAL: Crear contraseña admin (primera vez)
-// ────────────────────────────────────────────────
 function mostrarModalCrearPass() {
   document.getElementById('cp-nueva').value = '';
   document.getElementById('cp-confirmar').value = '';
@@ -1461,12 +1414,10 @@ async function buscarColaborador(id){
     document.getElementById('employee-info').style.display='block';
     document.getElementById('btn-submit').disabled=false;
 
-    // Mostrar jornada de hoy
     const horario=horarioHoyDeStaff(res.datos);
     const jornLabels={ninguno:'Sin horario / Día libre',medio:'🌅 Medio tiempo',completo:'☀️ Tiempo completo'};
     document.getElementById('employee-jornada').textContent=jornLabels[horario.tipo]||'Sin horario';
 
-    // Verificar si tiene horario v2 configurado y hoy es día libre
     const tieneHorarioV2 = res.datos.horario && res.datos.horario.version === 2 &&
                            res.datos.horario.dias && Object.keys(res.datos.horario.dias).length > 0;
     const esDiaLibre = tieneHorarioV2 && horario.tipo === 'ninguno';
@@ -1507,7 +1458,6 @@ async function enviarFormulario(e){
   const estado=document.getElementById('estado').value;
   const horario=horarioHoyDeStaff(staffData);
 
-  // Verificar si es día libre y necesita comentario
   const tieneHorarioV2 = staffData.horario && staffData.horario.version === 2 &&
                          staffData.horario.dias && Object.keys(staffData.horario.dias).length > 0;
   const esDiaLibre = tieneHorarioV2 && horario.tipo === 'ninguno';
@@ -1595,7 +1545,7 @@ function switchPersonalTab(t){
   });
   if(t==='buscar')setTimeout(()=>document.getElementById('buscar-personal-id').focus(),100);
   if(t==='lista')cargarListaPersonal();
-  if(t==='nuevo'){initHorarioDias();renderizarSelectorDias();}
+  if(t==='nuevo'&&!modoEdicionPersonal){initHorarioDias();renderizarSelectorDias();}
 }
 
 async function guardarPersonal(){if(modoEdicionPersonal)await actualizarPersonal();else await registrarNuevoPersonal();}
@@ -1643,33 +1593,59 @@ async function actualizarPersonal(){
 function limpiarFormPersonal(){
   ['p-id','p-nombres','p-apellidos','p-area','p-cargo','p-telefono','p-correo','p-foto','p-id-original','p-id-display'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('respuesta-personal').style.display='none';
+  _datosEdicionPersonal = null;
   initHorarioDias();renderizarSelectorDias();
 }
 
+// ════════════════════════════════════════════════════════════════════
+// CAMBIO 2: cargarFormEdicionPersonal usa variable global _datosEdicionPersonal
+// para evitar que JSON.stringify en onclick pierda datos del objeto horario
+// ════════════════════════════════════════════════════════════════════
 function cargarFormEdicionPersonal(d){
+  // Guardar en variable global para acceso seguro
+  _datosEdicionPersonal = d;
   modoEdicionPersonal=true;
-  document.getElementById('p-id-original').value=d.id;document.getElementById('p-id-display').value=d.id;
-  document.getElementById('p-nombres').value=d.nombres||'';document.getElementById('p-apellidos').value=d.apellidos||'';
-  document.getElementById('p-area').value=d.area||'';document.getElementById('p-cargo').value=d.cargo||'';
-  document.getElementById('p-telefono').value=d.telefono||'';document.getElementById('p-correo').value=d.correo||'';document.getElementById('p-foto').value=d.foto||'';
 
-  // Cargar horario por días
+  document.getElementById('p-id-original').value  = d.id;
+  document.getElementById('p-id-display').value   = d.id;
+  document.getElementById('p-nombres').value      = d.nombres    || '';
+  document.getElementById('p-apellidos').value    = d.apellidos  || '';
+  document.getElementById('p-area').value         = d.area       || '';
+  document.getElementById('p-cargo').value        = d.cargo      || '';
+  document.getElementById('p-telefono').value     = d.telefono   || '';
+  document.getElementById('p-correo').value       = d.correo     || '';
+  document.getElementById('p-foto').value         = d.foto       || '';
+
+  // ── Cargar horario existente (CAMBIO CLAVE: siempre deserializar desde los datos originales) ──
   let horarioRaw = null;
-  try { horarioRaw = d.horario ? (typeof d.horario === 'string' ? JSON.parse(d.horario) : d.horario) : null; } catch(e) {}
+  try {
+    if (d.horario) {
+      // Si ya es objeto (viene de listarTodoElPersonal/buscarUsuarioCompleto que parsea en GS)
+      horarioRaw = (typeof d.horario === 'string') ? JSON.parse(d.horario) : d.horario;
+    }
+  } catch(e) { horarioRaw = null; }
   deserializarHorario(horarioRaw);
   renderizarSelectorDias();
 
-  document.getElementById('grupo-id-nuevo').style.display='none';document.getElementById('grupo-id-editar').style.display='block';
-  document.getElementById('form-personal-titulo').textContent='✏️ Editar: '+d.nombres+' '+d.apellidos;
-  document.getElementById('btn-guardar-personal').innerHTML='💾 Actualizar';document.getElementById('btn-cancelar-edicion-p').style.display='inline-flex';
-  switchPersonalTab('nuevo');window.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('grupo-id-nuevo').style.display   = 'none';
+  document.getElementById('grupo-id-editar').style.display  = 'block';
+  document.getElementById('form-personal-titulo').textContent = '✏️ Editar: ' + d.nombres + ' ' + d.apellidos;
+  document.getElementById('btn-guardar-personal').innerHTML  = '💾 Actualizar';
+  document.getElementById('btn-cancelar-edicion-p').style.display = 'inline-flex';
+
+  switchPersonalTab('nuevo');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function cancelarEdicionPersonal(){
-  modoEdicionPersonal=false;limpiarFormPersonal();
-  document.getElementById('grupo-id-nuevo').style.display='block';document.getElementById('grupo-id-editar').style.display='none';
-  document.getElementById('form-personal-titulo').textContent='➕ Registrar Nuevo Colaborador';
-  document.getElementById('btn-guardar-personal').innerHTML='💾 Guardar';document.getElementById('btn-cancelar-edicion-p').style.display='none';
+  modoEdicionPersonal=false;
+  _datosEdicionPersonal=null;
+  limpiarFormPersonal();
+  document.getElementById('grupo-id-nuevo').style.display   = 'block';
+  document.getElementById('grupo-id-editar').style.display  = 'none';
+  document.getElementById('form-personal-titulo').textContent = '➕ Registrar Nuevo Colaborador';
+  document.getElementById('btn-guardar-personal').innerHTML  = '💾 Guardar';
+  document.getElementById('btn-cancelar-edicion-p').style.display = 'none';
 }
 
 async function buscarPersonalAdmin(){
@@ -1678,7 +1654,6 @@ async function buscarPersonalAdmin(){
   const res=await llamarAppsScript('buscarUsuarioCompleto',{id});
   if(res?.encontrado){
     const d=res.datos;
-    // Calcular resumen de días laborales
     let diasResumen = '—';
     try {
       const h = d.horario ? (typeof d.horario === 'string' ? JSON.parse(d.horario) : d.horario) : null;
@@ -1689,11 +1664,14 @@ async function buscarPersonalAdmin(){
         diasResumen = 'Lun–Vie (' + (h.tipo === 'medio' ? 'Medio' : 'Completo') + ')';
       }
     } catch(e) {}
+
+    // ── Guardar en variable global y usar índice en lugar de JSON.stringify inline ──
+    _datosEdicionPersonal = d;
     wrap.innerHTML=`<div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:var(--radius-sm);padding:15px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
         <h4 style="color:var(--primary);font-size:14px;">👤 ${d.nombres} ${d.apellidos}</h4>
         <div style="display:flex;gap:7px;">
-          <button class="btn btn-secondary btn-sm" onclick='cargarFormEdicionPersonal(${JSON.stringify(d)})'>✏️ Editar</button>
+          <button class="btn btn-secondary btn-sm" onclick="cargarFormEdicionPersonal(_datosEdicionPersonal)">✏️ Editar</button>
           <button class="btn btn-danger btn-sm" onclick="abrirModalEliminar('${d.id}','${d.nombres} ${d.apellidos}')">🗑️ Eliminar</button>
         </div>
       </div>
@@ -1770,18 +1748,19 @@ function renderizarTablaPersonal(data){
   tbody.innerHTML=data.map((p,i)=>{
     const activo=p.activo!==false&&p.activo!=='false'&&p.activo!==0;
     const nombre=(p.nombres||'')+' '+(p.apellidos||'');
-
-    // Resumen de días laborales
     let diasResumen='—';
     try{
       const h=p.horario?(typeof p.horario==='string'?JSON.parse(p.horario):p.horario):null;
       if(h?.version===2&&h.dias){
-        const activos=DIAS.filter(d=>h.dias[d.key]?.activo);
-        diasResumen=activos.length?activos.map(d=>d.abbr).join(' '):'Ninguno';
+        const activosDias=DIAS.filter(d=>h.dias[d.key]?.activo);
+        diasResumen=activosDias.length?activosDias.map(d=>d.abbr).join(' '):'Ninguno';
       }else if(h?.tipo&&h.tipo!=='ninguno'){
         diasResumen='L–V ('+(h.tipo==='medio'?'½':'☀️')+')';
       }
     }catch(e){}
+
+    // ── Guardar índice para edición segura ──
+    const dataIdx = listaPersonalData.indexOf(p);
 
     return `<tr style="${activo?'':'opacity:0.55;'}">
       <td style="color:var(--text-muted);font-size:12px;">${i+1}</td>
@@ -1793,7 +1772,7 @@ function renderizarTablaPersonal(data){
       <td><span class="badge ${activo?'badge-green':'badge-red'}">${activo?'✅ Activo':'🔴 Inactivo'}</span></td>
       <td>
         <div style="display:flex;gap:5px;flex-wrap:wrap;">
-          <button class="btn btn-secondary btn-sm" onclick='cargarFormEdicionPersonal(${JSON.stringify(p)})' title="Editar">✏️</button>
+          <button class="btn btn-secondary btn-sm" onclick="cargarFormEdicionPersonal(listaPersonalData[${dataIdx}])" title="Editar">✏️</button>
           <button class="btn btn-sm ${activo?'btn-ghost':'btn-primary'}"
             onclick="toggleActivoPersonal('${p.id}','${nombre.trim()}',${activo})"
             title="${activo?'Inactivar':'Reactivar'}"
@@ -2006,9 +1985,7 @@ async function cambiarMiContrasena(){
   const btn=document.getElementById('btn-cambiar-pass');
   btn.innerHTML='<span class="loading"></span> Cambiando...';btn.disabled=true;
 
-  // Si es admin: usar función especial que crea/actualiza el registro en GS
   if(SESSION.usuario===CONFIG.ADMIN_USER){
-    // Verificar contraseña actual: primero GS, luego CONFIG fallback
     let passActualOk=false;
     try{
       const chk=await llamarAppsScript('verificarCredencial',{usuario:CONFIG.ADMIN_USER,pass:actual});
@@ -2018,7 +1995,6 @@ async function cambiarMiContrasena(){
       btn.innerHTML='🔑 Cambiar Contraseña';btn.disabled=false;
       mostrarRespuestaEl('respuesta-mipass','❌ Contraseña actual incorrecta','error');return;
     }
-    // Guardar nueva contraseña del admin en GS (crea o actualiza)
     const res=await llamarAppsScript('guardarContrasenaAdmin',{passNueva:nueva});
     btn.innerHTML='🔑 Cambiar Contraseña';btn.disabled=false;
     if(res?.exito){
@@ -2029,7 +2005,6 @@ async function cambiarMiContrasena(){
     return;
   }
 
-  // Usuarios normales
   const res=await llamarAppsScript('cambiarContrasenaAdmin',{usuario:SESSION.usuario,passActual:actual,passNueva:nueva});
   btn.innerHTML='🔑 Cambiar Contraseña';btn.disabled=false;
   if(res?.exito){mostrarRespuestaEl('respuesta-mipass','✅ '+res.mensaje,'success');mostrarToast('✅ Contraseña actualizada','success');document.getElementById('mp-actual').value='';document.getElementById('mp-nueva').value='';document.getElementById('mp-confirmar').value='';}
@@ -2043,11 +2018,10 @@ function iniciarAplicacion(){
   construirNav();
   initHorarioDias();
   document.getElementById('formulario').addEventListener('submit',enviarFormulario);
-  document.getElementById('id').addEventListener('input',function(e){
-    clearTimeout(searchTimeout);
-    if(e.target.value.trim().length>0){ocultarInfoColaborador();document.getElementById('btn-submit').disabled=true;searchTimeout=setTimeout(()=>buscarColaborador(e.target.value.trim()),800);}
-    else{ocultarInfoColaborador();document.getElementById('btn-submit').disabled=true;}
-  });
+
+  // ── CAMBIO 1: El input de ID es readonly, solo el QR puede llenarlo ──
+  // No se añade listener de input manual; el QR llama directamente a buscarColaborador()
+
   document.getElementById('camera-toggle').addEventListener('change',e=>toggleCamera(e.target.checked));
   setInterval(actualizarReloj,1000);actualizarReloj();
   setTimeout(()=>{if(cameraEnabled&&SESSION.permisos.includes('asistencia'))cargarCamaras();},800);
