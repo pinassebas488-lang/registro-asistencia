@@ -1855,16 +1855,27 @@ function textoPuntualidad(punct, minutos) {
 //               punctEntrada, punctSalida, minutosEntrada, minutosSalida, comentario }
 // ══════════════════════════════════════════════════════════════════
 function agruparPorDia(registros) {
-  // Agrupar por fecha (dd/MM/yyyy)
+  // Agrupar por fecha usando slotHorario para asignar cada registro a su columna correcta
   const porFecha = {};
   registros.forEach(r => {
     const fecha = extraerFecha(r.fechaHora);
-    if (!porFecha[fecha]) porFecha[fecha] = { ingresos: [], salidas: [] };
-    if (r.estado === 'INGRESO') porFecha[fecha].ingresos.push(r);
-    else                        porFecha[fecha].salidas.push(r);
+    if (!porFecha[fecha]) porFecha[fecha] = { entrada1:null, salida1:null, entrada2:null, salida2:null };
+    const slot = r.slotHorario; // 'entrada1' | 'salida1' | 'entrada2' | 'salida2'
+    if (slot && porFecha[fecha].hasOwnProperty(slot) && porFecha[fecha][slot] === null) {
+      porFecha[fecha][slot] = r;
+    } else {
+      // Fallback si no hay slot o ya esta ocupado
+      if (r.estado === 'INGRESO') {
+        if (!porFecha[fecha].entrada1) porFecha[fecha].entrada1 = r;
+        else if (!porFecha[fecha].entrada2) porFecha[fecha].entrada2 = r;
+      } else {
+        if (!porFecha[fecha].salida1) porFecha[fecha].salida1 = r;
+        else if (!porFecha[fecha].salida2) porFecha[fecha].salida2 = r;
+      }
+    }
   });
 
-  // Ordenar fechas cronológicamente (dd/MM/yyyy → Date)
+  // Ordenar fechas cronologicamente
   const fechasOrdenadas = Object.keys(porFecha).sort((a, b) => {
     const pa = a.split('/'), pb = b.split('/');
     return new Date(pa[2], pa[1]-1, pa[0]) - new Date(pb[2], pb[1]-1, pb[0]);
@@ -1872,15 +1883,8 @@ function agruparPorDia(registros) {
 
   const filas = [];
   fechasOrdenadas.forEach(fecha => {
-    const dia = porFecha[fecha];
-    // Puede haber 1 o 2 ingresos (AM y retorno almuerzo) y 1 o 2 salidas
-    const ing1 = dia.ingresos[0] || null;
-    const ing2 = dia.ingresos[1] || null;
-    const sal1 = dia.salidas[0]  || null;
-    const sal2 = dia.salidas[1]  || null;
-
-    // Tomamos el primer registro para los datos del colaborador
-    const ref = ing1 || sal1;
+    const { entrada1: ing1, salida1: sal1, entrada2: ing2, salida2: sal2 } = porFecha[fecha];
+    const ref = ing1 || sal1 || ing2 || sal2;
     if (!ref) return;
 
     filas.push({
@@ -1889,17 +1893,19 @@ function agruparPorDia(registros) {
       nombre:        ref.nombre,
       area:          ref.area,
       cargo:         ref.perfil,
-      // Entradas
+      // Entrada AM (entrada1)
       horaEntrada:   ing1 ? extraerHora(ing1.fechaHora) : '—',
-      horaEntrada2:  ing2 ? extraerHora(ing2.fechaHora) : '—',
       punctEntrada:  ing1 ? textoPuntualidad(ing1.puntualidad, ing1.minutosDiff) : '—',
-      punctEntrada2: ing2 ? textoPuntualidad(ing2.puntualidad, ing2.minutosDiff) : '—',
-      // Salidas
+      // Salida almuerzo (salida1)
       horaSalida1:   sal1 ? extraerHora(sal1.fechaHora) : '—',
-      horaSalida:    sal2 ? extraerHora(sal2.fechaHora) : '—',
       punctSalida1:  sal1 ? textoPuntualidad(sal1.puntualidad, sal1.minutosDiff) : '—',
+      // Retorno (entrada2)
+      horaEntrada2:  ing2 ? extraerHora(ing2.fechaHora) : '—',
+      punctEntrada2: ing2 ? textoPuntualidad(ing2.puntualidad, ing2.minutosDiff) : '—',
+      // Salida final (salida2)
+      horaSalida:    sal2 ? extraerHora(sal2.fechaHora) : '—',
       punctSalida:   sal2 ? textoPuntualidad(sal2.puntualidad, sal2.minutosDiff) : '—',
-      comentario:    (ing1||sal1)?.comentario || ''
+      comentario:    (ing1||sal1||ing2||sal2)?.comentario || ''
     });
   });
   return filas;
