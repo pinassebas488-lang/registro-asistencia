@@ -1800,25 +1800,40 @@ function renderizarTablaReporte(registros){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// HELPER: extrae solo la hora "HH:MM" de un string "dd/MM/yyyy HH:mm:ss"
+// HELPER: parsea cualquier formato de fecha a objeto Date
+// Soporta: "dd/MM/yyyy HH:mm:ss", "Fri Mar 13 2026 08:05:32 GMT...", ISO, etc.
+// ══════════════════════════════════════════════════════════════════
+function parsearFechaHora(fechaHoraStr) {
+  if (!fechaHoraStr) return null;
+  const s = fechaHoraStr.toString().trim();
+  // Formato "dd/MM/yyyy HH:mm:ss" o "dd/MM/yyyy"
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+  if (m) {
+    const [,d,mo,y,h='0',mi='0',se='0'] = m;
+    return new Date(+y, +mo-1, +d, +h, +mi, +se);
+  }
+  // Otros formatos (ISO, GMT string, etc.) — confiar en Date
+  const dt = new Date(s);
+  return isNaN(dt) ? null : dt;
+}
+
+// HELPER: extrae solo la hora "HH:MM" de cualquier string de fecha/hora
 // ══════════════════════════════════════════════════════════════════
 function extraerHora(fechaHoraStr) {
-  if (!fechaHoraStr) return '—';
-  // Formato esperado: "13/03/2026 08:05:32"
-  const partes = fechaHoraStr.toString().trim().split(' ');
-  if (partes.length >= 2) {
-    const hms = partes[1].split(':');
-    return hms[0] + ':' + hms[1];
-  }
-  return '—';
+  const dt = parsearFechaHora(fechaHoraStr);
+  if (!dt) return '—';
+  return dt.getHours().toString().padStart(2,'0') + ':' + dt.getMinutes().toString().padStart(2,'0');
 }
 
 // ══════════════════════════════════════════════════════════════════
-// HELPER: extrae solo la fecha "dd/MM/yyyy" de un string
+// HELPER: extrae solo la fecha "dd/MM/yyyy" de cualquier string
 // ══════════════════════════════════════════════════════════════════
 function extraerFecha(fechaHoraStr) {
-  if (!fechaHoraStr) return '—';
-  return fechaHoraStr.toString().trim().split(' ')[0] || '—';
+  const dt = parsearFechaHora(fechaHoraStr);
+  if (!dt) return '—';
+  return dt.getDate().toString().padStart(2,'0') + '/' +
+         (dt.getMonth()+1).toString().padStart(2,'0') + '/' +
+         dt.getFullYear();
 }
 
 // ══════════════════════════════════════════════════════════════════
