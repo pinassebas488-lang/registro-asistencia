@@ -1914,6 +1914,85 @@ function agruparPorDia(registros) {
 // ══════════════════════════════════════════════════════════════════
 // EXPORTAR EXCEL — una hoja por colaborador (entrada/salida por día)
 // ══════════════════════════════════════════════════════════════════
+function estiloCelda(bold, bgHex, fontHex, fontSize, hAlign) {
+  return {
+    font:      { bold: !!bold, color: { rgb: (fontHex||'000000') }, sz: fontSize||11, name:'Calibri' },
+    fill:      bgHex ? { patternType:'solid', fgColor:{ rgb: bgHex } } : { patternType:'none' },
+    alignment: { horizontal: hAlign||'left', vertical:'center', wrapText:true },
+    border: {
+      top:    { style:'thin', color:{ rgb:'D0D7DE' } },
+      bottom: { style:'thin', color:{ rgb:'D0D7DE' } },
+      left:   { style:'thin', color:{ rgb:'D0D7DE' } },
+      right:  { style:'thin', color:{ rgb:'D0D7DE' } }
+    }
+  };
+}
+
+function colorPunct(txt) {
+  if (!txt || txt === '—') return null;
+  if (txt.toLowerCase().includes('puntual'))   return { bg:'D1FAE5', fg:'065F46' }; // verde
+  if (txt.toLowerCase().includes('tardanza'))  return { bg:'FEF3C7', fg:'92400E' }; // amarillo
+  if (txt.toLowerCase().includes('anticipada'))return { bg:'FEE2E2', fg:'991B1B' }; // rojo
+  if (txt.toLowerCase().includes('extra'))     return { bg:'EDE9FE', fg:'5B21B6' }; // lila
+  return null;
+}
+
+function aplicarEstilosHoja(ws, numMetaRows, numColsHeader, totalDataRows, ncols, esResumen) {
+  // ncols = número de columnas (0-indexed hasta ncols-1)
+  const R = (r,c) => XLSX.utils.encode_cell({r,c});
+
+  // Fila título (r=0)
+  if (ws[R(0,0)]) ws[R(0,0)].s = estiloCelda(true,'0F4C35','FFFFFF', esResumen?16:18,'center');
+
+  // Fila subtítulo (r=1,2)
+  [1,2].forEach(ri => {
+    if (ws[R(ri,0)]) ws[R(ri,0)].s = estiloCelda(false,'1A6348','A7F3D0',11,'center');
+  });
+
+  // Fila resumen estadístico (solo hojas individuales: r=4)
+  if (!esResumen) {
+    for (let c=0; c<4; c++) {
+      if (ws[R(4,c)]) ws[R(4,c)].s = estiloCelda(true,'1E3A5F','93C5FD',11,'center');
+    }
+  }
+
+  // Fila encabezado de columnas
+  const hdrRow = numMetaRows;
+  for (let c=0; c<ncols; c++) {
+    if (ws[R(hdrRow,c)]) ws[R(hdrRow,c)].s = estiloCelda(true,'064E3B','6EE7B7',11,'center');
+  }
+
+  // Filas de datos
+  for (let ri=0; ri<totalDataRows; ri++) {
+    const row = hdrRow + 1 + ri;
+    const isAlt = ri % 2 === 1;
+    const bgBase = isAlt ? 'F0FDF4' : 'FFFFFF';
+    for (let c=0; c<ncols; c++) {
+      const cell = ws[R(row,c)];
+      if (!cell) continue;
+      // Columnas de puntualidad: colorear según valor
+      const val = cell.v ? cell.v.toString() : '';
+      const cp = colorPunct(val);
+      if (cp) {
+        cell.s = estiloCelda(false, cp.bg, cp.fg, 10, 'center');
+      } else if (c===0) {
+        cell.s = estiloCelda(true, bgBase, '6B7280', 10, 'center');
+      } else if (c===1) {
+        cell.s = estiloCelda(false, bgBase, '374151', 11, 'center');
+      } else {
+        cell.s = estiloCelda(false, bgBase, '1F2937', 11, c<=1?'left':'center');
+      }
+    }
+  }
+
+  // Altura de filas
+  ws['!rows'] = [];
+  ws['!rows'][0] = { hpt: 30 };
+  ws['!rows'][1] = { hpt: 20 };
+  ws['!rows'][2] = { hpt: 18 };
+  ws['!rows'][hdrRow] = { hpt: 22 };
+}
+
 function exportarExcel() {
   if (!reporteData.length) return mostrarToast('⚠️ Sin datos', 'warning');
 
@@ -1931,7 +2010,7 @@ function exportarExcel() {
   });
   const usuarios = Object.values(usuariosMap);
 
-  // ── Hoja 1: Resumen general (todos, una fila por día por persona) ─
+  // ── Hoja 1: Resumen general ──────────────────────────────────────
   const COLS_RESUMEN = [
     '#','Fecha','ID','Nombre','Área','Cargo',
     'Entrada AM','Puntualidad Entrada',
@@ -1959,7 +2038,7 @@ function exportarExcel() {
 
   const wsAll = XLSX.utils.aoa_to_sheet([
     ['REPORTE DE ASISTENCIA — FINACORP'],
-    [`Período: ${fI} al ${fF}`],
+    [`Período: ${fI}  al  ${fF}`],
     [`Generado: ${new Date().toLocaleString('es-PE')}`],
     [],
     COLS_RESUMEN,
@@ -1974,12 +2053,13 @@ function exportarExcel() {
     {s:{r:1,c:0},e:{r:1,c:14}},
     {s:{r:2,c:0},e:{r:2,c:14}}
   ];
+  aplicarEstilosHoja(wsAll, 4, 15, filasGeneral.length, 15, true);
   XLSX.utils.book_append_sheet(wb, wsAll, 'Todos');
 
   // ── Una hoja por colaborador ─────────────────────────────────────
   usuarios.forEach(u => {
     const diasAgrupados = agruparPorDia(u.registros);
-    const tardanzas = u.registros.filter(r => r.puntualidad === 'tardanza').length;
+    const tardanzas   = u.registros.filter(r => r.puntualidad === 'tardanza').length;
     const anticipadas = u.registros.filter(r => r.puntualidad === 'anticipada').length;
     const diasAsistidos = diasAgrupados.length;
 
@@ -1994,20 +2074,19 @@ function exportarExcel() {
 
     const wsU = XLSX.utils.aoa_to_sheet([
       [u.nombre],
-      [`ID: ${u.id}  |  Área: ${u.area}  |  Cargo: ${u.cargo || '—'}`],
-      [`Período: ${fI} al ${fF}`],
+      [`ID: ${u.id}   |   Área: ${u.area}   |   Cargo: ${u.cargo || '—'}`],
+      [`Período: ${fI}  al  ${fF}`],
       [],
       [
-        `Días asistidos: ${diasAsistidos}`,
-        `Tardanzas: ${tardanzas}`,
-        `Sal. Anticipadas: ${anticipadas}`,
-        `Total registros: ${u.registros.length}`
+        `📅 Días asistidos: ${diasAsistidos}`,
+        `⏰ Tardanzas: ${tardanzas}`,
+        `⚠️ Sal. Anticipadas: ${anticipadas}`,
+        `📋 Total registros: ${u.registros.length}`
       ],
       [],
       COLS_USER,
       ...diasAgrupados.map((f, i) => [
-        i + 1,
-        f.fecha,
+        i + 1, f.fecha,
         f.horaEntrada,  f.punctEntrada,
         f.horaSalida1,  f.punctSalida1,
         f.horaEntrada2, f.punctEntrada2,
@@ -2018,10 +2097,10 @@ function exportarExcel() {
 
     wsU['!cols'] = [
       {wch:4},{wch:12},
-      {wch:11},{wch:20},
-      {wch:14},{wch:20},
-      {wch:11},{wch:20},
-      {wch:13},{wch:20},
+      {wch:11},{wch:22},
+      {wch:14},{wch:22},
+      {wch:11},{wch:22},
+      {wch:13},{wch:22},
       {wch:35}
     ];
     wsU['!merges'] = [
@@ -2029,12 +2108,12 @@ function exportarExcel() {
       {s:{r:1,c:0},e:{r:1,c:10}},
       {s:{r:2,c:0},e:{r:2,c:10}}
     ];
+    // numMetaRows=6 (filas 0-5 antes del header en fila 6)
+    aplicarEstilosHoja(wsU, 6, 11, diasAgrupados.length, 11, false);
 
-    // Nombre de hoja: máx 31 chars, sin caracteres inválidos de Excel
     const nombreHoja = (u.nombre || u.id)
       .replace(/[:\\\/\?\*\[\]]/g, '')
-      .substring(0, 28)
-      .trim() || u.id;
+      .substring(0, 28).trim() || u.id;
 
     XLSX.utils.book_append_sheet(wb, wsU, nombreHoja);
   });
