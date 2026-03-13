@@ -45,7 +45,6 @@
     .login-error{background:var(--error-light);color:var(--error-text);padding:10px 16px;border-radius:8px;margin-top:14px;display:none;text-align:center;font-size:13px;font-weight:600;animation:shake .4s ease;}
     @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
     .login-footer{text-align:center;margin-top:20px;color:var(--text-muted);font-size:11px;}
-    /* Modal crear contraseña admin primera vez */
     #modal-crear-pass{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99999;align-items:center;justify-content:center;}
     #modal-crear-pass.show{display:flex;}
     .crear-pass-box{background:rgba(15,23,42,.98);border:1px solid rgba(16,185,129,.35);border-radius:24px;padding:40px 32px;max-width:420px;width:90%;box-shadow:0 0 80px rgba(16,185,129,.15),0 20px 60px rgba(0,0,0,.6);animation:loginIn .3s ease-out;}
@@ -112,7 +111,6 @@
     .form-group input:disabled{opacity:.4;cursor:not-allowed;}
     .form-group select option{background:var(--surface2);}
 
-    /* ── CAMPO ID SOLO-QR ── */
     .id-qr-only{position:relative;}
     .id-qr-only input{padding-right:90px;cursor:not-allowed;opacity:.6;background:var(--surface2)!important;border-color:rgba(16,185,129,.2)!important;}
     .id-qr-badge{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#34d399;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;pointer-events:none;letter-spacing:.3px;}
@@ -402,7 +400,6 @@
             <div class="card">
               <div class="card-title">✏️ Registro</div>
               <form id="formulario">
-                <!-- ══ CAMBIO 1: ID solo lectura, solo por QR ══ -->
                 <div class="form-group">
                   <label>ID del Colaborador <span style="color:#34d399;font-size:10px;font-weight:700;">— Solo QR</span></label>
                   <div class="id-qr-only">
@@ -410,8 +407,6 @@
                     <span class="id-qr-badge">📷 QR</span>
                   </div>
                 </div>
-
-                <!-- Info colaborador -->
                 <div class="employee-info" id="employee-info">
                   <h4>👤 Colaborador encontrado</h4>
                   <p>Nombre: <span class="val" id="employee-name">-</span></p>
@@ -419,23 +414,15 @@
                   <p>Cargo: <span class="val" id="employee-position">-</span></p>
                   <p>Jornada hoy: <span class="val" id="employee-jornada">-</span></p>
                 </div>
-
-                <!-- Panel de horario de hoy -->
                 <div class="today-schedule-panel" id="today-schedule-panel">
                   <h5>🕐 Horario de hoy</h5>
                   <div class="today-slots-row" id="today-slots-row"></div>
                 </div>
-
-                <!-- Panel de horario del colaborador (slots activos) -->
                 <div class="schedule-info" id="schedule-info">
                   <h4>📍 Slot activo</h4>
                   <div class="schedule-slots" id="schedule-slots-display"></div>
                 </div>
-
-                <!-- Alerta de puntualidad -->
                 <div class="punct-alert" id="punct-alert"></div>
-
-                <!-- Panel comentario día no laboral -->
                 <div class="dia-libre-panel" id="dia-libre-panel" style="display:none;">
                   <div class="dia-libre-header">
                     <span>📅</span>
@@ -450,7 +437,6 @@
                     <div class="dia-libre-counter"><span id="comentario-chars">0</span> caracteres</div>
                   </div>
                 </div>
-
                 <div class="form-group">
                   <label>Estado</label>
                   <select id="estado" onchange="recalcularPuntualidad()">
@@ -493,8 +479,6 @@
           <button class="tab-btn" id="tab-buscar-btn" onclick="switchPersonalTab('buscar')">🔍 Buscar por ID</button>
           <button class="tab-btn" id="tab-lista-btn" onclick="switchPersonalTab('lista')">📋 Todo el Personal</button>
         </div>
-
-        <!-- TAB NUEVO -->
         <div class="tab-panel active" id="tab-nuevo">
           <div style="max-width:820px;">
             <div class="card">
@@ -511,8 +495,6 @@
                 <div class="form-group"><label>Correo Electrónico</label><input type="email" id="p-correo" placeholder="Ej: juan@empresa.com"></div>
                 <div class="form-group full"><label>URL Foto (Google Drive)</label><input type="text" id="p-foto" placeholder="https://drive.google.com/..."></div>
               </div>
-
-              <!-- CONFIGURACIÓN DE HORARIO POR DÍAS -->
               <div class="schedule-section">
                 <div class="schedule-section-title">📅 Horario Laboral por Día</div>
                 <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Selecciona los días que trabaja el colaborador y configura el horario de cada día de forma independiente.</p>
@@ -527,7 +509,6 @@
                 </div>
                 <div class="day-schedule-list" id="day-schedule-list"></div>
               </div>
-
               <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
                 <button class="btn btn-primary" id="btn-guardar-personal" onclick="guardarPersonal()">💾 Guardar</button>
                 <button class="btn btn-ghost" id="btn-cancelar-edicion-p" onclick="cancelarEdicionPersonal()" style="display:none;">✖ Cancelar</button>
@@ -537,8 +518,6 @@
             </div>
           </div>
         </div>
-
-        <!-- TAB BUSCAR -->
         <div class="tab-panel" id="tab-buscar">
           <div style="max-width:720px;">
             <div class="card">
@@ -553,8 +532,6 @@
             </div>
           </div>
         </div>
-
-        <!-- TAB LISTA COMPLETA -->
         <div class="tab-panel" id="tab-lista">
           <div class="card">
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
@@ -610,7 +587,7 @@
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
             <button class="btn btn-secondary" onclick="cargarReporte()">🔍 Ver Reporte</button>
-            <button class="btn btn-excel" id="btn-exportar-excel" onclick="exportarExcel()" disabled>📥 Exportar Excel</button>
+            <button class="btn btn-excel" id="btn-exportar-excel" onclick="exportarExcel()" disabled>📥 Exportar Excel (por colaborador)</button>
           </div>
         </div>
         <div id="reporte-resumen" style="display:none;" class="report-summary">
@@ -658,7 +635,6 @@
             <button class="tab-btn" id="cred-tab-lista-btn" onclick="switchCredTab('lista')">📋 Gestionar Accesos</button>
             <button class="tab-btn" id="cred-tab-mipass-btn" onclick="switchCredTab('mipass')">🔑 Mi Contraseña</button>
           </div>
-
           <div class="tab-panel active" id="cred-tab-crear">
             <div class="card">
               <div class="card-title" id="cred-form-titulo">➕ Crear Nuevo Acceso al Sistema</div>
@@ -694,14 +670,12 @@
               <div class="respuesta" id="respuesta-cred"></div>
             </div>
           </div>
-
           <div class="tab-panel" id="cred-tab-lista">
             <div class="card">
               <div class="card-title">👥 Accesos Registrados</div>
               <div id="cred-lista-wrap"><div class="empty-state"><span>⏳</span><p>Cargando...</p></div></div>
             </div>
           </div>
-
           <div class="tab-panel" id="cred-tab-mipass">
             <div class="card" style="max-width:460px;">
               <div class="card-title">🔑 Cambiar Mi Contraseña</div>
@@ -732,7 +706,6 @@
     </div>
   </div>
 </div>
-
 <div class="modal-overlay" id="modal-eliminar-cred">
   <div class="modal-box">
     <div style="font-size:32px;text-align:center;margin-bottom:10px;">🔐</div>
@@ -744,7 +717,6 @@
     </div>
   </div>
 </div>
-
 <div class="modal-overlay" id="modal-toggle-activo">
   <div class="modal-box">
     <div style="font-size:32px;text-align:center;margin-bottom:10px;" id="modal-toggle-emoji">⚠️</div>
@@ -802,17 +774,11 @@ let reporteData=[], idAEliminar='', usuarioCredAEliminar='', idToggleActivo='', 
 let modoEdicionPersonal=false, modoEdicionCred=false;
 let qrCodeReader=null, isScanning=false, searchTimeout=null;
 let staffData=null, selectedCameraId=null, cameraEnabled=true;
-
-// ══════════════════════════════════════════════════════════════════════
-// CAMBIO 2: Variable global para datos de edición de personal
-// Evita que JSON.stringify dentro del onclick pierda objetos complejos
-// ══════════════════════════════════════════════════════════════════════
 let _datosEdicionPersonal = null;
 
 // ════════════════════════════════════════════════════════════════════════
 // SISTEMA DE HORARIOS POR DÍA
 // ════════════════════════════════════════════════════════════════════════
-
 const DIAS = [
   { key:'lunes',     abbr:'Lun', num:'Lu' },
   { key:'martes',    abbr:'Mar', num:'Ma' },
@@ -841,7 +807,6 @@ function renderizarSelectorDias() {
   const selector = document.getElementById('days-selector');
   const lista = document.getElementById('day-schedule-list');
   if (!selector || !lista) return;
-
   selector.innerHTML = DIAS.map(d => `
     <div class="day-toggle">
       <input type="checkbox" id="day-chk-${d.key}" ${horarioDias[d.key]?.activo ? 'checked' : ''}
@@ -851,7 +816,6 @@ function renderizarSelectorDias() {
         <span class="day-num">${d.num}</span>
       </label>
     </div>`).join('');
-
   lista.innerHTML = DIAS.map(d => renderDayItem(d)).join('');
 }
 
@@ -862,7 +826,6 @@ function renderDayItem(d) {
   const badgeText  = tipo === 'completo' ? '☀️ Completo' : tipo === 'medio' ? '🌅 Medio' : '🚫 No trabaja';
   const dotClass   = dia.activo ? 'active' : '';
   const timeSummary = dia.activo && tipo !== 'libre' ? resumenHorarioDia(dia) : '';
-
   return `<div class="day-schedule-item ${!dia.activo ? 'day-off' : ''}" id="day-item-${d.key}">
     <div class="day-schedule-header" onclick="toggleDayAccordion('${d.key}')">
       <div class="day-schedule-label">
@@ -1049,7 +1012,6 @@ function horarioHoyDeStaff(staff) {
 // ════════════════════════════════════════════════════════════
 // SISTEMA DE PUNTUALIDAD
 // ════════════════════════════════════════════════════════════
-
 function horaAMinutos(hhmm) {
   if (!hhmm) return null;
   const partes = hhmm.split(':');
@@ -1109,13 +1071,11 @@ function mostrarHorarioColaborador(horario) {
   const slotsDiv = document.getElementById('schedule-slots-display');
   const todayPanel = document.getElementById('today-schedule-panel');
   const todayRow   = document.getElementById('today-slots-row');
-
   if (!horario || horario.tipo === 'ninguno') {
     panel.style.display = 'none';
     todayPanel.style.display = 'none';
     return;
   }
-
   const slots = [];
   if (horario.tipo === 'medio') {
     if (horario.entrada1) slots.push({ label:'Entrada', hora:horario.entrada1, key:'entrada1' });
@@ -1126,18 +1086,14 @@ function mostrarHorarioColaborador(horario) {
     if (horario.entrada2) slots.push({ label:'Retorno',     hora:horario.entrada2, key:'entrada2' });
     if (horario.salida2)  slots.push({ label:'Salida Final',hora:horario.salida2,  key:'salida2' });
   }
-
   if (!slots.length) { panel.style.display='none'; todayPanel.style.display='none'; return; }
-
   todayPanel.style.display = 'block';
   const estadoActual = document.getElementById('estado').value;
   const slotActivo   = detectarSlotActivo(horario, estadoActual);
-
   todayRow.innerHTML = slots.map(s => `
     <div class="today-slot-pill ${s.key === slotActivo ? 'active-pill' : ''}">
       ${s.label}: <b>${s.hora}</b>
     </div>`).join('');
-
   const slotInfo = slots.find(s => s.key === slotActivo);
   if (slotInfo) {
     panel.style.display = 'block';
@@ -1214,7 +1170,6 @@ async function verificarLogin() {
   const pass   = document.getElementById('login-pass').value.trim();
   const btn    = document.getElementById('login-btn');
   if (!user) { mostrarErrorLogin('Ingresa tu usuario'); return; }
-
   if (user === CONFIG.ADMIN_USER) {
     btn.textContent = 'Verificando...'; btn.disabled = true;
     try {
@@ -1229,7 +1184,6 @@ async function verificarLogin() {
     mostrarModalCrearPass();
     return;
   }
-
   if (!pass) { mostrarErrorLogin('Ingresa tu contraseña'); return; }
   btn.textContent = 'Verificando...'; btn.disabled = true;
   const res = await llamarAppsScript('verificarCredencial', {usuario: user, pass});
@@ -1413,15 +1367,12 @@ async function buscarColaborador(id){
     document.getElementById('employee-position').textContent=res.datos.cargo||'-';
     document.getElementById('employee-info').style.display='block';
     document.getElementById('btn-submit').disabled=false;
-
     const horario=horarioHoyDeStaff(res.datos);
     const jornLabels={ninguno:'Sin horario / Día libre',medio:'🌅 Medio tiempo',completo:'☀️ Tiempo completo'};
     document.getElementById('employee-jornada').textContent=jornLabels[horario.tipo]||'Sin horario';
-
     const tieneHorarioV2 = res.datos.horario && res.datos.horario.version === 2 &&
                            res.datos.horario.dias && Object.keys(res.datos.horario.dias).length > 0;
     const esDiaLibre = tieneHorarioV2 && horario.tipo === 'ninguno';
-
     if (esDiaLibre) {
       const diasNombres={lunes:'Lunes',martes:'Martes',miercoles:'Miércoles',jueves:'Jueves',viernes:'Viernes',sabado:'Sábado',domingo:'Domingo'};
       const diaHoy = diasNombres[diaHoyKey()] || diaHoyKey();
@@ -1430,7 +1381,6 @@ async function buscarColaborador(id){
       mostrarHorarioColaborador(horario);
       return;
     }
-
     mostrarPanelDiaLibre(false);
     mostrarHorarioColaborador(horario);
     recalcularPuntualidad();
@@ -1457,7 +1407,6 @@ async function enviarFormulario(e){
   e.preventDefault();if(!staffData)return mostrarRespuesta('ID no válido','error');
   const estado=document.getElementById('estado').value;
   const horario=horarioHoyDeStaff(staffData);
-
   const tieneHorarioV2 = staffData.horario && staffData.horario.version === 2 &&
                          staffData.horario.dias && Object.keys(staffData.horario.dias).length > 0;
   const esDiaLibre = tieneHorarioV2 && horario.tipo === 'ninguno';
@@ -1470,7 +1419,6 @@ async function enviarFormulario(e){
     }
   }
   const evalPunct=evaluarPuntualidad(horario,estado);
-
   const btn=document.getElementById('btn-submit');const orig=btn.innerHTML;
   btn.innerHTML='<span class="loading"></span> Registrando...';btn.disabled=true;
   const res=await llamarAppsScript('registrarAsistencia',{
@@ -1597,15 +1545,9 @@ function limpiarFormPersonal(){
   initHorarioDias();renderizarSelectorDias();
 }
 
-// ════════════════════════════════════════════════════════════════════
-// CAMBIO 2: cargarFormEdicionPersonal usa variable global _datosEdicionPersonal
-// para evitar que JSON.stringify en onclick pierda datos del objeto horario
-// ════════════════════════════════════════════════════════════════════
 function cargarFormEdicionPersonal(d){
-  // Guardar en variable global para acceso seguro
   _datosEdicionPersonal = d;
   modoEdicionPersonal=true;
-
   document.getElementById('p-id-original').value  = d.id;
   document.getElementById('p-id-display').value   = d.id;
   document.getElementById('p-nombres').value      = d.nombres    || '';
@@ -1615,24 +1557,19 @@ function cargarFormEdicionPersonal(d){
   document.getElementById('p-telefono').value     = d.telefono   || '';
   document.getElementById('p-correo').value       = d.correo     || '';
   document.getElementById('p-foto').value         = d.foto       || '';
-
-  // ── Cargar horario existente (CAMBIO CLAVE: siempre deserializar desde los datos originales) ──
   let horarioRaw = null;
   try {
     if (d.horario) {
-      // Si ya es objeto (viene de listarTodoElPersonal/buscarUsuarioCompleto que parsea en GS)
       horarioRaw = (typeof d.horario === 'string') ? JSON.parse(d.horario) : d.horario;
     }
   } catch(e) { horarioRaw = null; }
   deserializarHorario(horarioRaw);
   renderizarSelectorDias();
-
   document.getElementById('grupo-id-nuevo').style.display   = 'none';
   document.getElementById('grupo-id-editar').style.display  = 'block';
   document.getElementById('form-personal-titulo').textContent = '✏️ Editar: ' + d.nombres + ' ' + d.apellidos;
   document.getElementById('btn-guardar-personal').innerHTML  = '💾 Actualizar';
   document.getElementById('btn-cancelar-edicion-p').style.display = 'inline-flex';
-
   switchPersonalTab('nuevo');
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -1664,8 +1601,6 @@ async function buscarPersonalAdmin(){
         diasResumen = 'Lun–Vie (' + (h.tipo === 'medio' ? 'Medio' : 'Completo') + ')';
       }
     } catch(e) {}
-
-    // ── Guardar en variable global y usar índice en lugar de JSON.stringify inline ──
     _datosEdicionPersonal = d;
     wrap.innerHTML=`<div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:var(--radius-sm);padding:15px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
@@ -1744,7 +1679,6 @@ function renderizarTablaPersonal(data){
   const inactivos=data.length-activos;
   contador.innerHTML=`<span style="color:var(--text-muted);">Mostrando <b style="color:var(--text);">${data.length}</b> — <span style="color:#34d399;">✅ ${activos} activos</span> · <span style="color:#f87171;">🔴 ${inactivos} inactivos</span></span>`;
   if(!data.length){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:28px;"><div class="empty-state"><span>🔍</span><p>Sin resultados</p></div></td></tr>';return;}
-
   tbody.innerHTML=data.map((p,i)=>{
     const activo=p.activo!==false&&p.activo!=='false'&&p.activo!==0;
     const nombre=(p.nombres||'')+' '+(p.apellidos||'');
@@ -1758,10 +1692,7 @@ function renderizarTablaPersonal(data){
         diasResumen='L–V ('+(h.tipo==='medio'?'½':'☀️')+')';
       }
     }catch(e){}
-
-    // ── Guardar índice para edición segura ──
     const dataIdx = listaPersonalData.indexOf(p);
-
     return `<tr style="${activo?'':'opacity:0.55;'}">
       <td style="color:var(--text-muted);font-size:12px;">${i+1}</td>
       <td style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;">${p.id}</td>
@@ -1868,39 +1799,227 @@ function renderizarTablaReporte(registros){
   card.style.display='block';mostrarToast(`✅ ${registros.length} registros`,'success');
 }
 
-function exportarExcel(){
-  if(!reporteData.length)return mostrarToast('⚠️ Sin datos','warning');
-  const ing=reporteData.filter(r=>r.estado==='INGRESO').length;
-  const sal=reporteData.filter(r=>r.estado==='SALIDA').length;
-  const pers=new Set(reporteData.map(r=>r.id)).size;
-  const tard=reporteData.filter(r=>r.puntualidad==='tardanza').length;
-  const anti=reporteData.filter(r=>r.puntualidad==='anticipada').length;
-  const punt=reporteData.filter(r=>r.puntualidad==='puntual').length;
-  const fI=document.getElementById('rep-fecha-inicio').value;const fF=document.getElementById('rep-fecha-fin').value;
-  const wb=XLSX.utils.book_new();
-  const ws=XLSX.utils.aoa_to_sheet([
+// ══════════════════════════════════════════════════════════════════
+// HELPER: extrae solo la hora "HH:MM" de un string "dd/MM/yyyy HH:mm:ss"
+// ══════════════════════════════════════════════════════════════════
+function extraerHora(fechaHoraStr) {
+  if (!fechaHoraStr) return '—';
+  // Formato esperado: "13/03/2026 08:05:32"
+  const partes = fechaHoraStr.toString().trim().split(' ');
+  if (partes.length >= 2) {
+    const hms = partes[1].split(':');
+    return hms[0] + ':' + hms[1];
+  }
+  return '—';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// HELPER: extrae solo la fecha "dd/MM/yyyy" de un string
+// ══════════════════════════════════════════════════════════════════
+function extraerFecha(fechaHoraStr) {
+  if (!fechaHoraStr) return '—';
+  return fechaHoraStr.toString().trim().split(' ')[0] || '—';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// HELPER: texto de puntualidad legible
+// ══════════════════════════════════════════════════════════════════
+function textoPuntualidad(punct, minutos) {
+  if (!punct || punct === 'sin_horario') return '—';
+  if (punct === 'puntual')        return 'Puntual';
+  if (punct === 'tardanza')       return `Tardanza +${minutos || 0} min`;
+  if (punct === 'anticipada')     return `Anticipada -${minutos || 0} min`;
+  if (punct === 'extraordinario') return 'Día Extra';
+  return '—';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// HELPER: agrupa registros de un usuario en filas por día
+// Cada fila = { fecha, id, nombre, area, cargo,
+//               horaEntrada, horaEntrada2, horaSalida1, horaSalida,
+//               punctEntrada, punctSalida, minutosEntrada, minutosSalida, comentario }
+// ══════════════════════════════════════════════════════════════════
+function agruparPorDia(registros) {
+  // Agrupar por fecha (dd/MM/yyyy)
+  const porFecha = {};
+  registros.forEach(r => {
+    const fecha = extraerFecha(r.fechaHora);
+    if (!porFecha[fecha]) porFecha[fecha] = { ingresos: [], salidas: [] };
+    if (r.estado === 'INGRESO') porFecha[fecha].ingresos.push(r);
+    else                        porFecha[fecha].salidas.push(r);
+  });
+
+  // Ordenar fechas cronológicamente (dd/MM/yyyy → Date)
+  const fechasOrdenadas = Object.keys(porFecha).sort((a, b) => {
+    const pa = a.split('/'), pb = b.split('/');
+    return new Date(pa[2], pa[1]-1, pa[0]) - new Date(pb[2], pb[1]-1, pb[0]);
+  });
+
+  const filas = [];
+  fechasOrdenadas.forEach(fecha => {
+    const dia = porFecha[fecha];
+    // Puede haber 1 o 2 ingresos (AM y retorno almuerzo) y 1 o 2 salidas
+    const ing1 = dia.ingresos[0] || null;
+    const ing2 = dia.ingresos[1] || null;
+    const sal1 = dia.salidas[0]  || null;
+    const sal2 = dia.salidas[1]  || null;
+
+    // Tomamos el primer registro para los datos del colaborador
+    const ref = ing1 || sal1;
+    if (!ref) return;
+
+    filas.push({
+      fecha,
+      id:            ref.id,
+      nombre:        ref.nombre,
+      area:          ref.area,
+      cargo:         ref.perfil,
+      // Entradas
+      horaEntrada:   ing1 ? extraerHora(ing1.fechaHora) : '—',
+      horaEntrada2:  ing2 ? extraerHora(ing2.fechaHora) : '—',
+      punctEntrada:  ing1 ? textoPuntualidad(ing1.puntualidad, ing1.minutosDiff) : '—',
+      punctEntrada2: ing2 ? textoPuntualidad(ing2.puntualidad, ing2.minutosDiff) : '—',
+      // Salidas
+      horaSalida1:   sal1 ? extraerHora(sal1.fechaHora) : '—',
+      horaSalida:    sal2 ? extraerHora(sal2.fechaHora) : '—',
+      punctSalida1:  sal1 ? textoPuntualidad(sal1.puntualidad, sal1.minutosDiff) : '—',
+      punctSalida:   sal2 ? textoPuntualidad(sal2.puntualidad, sal2.minutosDiff) : '—',
+      comentario:    (ing1||sal1)?.comentario || ''
+    });
+  });
+  return filas;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// EXPORTAR EXCEL — una hoja por colaborador (entrada/salida por día)
+// ══════════════════════════════════════════════════════════════════
+function exportarExcel() {
+  if (!reporteData.length) return mostrarToast('⚠️ Sin datos', 'warning');
+
+  const fI = document.getElementById('rep-fecha-inicio').value;
+  const fF = document.getElementById('rep-fecha-fin').value;
+
+  const wb = XLSX.utils.book_new();
+
+  // ── Agrupar todos los registros por colaborador ──────────────────
+  const usuariosMap = {};
+  reporteData.forEach(r => {
+    if (!usuariosMap[r.id])
+      usuariosMap[r.id] = { id:r.id, nombre:r.nombre, area:r.area, cargo:r.perfil, registros:[] };
+    usuariosMap[r.id].registros.push(r);
+  });
+  const usuarios = Object.values(usuariosMap);
+
+  // ── Hoja 1: Resumen general (todos, una fila por día por persona) ─
+  const COLS_RESUMEN = [
+    '#','Fecha','ID','Nombre','Área','Cargo',
+    'Entrada AM','Puntualidad Entrada',
+    'Salida Almuerzo','Puntualidad Sal. Alm.',
+    'Retorno','Puntualidad Retorno',
+    'Salida Final','Puntualidad Sal. Final',
+    'Comentario'
+  ];
+
+  const filasGeneral = [];
+  let numGen = 1;
+  usuarios.forEach(u => {
+    agruparPorDia(u.registros).forEach(f => {
+      filasGeneral.push([
+        numGen++,
+        f.fecha, f.id, f.nombre, f.area, f.cargo,
+        f.horaEntrada,  f.punctEntrada,
+        f.horaSalida1,  f.punctSalida1,
+        f.horaEntrada2, f.punctEntrada2,
+        f.horaSalida,   f.punctSalida,
+        f.comentario
+      ]);
+    });
+  });
+
+  const wsAll = XLSX.utils.aoa_to_sheet([
     ['REPORTE DE ASISTENCIA — FINACORP'],
     [`Período: ${fI} al ${fF}`],
-    [`Generado: ${new Date().toLocaleString('es-PE')}`],[],
-    ['#','Fecha/Hora','ID','Nombre Completo','Área','Cargo','Estado','Puntualidad','Minutos Diff','Slot Horario','Comentario (Día Extra)'],
-    ...reporteData.map((r,i)=>[i+1,r.fechaHora,r.id,r.nombre,r.area,r.perfil,r.estado,
-      r.puntualidad==='tardanza'?'TARDANZA':r.puntualidad==='anticipada'?'SALIDA ANTICIPADA':r.puntualidad==='puntual'?'PUNTUAL':r.puntualidad==='extraordinario'?'DÍA EXTRA':'—',
-      r.puntualidad==='tardanza'?`+${r.minutosDiff||0}`:r.puntualidad==='anticipada'?`-${r.minutosDiff||0}`:'',
-      r.slotHorario||'',r.comentario||''])
+    [`Generado: ${new Date().toLocaleString('es-PE')}`],
+    [],
+    COLS_RESUMEN,
+    ...filasGeneral
   ]);
-  ws['!cols']=[{wch:5},{wch:20},{wch:12},{wch:30},{wch:22},{wch:20},{wch:10},{wch:18},{wch:12},{wch:18},{wch:40}];
-  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:10}},{s:{r:1,c:0},e:{r:1,c:10}},{s:{r:2,c:0},e:{r:2,c:10}}];
-  XLSX.utils.book_append_sheet(wb,ws,'Asistencia');
-  const wsR=XLSX.utils.aoa_to_sheet([
-    ['RESUMEN'],[],['Indicador','Valor'],['Período',`${fI} al ${fF}`],
-    ['Total registros',reporteData.length],['Ingresos',ing],['Salidas',sal],['Personas únicas',pers],
-    ['',''],['PUNTUALIDAD',''],['Puntuales',punt],['Tardanzas',tard],['Salidas anticipadas',anti],
-    ['',''],['Generado',new Date().toLocaleString('es-PE')]
-  ]);
-  wsR['!cols']=[{wch:22},{wch:30}];
-  XLSX.utils.book_append_sheet(wb,wsR,'Resumen');
-  XLSX.writeFile(wb,`reporte_asistencia_${new Date().toISOString().split('T')[0]}.xlsx`);
-  mostrarToast('📥 Excel descargado','success');
+  wsAll['!cols'] = [
+    {wch:5},{wch:12},{wch:12},{wch:28},{wch:20},{wch:18},
+    {wch:11},{wch:20},{wch:14},{wch:20},{wch:11},{wch:20},{wch:13},{wch:20},{wch:35}
+  ];
+  wsAll['!merges'] = [
+    {s:{r:0,c:0},e:{r:0,c:14}},
+    {s:{r:1,c:0},e:{r:1,c:14}},
+    {s:{r:2,c:0},e:{r:2,c:14}}
+  ];
+  XLSX.utils.book_append_sheet(wb, wsAll, 'Todos');
+
+  // ── Una hoja por colaborador ─────────────────────────────────────
+  usuarios.forEach(u => {
+    const diasAgrupados = agruparPorDia(u.registros);
+    const tardanzas = u.registros.filter(r => r.puntualidad === 'tardanza').length;
+    const anticipadas = u.registros.filter(r => r.puntualidad === 'anticipada').length;
+    const diasAsistidos = diasAgrupados.length;
+
+    const COLS_USER = [
+      '#','Fecha',
+      'Entrada AM','Puntualidad Entrada',
+      'Salida Almuerzo','Puntualidad Sal. Alm.',
+      'Retorno','Puntualidad Retorno',
+      'Salida Final','Puntualidad Sal. Final',
+      'Comentario'
+    ];
+
+    const wsU = XLSX.utils.aoa_to_sheet([
+      [u.nombre],
+      [`ID: ${u.id}  |  Área: ${u.area}  |  Cargo: ${u.cargo || '—'}`],
+      [`Período: ${fI} al ${fF}`],
+      [],
+      [
+        `Días asistidos: ${diasAsistidos}`,
+        `Tardanzas: ${tardanzas}`,
+        `Sal. Anticipadas: ${anticipadas}`,
+        `Total registros: ${u.registros.length}`
+      ],
+      [],
+      COLS_USER,
+      ...diasAgrupados.map((f, i) => [
+        i + 1,
+        f.fecha,
+        f.horaEntrada,  f.punctEntrada,
+        f.horaSalida1,  f.punctSalida1,
+        f.horaEntrada2, f.punctEntrada2,
+        f.horaSalida,   f.punctSalida,
+        f.comentario
+      ])
+    ]);
+
+    wsU['!cols'] = [
+      {wch:4},{wch:12},
+      {wch:11},{wch:20},
+      {wch:14},{wch:20},
+      {wch:11},{wch:20},
+      {wch:13},{wch:20},
+      {wch:35}
+    ];
+    wsU['!merges'] = [
+      {s:{r:0,c:0},e:{r:0,c:10}},
+      {s:{r:1,c:0},e:{r:1,c:10}},
+      {s:{r:2,c:0},e:{r:2,c:10}}
+    ];
+
+    // Nombre de hoja: máx 31 chars, sin caracteres inválidos de Excel
+    const nombreHoja = (u.nombre || u.id)
+      .replace(/[:\\\/\?\*\[\]]/g, '')
+      .substring(0, 28)
+      .trim() || u.id;
+
+    XLSX.utils.book_append_sheet(wb, wsU, nombreHoja);
+  });
+
+  XLSX.writeFile(wb, `reporte_asistencia_${new Date().toISOString().split('T')[0]}.xlsx`);
+  mostrarToast(`📥 Excel descargado — ${usuarios.length} colaboradores`, 'success');
 }
 
 // ════════════════════════════════
@@ -1984,7 +2103,6 @@ async function cambiarMiContrasena(){
   if(nueva!==confirmar){mostrarRespuestaEl('respuesta-mipass','⚠️ Las contraseñas no coinciden','error');return;}
   const btn=document.getElementById('btn-cambiar-pass');
   btn.innerHTML='<span class="loading"></span> Cambiando...';btn.disabled=true;
-
   if(SESSION.usuario===CONFIG.ADMIN_USER){
     let passActualOk=false;
     try{
@@ -2004,7 +2122,6 @@ async function cambiarMiContrasena(){
     }else{mostrarRespuestaEl('respuesta-mipass','❌ '+(res?.mensaje||'Error'),'error');}
     return;
   }
-
   const res=await llamarAppsScript('cambiarContrasenaAdmin',{usuario:SESSION.usuario,passActual:actual,passNueva:nueva});
   btn.innerHTML='🔑 Cambiar Contraseña';btn.disabled=false;
   if(res?.exito){mostrarRespuestaEl('respuesta-mipass','✅ '+res.mensaje,'success');mostrarToast('✅ Contraseña actualizada','success');document.getElementById('mp-actual').value='';document.getElementById('mp-nueva').value='';document.getElementById('mp-confirmar').value='';}
@@ -2018,10 +2135,6 @@ function iniciarAplicacion(){
   construirNav();
   initHorarioDias();
   document.getElementById('formulario').addEventListener('submit',enviarFormulario);
-
-  // ── CAMBIO 1: El input de ID es readonly, solo el QR puede llenarlo ──
-  // No se añade listener de input manual; el QR llama directamente a buscarColaborador()
-
   document.getElementById('camera-toggle').addEventListener('change',e=>toggleCamera(e.target.checked));
   setInterval(actualizarReloj,1000);actualizarReloj();
   setTimeout(()=>{if(cameraEnabled&&SESSION.permisos.includes('asistencia'))cargarCamaras();},800);
@@ -2041,7 +2154,6 @@ window.onbeforeunload=function(){detenerEscaneo();};
 // ════════════════════════════════════════════════════════════
 // DÍA LIBRE - PANEL DE COMENTARIO
 // ════════════════════════════════════════════════════════════
-
 function mostrarPanelDiaLibre(mostrar) {
   const panel = document.getElementById('dia-libre-panel');
   const btn   = document.getElementById('btn-submit');
