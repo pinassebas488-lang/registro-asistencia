@@ -4,9 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>FINACORP — Control de Asistencia</title>
+  <!-- Librerías existentes -->
   <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- NUEVAS librerías para PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   <style>
+    /* ... (tu CSS existente se mantiene exactamente igual) ... */
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
     :root {
       --primary:#10b981;--primary-dark:#059669;
@@ -588,6 +593,8 @@
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
             <button class="btn btn-secondary" onclick="cargarReporte()">🔍 Ver Reporte</button>
             <button class="btn btn-excel" id="btn-exportar-excel" onclick="exportarExcel()" disabled>📥 Exportar Excel (por colaborador)</button>
+            <!-- BOTÓN DE PDF AHORA ACTIVADO -->
+            <button class="btn btn-danger" id="btn-exportar-pdf" onclick="exportarPDF()" disabled style="background:#dc2626;">📄 Exportar PDF (detallado)</button>
           </div>
         </div>
         <div id="reporte-resumen" style="display:none;" class="report-summary">
@@ -761,7 +768,7 @@
 // CONFIG
 // ════════════════════════════════
 const CONFIG = {
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxxNz9FhBV3ybKs8CMow5mc1PusG2AybD6_POwWvsUR813pNC60OFS_VDzbpzGs24k/exec',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxxNz9FhBV3ybKs8CMow5mc1PusG2AybD6_POwWvsUR813pNC60OFS_VDzbpzGs24k/exec', // <--- REEMPLAZA CON TU URL
   ADMIN_USER: 'admin',
   TIEMPO_TOAST: 3500
 };
@@ -1759,7 +1766,8 @@ async function cargarReporte(){
   const res=await llamarAppsScript('obtenerReporte',{fechaIni:fI,fechaFin:fF,idUsuario:document.getElementById('rep-id-usuario').value.trim(),area:document.getElementById('rep-area').value,inclIngreso:inc,inclSalida:sal});
   if(res?.error||!res?.registros){mostrarToast('❌ Error al cargar','error');return;}
   reporteData=res.registros;renderizarTablaReporte(reporteData);
-  document.getElementById('btn-exportar-excel').disabled=reporteData.length===0;
+  document.getElementById('btn-exportar-excel').disabled = reporteData.length === 0;
+  document.getElementById('btn-exportar-pdf').disabled = reporteData.length === 0; // HABILITAR PDF
 }
 
 function renderizarTablaReporte(registros){
@@ -1800,119 +1808,182 @@ function renderizarTablaReporte(registros){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// HELPER: parsea cualquier formato de fecha a objeto Date
-// Soporta: "dd/MM/yyyy HH:mm:ss", "Fri Mar 13 2026 08:05:32 GMT...", ISO, etc.
+// EXPORTAR PDF - UN SOLO ARCHIVO CON TODOS LOS COLABORADORES
+// (NOMBRES EN NEGRITA - VERSIÓN CORREGIDA)
 // ══════════════════════════════════════════════════════════════════
-function parsearFechaHora(fechaHoraStr) {
-  if (!fechaHoraStr) return null;
-  const s = fechaHoraStr.toString().trim();
-  // Formato "dd/MM/yyyy HH:mm:ss" o "dd/MM/yyyy"
-  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
-  if (m) {
-    const [,d,mo,y,h='0',mi='0',se='0'] = m;
-    return new Date(+y, +mo-1, +d, +h, +mi, +se);
+async function exportarPDF() {
+  if (!reporteData.length) {
+    mostrarToast('⚠️ No hay datos para exportar', 'warning');
+    return;
   }
-  // Otros formatos (ISO, GMT string, etc.) — confiar en Date
-  const dt = new Date(s);
-  return isNaN(dt) ? null : dt;
-}
 
-// HELPER: extrae solo la hora "HH:MM" de cualquier string de fecha/hora
-// ══════════════════════════════════════════════════════════════════
-function extraerHora(fechaHoraStr) {
-  const dt = parsearFechaHora(fechaHoraStr);
-  if (!dt) return '—';
-  return dt.getHours().toString().padStart(2,'0') + ':' + dt.getMinutes().toString().padStart(2,'0');
-}
+  const { jsPDF } = window.jspdf;
+  const fI = document.getElementById('rep-fecha-inicio').value;
+  const fF = document.getElementById('rep-fecha-fin').value;
+  const fechaGeneracion = new Date().toLocaleString('es-PE');
 
-// ══════════════════════════════════════════════════════════════════
-// HELPER: extrae solo la fecha "dd/MM/yyyy" de cualquier string
-// ══════════════════════════════════════════════════════════════════
-function extraerFecha(fechaHoraStr) {
-  const dt = parsearFechaHora(fechaHoraStr);
-  if (!dt) return '—';
-  return dt.getDate().toString().padStart(2,'0') + '/' +
-         (dt.getMonth()+1).toString().padStart(2,'0') + '/' +
-         dt.getFullYear();
-}
+  // ── Agrupar todos los registros por colaborador ──────────────────
+  const usuariosMap = {};
+  reporteData.forEach(r => {
+    if (!usuariosMap[r.id])
+      usuariosMap[r.id] = { 
+        id: r.id, 
+        nombre: r.nombre, 
+        area: r.area, 
+        cargo: r.perfil, 
+        registros: [] 
+      };
+    usuariosMap[r.id].registros.push(r);
+  });
+  const usuarios = Object.values(usuariosMap);
 
-// ══════════════════════════════════════════════════════════════════
-// HELPER: texto de puntualidad legible
-// ══════════════════════════════════════════════════════════════════
-function textoPuntualidad(punct, minutos) {
-  if (!punct || punct === 'sin_horario') return '—';
-  if (punct === 'puntual')        return 'Puntual';
-  if (punct === 'tardanza')       return `Tardanza +${minutos || 0} min`;
-  if (punct === 'anticipada')     return `Anticipada -${minutos || 0} min`;
-  if (punct === 'extraordinario') return 'Día Extra';
-  return '—';
-}
+  // ── Crear un solo documento PDF ───────────────────────────────────
+  const doc = new jsPDF({ orientation: 'landscape' });
 
-// ══════════════════════════════════════════════════════════════════
-// HELPER: agrupa registros de un usuario en filas por día
-// Cada fila = { fecha, id, nombre, area, cargo,
-//               horaEntrada, horaEntrada2, horaSalida1, horaSalida,
-//               punctEntrada, punctSalida, minutosEntrada, minutosSalida, comentario }
-// ══════════════════════════════════════════════════════════════════
-function agruparPorDia(registros) {
-  // Agrupar por fecha usando slotHorario para asignar cada registro a su columna correcta
-  const porFecha = {};
-  registros.forEach(r => {
-    const fecha = extraerFecha(r.fechaHora);
-    if (!porFecha[fecha]) porFecha[fecha] = { entrada1:null, salida1:null, entrada2:null, salida2:null };
-    const slot = r.slotHorario; // 'entrada1' | 'salida1' | 'entrada2' | 'salida2'
-    if (slot && porFecha[fecha].hasOwnProperty(slot) && porFecha[fecha][slot] === null) {
-      porFecha[fecha][slot] = r;
-    } else {
-      // Fallback si no hay slot o ya esta ocupado
-      if (r.estado === 'INGRESO') {
-        if (!porFecha[fecha].entrada1) porFecha[fecha].entrada1 = r;
-        else if (!porFecha[fecha].entrada2) porFecha[fecha].entrada2 = r;
-      } else {
-        if (!porFecha[fecha].salida1) porFecha[fecha].salida1 = r;
-        else if (!porFecha[fecha].salida2) porFecha[fecha].salida2 = r;
-      }
+  // ── Iterar sobre cada usuario y agregar una página ───────────────
+  usuarios.forEach((usuario, index) => {
+    // Si no es el primer usuario, agregar una nueva página
+    if (index > 0) {
+      doc.addPage();
     }
-  });
 
-  // Ordenar fechas cronologicamente
-  const fechasOrdenadas = Object.keys(porFecha).sort((a, b) => {
-    const pa = a.split('/'), pb = b.split('/');
-    return new Date(pa[2], pa[1]-1, pa[0]) - new Date(pb[2], pb[1]-1, pb[0]);
-  });
+    // Agrupar registros por día para este usuario
+    const diasAgrupados = agruparPorDia(usuario.registros);
+    
+    // Calcular estadísticas para el resumen
+    const totalRegistros = usuario.registros.length;
+    const tardanzas = usuario.registros.filter(r => r.puntualidad === 'tardanza').length;
+    const anticipadas = usuario.registros.filter(r => r.puntualidad === 'anticipada').length;
+    const puntuales = usuario.registros.filter(r => r.puntualidad === 'puntual').length;
+    const extraordinarios = usuario.registros.filter(r => r.puntualidad === 'extraordinario').length;
 
-  const filas = [];
-  fechasOrdenadas.forEach(fecha => {
-    const { entrada1: ing1, salida1: sal1, entrada2: ing2, salida2: sal2 } = porFecha[fecha];
-    const ref = ing1 || sal1 || ing2 || sal2;
-    if (!ref) return;
+    // --- Título principal del reporte ---
+    doc.setFontSize(16);
+    doc.setTextColor(16, 185, 129); // Verde primary
+    doc.setFont('helvetica', 'bold'); // <-- CORREGIDO: así se pone negrita en jsPDF
+    doc.text('REPORTE DE ASISTENCIA — FINACORP', 14, 15);
+    
+    // --- NOMBRE DEL COLABORADOR EN NEGRITA (CORREGIDO) ---
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0); // Texto blanco
+    doc.setFont('helvetica', 'bold'); // <-- CORREGIDO: activar negrita
+    doc.text(`${usuario.nombre}`, 14, 25);
+    
+    // --- Información adicional (sin negrita) ---
+    doc.setFontSize(10);
+    doc.setTextColor(148, 163, 184); // text-muted
+    doc.setFont('helvetica', 'normal'); // <-- CORREGIDO: desactivar negrita
+    doc.text(`ID: ${usuario.id}   |   Área: ${usuario.area}   |   Cargo: ${usuario.cargo || '—'}`, 14, 32);
+    doc.text(`Período: ${fI} al ${fF}`, 14, 38);
+    doc.text(`Generado: ${fechaGeneracion}`, 14, 44);
 
-    filas.push({
-      fecha,
-      id:            ref.id,
-      nombre:        ref.nombre,
-      area:          ref.area,
-      cargo:         ref.perfil,
-      // Entrada AM (entrada1)
-      horaEntrada:   ing1 ? extraerHora(ing1.fechaHora) : '—',
-      punctEntrada:  ing1 ? textoPuntualidad(ing1.puntualidad, ing1.minutosDiff) : '—',
-      // Salida almuerzo (salida1)
-      horaSalida1:   sal1 ? extraerHora(sal1.fechaHora) : '—',
-      punctSalida1:  sal1 ? textoPuntualidad(sal1.puntualidad, sal1.minutosDiff) : '—',
-      // Retorno (entrada2)
-      horaEntrada2:  ing2 ? extraerHora(ing2.fechaHora) : '—',
-      punctEntrada2: ing2 ? textoPuntualidad(ing2.puntualidad, ing2.minutosDiff) : '—',
-      // Salida final (salida2)
-      horaSalida:    sal2 ? extraerHora(sal2.fechaHora) : '—',
-      punctSalida:   sal2 ? textoPuntualidad(sal2.puntualidad, sal2.minutosDiff) : '—',
-      comentario:    (ing1||sal1||ing2||sal2)?.comentario || ''
+    // --- Resumen estadístico del colaborador ---
+    doc.setFillColor(30, 41, 59); // surface
+    doc.rect(14, 48, 260, 16, 'F');
+    doc.setTextColor(241, 245, 249); // text
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Total registros: ${totalRegistros}`, 18, 58);
+    doc.setTextColor(52, 211, 153); // verde
+    doc.text(`Puntuales: ${puntuales}`, 58, 58);
+    doc.setTextColor(252, 211, 77); // amarillo
+    doc.text(`Tardanzas: ${tardanzas}`, 108, 58);
+    doc.setTextColor(248, 113, 113); // rojo
+    doc.text(`Anticipadas: ${anticipadas}`, 158, 58);
+    doc.setTextColor(196, 181, 253); // lila
+    doc.text(`Días extra: ${extraordinarios}`, 208, 58);
+
+    // --- Preparar datos para la tabla (agrupados por día) ---
+    const tableColumn = [
+      '#', 'Fecha',
+      'Entrada AM', 'Puntualidad',
+      'Salida Alm.', 'Puntualidad',
+      'Retorno', 'Puntualidad',
+      'Salida Final', 'Puntualidad',
+      'Comentario'
+    ];
+
+    const tableRows = [];
+    
+    diasAgrupados.forEach((dia, idx) => {
+      tableRows.push([
+        (idx + 1).toString(),
+        dia.fecha,
+        dia.horaEntrada,
+        dia.punctEntrada,
+        dia.horaSalida1,
+        dia.punctSalida1,
+        dia.horaEntrada2,
+        dia.punctEntrada2,
+        dia.horaSalida,
+        dia.punctSalida,
+        dia.comentario || '—'
+      ]);
+    });
+
+    // --- Generar tabla con autoTable ---
+    doc.autoTable({
+      startY: 68,
+      head: [tableColumn],
+      body: tableRows,
+      theme: 'grid',
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        lineColor: [44, 55, 74],
+        lineWidth: 0.1,
+      },
+      headStyles: {
+        fillColor: [16, 185, 129],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        halign: 'center',
+      },
+      columnStyles: {
+        0: { cellWidth: 8, halign: 'center' },
+        1: { cellWidth: 20 },
+        2: { cellWidth: 18, halign: 'center' },
+        3: { cellWidth: 22, halign: 'center' },
+        4: { cellWidth: 18, halign: 'center' },
+        5: { cellWidth: 22, halign: 'center' },
+        6: { cellWidth: 18, halign: 'center' },
+        7: { cellWidth: 22, halign: 'center' },
+        8: { cellWidth: 18, halign: 'center' },
+        9: { cellWidth: 22, halign: 'center' },
+        10: { cellWidth: 'auto' },
+      },
+      didParseCell: function (data) {
+        // Aplicar color según puntualidad (solo en columnas de puntualidad: 3, 5, 7, 9)
+        if ([3, 5, 7, 9].includes(data.column.index) && data.row.index >= 0) {
+          const puntualidad = data.cell.raw;
+          let color = [255, 255, 255]; // blanco por defecto
+          
+          if (puntualidad.includes('Tardanza')) color = [254, 243, 199];
+          else if (puntualidad.includes('Anticipada')) color = [254, 226, 226];
+          else if (puntualidad.includes('Puntual')) color = [209, 250, 229];
+          else if (puntualidad.includes('Extra')) color = [237, 233, 254];
+          
+          data.cell.styles.fillColor = color;
+          data.cell.styles.halign = 'center';
+        }
+        
+        // Centrar columnas de números y fechas
+        if ([0, 1, 2, 4, 6, 8].includes(data.column.index)) {
+          data.cell.styles.halign = 'center';
+        }
+      },
+      margin: { left: 14, right: 14 },
     });
   });
-  return filas;
+
+  // --- Guardar el PDF único con todas las páginas ---
+  const nombreArchivo = `reporte_asistencia_completo_${new Date().toISOString().split('T')[0]}.pdf`;
+  doc.save(nombreArchivo);
+  mostrarToast(`📄 PDF generado con ${usuarios.length} colaboradores`, 'success');
 }
 
 // ══════════════════════════════════════════════════════════════════
-// EXPORTAR EXCEL — una hoja por colaborador (entrada/salida por día)
+// EXPORTAR EXCEL — (sin cambios, igual que antes)
 // ══════════════════════════════════════════════════════════════════
 function estiloCelda(bold, bgHex, fontHex, fontSize, hAlign) {
   return {
@@ -1938,31 +2009,25 @@ function colorPunct(txt) {
 }
 
 function aplicarEstilosHoja(ws, numMetaRows, numColsHeader, totalDataRows, ncols, esResumen) {
-  // ncols = número de columnas (0-indexed hasta ncols-1)
   const R = (r,c) => XLSX.utils.encode_cell({r,c});
 
-  // Fila título (r=0)
   if (ws[R(0,0)]) ws[R(0,0)].s = estiloCelda(true,'0F4C35','FFFFFF', esResumen?16:18,'center');
 
-  // Fila subtítulo (r=1,2)
   [1,2].forEach(ri => {
     if (ws[R(ri,0)]) ws[R(ri,0)].s = estiloCelda(false,'1A6348','A7F3D0',11,'center');
   });
 
-  // Fila resumen estadístico (solo hojas individuales: r=4)
   if (!esResumen) {
     for (let c=0; c<4; c++) {
       if (ws[R(4,c)]) ws[R(4,c)].s = estiloCelda(true,'1E3A5F','93C5FD',11,'center');
     }
   }
 
-  // Fila encabezado de columnas
   const hdrRow = numMetaRows;
   for (let c=0; c<ncols; c++) {
     if (ws[R(hdrRow,c)]) ws[R(hdrRow,c)].s = estiloCelda(true,'064E3B','6EE7B7',11,'center');
   }
 
-  // Filas de datos
   for (let ri=0; ri<totalDataRows; ri++) {
     const row = hdrRow + 1 + ri;
     const isAlt = ri % 2 === 1;
@@ -1970,7 +2035,6 @@ function aplicarEstilosHoja(ws, numMetaRows, numColsHeader, totalDataRows, ncols
     for (let c=0; c<ncols; c++) {
       const cell = ws[R(row,c)];
       if (!cell) continue;
-      // Columnas de puntualidad: colorear según valor
       const val = cell.v ? cell.v.toString() : '';
       const cp = colorPunct(val);
       if (cp) {
@@ -1985,7 +2049,6 @@ function aplicarEstilosHoja(ws, numMetaRows, numColsHeader, totalDataRows, ncols
     }
   }
 
-  // Altura de filas
   ws['!rows'] = [];
   ws['!rows'][0] = { hpt: 30 };
   ws['!rows'][1] = { hpt: 20 };
@@ -2108,7 +2171,6 @@ function exportarExcel() {
       {s:{r:1,c:0},e:{r:1,c:10}},
       {s:{r:2,c:0},e:{r:2,c:10}}
     ];
-    // numMetaRows=6 (filas 0-5 antes del header en fila 6)
     aplicarEstilosHoja(wsU, 6, 11, diasAgrupados.length, 11, false);
 
     const nombreHoja = (u.nombre || u.id)
@@ -2120,6 +2182,94 @@ function exportarExcel() {
 
   XLSX.writeFile(wb, `reporte_asistencia_${new Date().toISOString().split('T')[0]}.xlsx`);
   mostrarToast(`📥 Excel descargado — ${usuarios.length} colaboradores`, 'success');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// HELPER: parsea cualquier formato de fecha a objeto Date
+// ══════════════════════════════════════════════════════════════════
+function parsearFechaHora(fechaHoraStr) {
+  if (!fechaHoraStr) return null;
+  const s = fechaHoraStr.toString().trim();
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+  if (m) {
+    const [,d,mo,y,h='0',mi='0',se='0'] = m;
+    return new Date(+y, +mo-1, +d, +h, +mi, +se);
+  }
+  const dt = new Date(s);
+  return isNaN(dt) ? null : dt;
+}
+
+function extraerHora(fechaHoraStr) {
+  const dt = parsearFechaHora(fechaHoraStr);
+  if (!dt) return '—';
+  return dt.getHours().toString().padStart(2,'0') + ':' + dt.getMinutes().toString().padStart(2,'0');
+}
+
+function extraerFecha(fechaHoraStr) {
+  const dt = parsearFechaHora(fechaHoraStr);
+  if (!dt) return '—';
+  return dt.getDate().toString().padStart(2,'0') + '/' +
+         (dt.getMonth()+1).toString().padStart(2,'0') + '/' +
+         dt.getFullYear();
+}
+
+function textoPuntualidad(punct, minutos) {
+  if (!punct || punct === 'sin_horario') return '—';
+  if (punct === 'puntual')        return 'Puntual';
+  if (punct === 'tardanza')       return `Tardanza +${minutos || 0} min`;
+  if (punct === 'anticipada')     return `Anticipada -${minutos || 0} min`;
+  if (punct === 'extraordinario') return 'Día Extra';
+  return '—';
+}
+
+function agruparPorDia(registros) {
+  const porFecha = {};
+  registros.forEach(r => {
+    const fecha = extraerFecha(r.fechaHora);
+    if (!porFecha[fecha]) porFecha[fecha] = { entrada1:null, salida1:null, entrada2:null, salida2:null };
+    const slot = r.slotHorario;
+    if (slot && porFecha[fecha].hasOwnProperty(slot) && porFecha[fecha][slot] === null) {
+      porFecha[fecha][slot] = r;
+    } else {
+      if (r.estado === 'INGRESO') {
+        if (!porFecha[fecha].entrada1) porFecha[fecha].entrada1 = r;
+        else if (!porFecha[fecha].entrada2) porFecha[fecha].entrada2 = r;
+      } else {
+        if (!porFecha[fecha].salida1) porFecha[fecha].salida1 = r;
+        else if (!porFecha[fecha].salida2) porFecha[fecha].salida2 = r;
+      }
+    }
+  });
+
+  const fechasOrdenadas = Object.keys(porFecha).sort((a, b) => {
+    const pa = a.split('/'), pb = b.split('/');
+    return new Date(pa[2], pa[1]-1, pa[0]) - new Date(pb[2], pb[1]-1, pb[0]);
+  });
+
+  const filas = [];
+  fechasOrdenadas.forEach(fecha => {
+    const { entrada1: ing1, salida1: sal1, entrada2: ing2, salida2: sal2 } = porFecha[fecha];
+    const ref = ing1 || sal1 || ing2 || sal2;
+    if (!ref) return;
+
+    filas.push({
+      fecha,
+      id:            ref.id,
+      nombre:        ref.nombre,
+      area:          ref.area,
+      cargo:         ref.perfil,
+      horaEntrada:   ing1 ? extraerHora(ing1.fechaHora) : '—',
+      punctEntrada:  ing1 ? textoPuntualidad(ing1.puntualidad, ing1.minutosDiff) : '—',
+      horaSalida1:   sal1 ? extraerHora(sal1.fechaHora) : '—',
+      punctSalida1:  sal1 ? textoPuntualidad(sal1.puntualidad, sal1.minutosDiff) : '—',
+      horaEntrada2:  ing2 ? extraerHora(ing2.fechaHora) : '—',
+      punctEntrada2: ing2 ? textoPuntualidad(ing2.puntualidad, ing2.minutosDiff) : '—',
+      horaSalida:    sal2 ? extraerHora(sal2.fechaHora) : '—',
+      punctSalida:   sal2 ? textoPuntualidad(sal2.puntualidad, sal2.minutosDiff) : '—',
+      comentario:    (ing1||sal1||ing2||sal2)?.comentario || ''
+    });
+  });
+  return filas;
 }
 
 // ════════════════════════════════
