@@ -854,6 +854,58 @@ let qrCodeReader=null, isScanning=false;
 let staffData=null, selectedCameraId=null, cameraEnabled=true;
 let _datosEdicionPersonal=null;
 
+// ════════════════════════════════════════════════════════════════
+// CACHÉ LOCAL DE REGISTROS DEL DÍA
+// Guarda en memoria los registros ya realizados en esta sesión
+// para no depender de latencia de Google Sheets en el siguiente escaneo.
+// Estructura: { 'ID_COLAB': [ {hora:'08:01:00', estado:'INGRESO'}, ... ] }
+// Se limpia automáticamente si cambia el día (sesión de otro día).
+// ════════════════════════════════════════════════════════════════
+const registrosLocales = {
+  _cache: {},           // { id: [{hora, estado}] }
+  _fecha: null,         // fecha del día en que se creó el caché
+
+  // Devuelve true si el caché es del día de hoy
+  _esHoy() {
+    const hoy = new Date().toDateString();
+    if (this._fecha !== hoy) { this._cache = {}; this._fecha = hoy; }
+    return true;
+  },
+
+  // Obtiene los registros locales de un colaborador
+  get(id) {
+    this._esHoy();
+    return this._cache[id.toString().toUpperCase()] || [];
+  },
+
+  // Agrega un nuevo registro al caché local
+  agregar(id, estado) {
+    this._esHoy();
+    const key = id.toString().toUpperCase();
+    if (!this._cache[key]) this._cache[key] = [];
+    const hora = new Date().toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false});
+    this._cache[key].push({ hora, estado });
+    // Mantener ordenado por hora
+    this._cache[key].sort((a,b) => (a.hora||'').localeCompare(b.hora||''));
+  },
+
+  // Fusiona registros del servidor con el caché local (el local tiene prioridad para los más recientes)
+  fusionar(id, registrosServidor) {
+    this._esHoy();
+    const key = id.toString().toUpperCase();
+    const locales = this._cache[key] || [];
+    if (!locales.length) return registrosServidor;
+    // Unir y deduplicar: si hay un registro local más reciente que el último del servidor, se usa
+    const todos = [...registrosServidor];
+    locales.forEach(local => {
+      const yaExiste = todos.some(s => s.hora === local.hora && s.estado === local.estado);
+      if (!yaExiste) todos.push(local);
+    });
+    todos.sort((a,b) => (a.hora||'').localeCompare(b.hora||''));
+    return todos;
+  }
+};
+
 // ═══════════════════════════════════════════════════════════════
 // ESTADO DEL QR — bloqueo inteligente post-lectura
 // ═══════════════════════════════════════════════════════════════
@@ -1071,6 +1123,12 @@ function badgePuntualidad(punct){
 
 // ════════════════════════════════════════════════════════════════
 // DETECCIÓN AUTOMÁTICA DE ESTADO (INGRESO / SALIDA)
+//
+// ESTRATEGIA DOBLE (evita el bug de latencia de Sheets):
+//   1. Primero revisa el caché LOCAL (registros hechos en esta sesión)
+//   2. Luego consulta el SERVIDOR y fusiona ambos
+//   3. El último registro fusionado determina el siguiente estado
+//
 // Lógica:
 //   Sin registros hoy          → INGRESO
 //   Último registro = INGRESO  → SALIDA
@@ -1078,35 +1136,47 @@ function badgePuntualidad(punct){
 // ════════════════════════════════════════════════════════════════
 async function detectarEstadoAuto(id) {
   mostrarEstadoAutoPanel('cargando','⏳','Detectando...','Consultando registros de hoy','');
+
+  // ── Paso 1: leer caché local inmediatamente (sin esperar al servidor)
+  const locales = registrosLocales.get(id);
+
+  // ── Paso 2: consultar servidor en paralelo
+  let registrosFusionados = [...locales];
   try {
     const res = await llamarAppsScript('obtenerRegistrosHoyColaborador', { id });
-    const registros = (res?.registros || []).sort((a,b) => (a.hora||'').localeCompare(b.hora||''));
-    const ultimo = registros.length > 0 ? registros[registros.length - 1] : null;
-
-    let siguiente;
-    if (!ultimo)                         siguiente = 'INGRESO';
-    else if (ultimo.estado === 'INGRESO') siguiente = 'SALIDA';
-    else                                 siguiente = 'INGRESO';
-
-    document.getElementById('estado').value = siguiente;
-    const secHtml = construirSecuenciaHoy(registros, siguiente);
-
-    if (siguiente === 'INGRESO') {
-      const sub = registros.length === 0
-        ? 'Primer registro del día'
-        : `Regreso — ${registros.length} registro${registros.length>1?'s':''} previo${registros.length>1?'s':''} hoy`;
-      mostrarEstadoAutoPanel('ingreso','📥','INGRESO',sub,secHtml);
-    } else {
-      mostrarEstadoAutoPanel('salida','🚪','SALIDA',
-        `Salida — ${registros.length} registro${registros.length>1?'s':''} previo${registros.length>1?'s':''} hoy`,
-        secHtml);
-    }
-    return siguiente;
+    const delServidor = (res?.registros || []);
+    // Fusionar: combinar registros del servidor con los locales
+    registrosFusionados = registrosLocales.fusionar(id, delServidor);
   } catch(e) {
-    document.getElementById('estado').value = 'INGRESO';
-    mostrarEstadoAutoPanel('ingreso','📥','INGRESO','No se pudo verificar historial — asumiendo entrada','');
-    return 'INGRESO';
+    // Si falla la consulta, usamos solo el caché local (mejor que nada)
   }
+
+  // Ordenar por hora
+  registrosFusionados.sort((a,b) => (a.hora||'').localeCompare(b.hora||''));
+
+  const ultimo = registrosFusionados.length > 0
+    ? registrosFusionados[registrosFusionados.length - 1]
+    : null;
+
+  let siguiente;
+  if (!ultimo)                          siguiente = 'INGRESO';
+  else if (ultimo.estado === 'INGRESO') siguiente = 'SALIDA';
+  else                                  siguiente = 'INGRESO';
+
+  document.getElementById('estado').value = siguiente;
+  const secHtml = construirSecuenciaHoy(registrosFusionados, siguiente);
+
+  if (siguiente === 'INGRESO') {
+    const sub = registrosFusionados.length === 0
+      ? 'Primer registro del día'
+      : `Regreso — ${registrosFusionados.length} registro${registrosFusionados.length>1?'s':''} previo${registrosFusionados.length>1?'s':''} hoy`;
+    mostrarEstadoAutoPanel('ingreso','📥','INGRESO',sub,secHtml);
+  } else {
+    mostrarEstadoAutoPanel('salida','🚪','SALIDA',
+      `Salida — ${registrosFusionados.length} registro${registrosFusionados.length>1?'s':''} previo${registrosFusionados.length>1?'s':''} hoy`,
+      secHtml);
+  }
+  return siguiente;
 }
 
 function mostrarEstadoAutoPanel(tipo, icono, valor, sub, secHtml) {
@@ -1409,12 +1479,13 @@ async function procesarQrEscaneado(id) {
 async function registrarAutomaticamente() {
   if (!staffData) return;
 
+  const id        = document.getElementById('id').value.trim();
   const estado    = document.getElementById('estado').value;
   const horario   = horarioHoyDeStaff(staffData);
   const evalPunct = evaluarPuntualidad(horario, estado);
 
   const res = await llamarAppsScript('registrarAsistencia', {
-    id:            document.getElementById('id').value.trim(),
+    id,
     nombre:        staffData.nombre,
     area:          staffData.area,
     cargo:         staffData.cargo,
@@ -1430,6 +1501,11 @@ async function registrarAutomaticamente() {
   qrState.procesando = false;
 
   if (res?.exito) {
+    // ★ CLAVE: guardar en caché local INMEDIATAMENTE
+    // Así el siguiente escaneo (aunque Sheets aún no haya procesado)
+    // ya sabe que el último registro fue este estado.
+    registrosLocales.agregar(id, estado);
+
     let msg = res.mensaje;
     if (evalPunct.estado === 'tardanza')   msg += ` — ⏰ Tardanza: ${evalPunct.minutos} min`;
     if (evalPunct.estado === 'anticipada') msg += ` — ⚠️ Salida anticipada: ${evalPunct.minutos} min`;
@@ -1524,6 +1600,9 @@ async function enviarFormularioDiaLibre(e) {
   });
 
   if (res?.exito) {
+    // ★ Guardar en caché local también para día libre
+    registrosLocales.agregar(document.getElementById('id').value.trim(), estado);
+
     mostrarRespuesta(res.mensaje + ' (día no laboral)', 'success');
     mostrarToast('📅 Asistencia extraordinaria registrada', 'success');
     setQrStatus('detected','✅ Registrado');
