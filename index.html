@@ -1628,14 +1628,36 @@ async function enviarFormularioDiaLibre(e) {
 }
 
 async function cargarUltimosRegistros(){
-  const res = await llamarAppsScript('obtenerUltimosRegistros', {limite:8});
+  // Pedimos 100 para tener suficiente historial y pre-cargar el caché
+  const res = await llamarAppsScript('obtenerUltimosRegistros', {limite:100});
   const wrap = document.getElementById('ultimos-registros-wrap');
   if (!res?.registros?.length) {
     wrap.innerHTML='<div class="empty-state"><span>📭</span><p>Sin registros hoy</p></div>';
     return;
   }
+
+  // ★ PRE-CARGAR CACHÉ LOCAL con todos los registros de hoy que ya existen en Sheets
+  // Esto es esencial al arrancar la página: si alguien ya marcó entrada antes,
+  // el caché local lo sabrá y el siguiente escaneo detectará correctamente SALIDA.
+  res.registros.forEach(r => {
+    if (!r.id || !r.estado || !r.hora) return;
+    registrosLocales._esHoy();
+    const key = r.id.toString().toUpperCase();
+    if (!registrosLocales._cache[key]) registrosLocales._cache[key] = [];
+    // Solo agregar si no existe ya (evitar duplicados)
+    const yaExiste = registrosLocales._cache[key].some(
+      e => e.hora === r.hora && e.estado === r.estado
+    );
+    if (!yaExiste) {
+      registrosLocales._cache[key].push({ hora: r.hora, estado: r.estado });
+      registrosLocales._cache[key].sort((a,b) => (a.hora||'').localeCompare(b.hora||''));
+    }
+  });
+
+  // Mostrar solo los últimos 8 en la tabla de la UI
+  const ultimos8 = res.registros.slice(0, 8);
   wrap.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Hora</th><th>Nombre</th><th>Estado</th><th>Puntualidad</th></tr></thead><tbody>
-    ${res.registros.map(r=>`<tr><td class="recent-row-time">${r.hora}</td><td>${r.nombre}</td><td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td><td>${badgePuntualidad(r.puntualidad)}</td></tr>`).join('')}
+    ${ultimos8.map(r=>`<tr><td class="recent-row-time">${r.hora}</td><td>${r.nombre}</td><td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td><td>${badgePuntualidad(r.puntualidad)}</td></tr>`).join('')}
   </tbody></table></div>`;
 }
 
