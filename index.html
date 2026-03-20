@@ -114,13 +114,8 @@
     .id-qr-only input{padding-right:90px;cursor:not-allowed;opacity:.6;background:var(--surface2)!important;border-color:rgba(16,185,129,.2)!important;}
     .id-qr-badge{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#34d399;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;pointer-events:none;letter-spacing:.3px;}
 
-    /* ════════════════════════════════════════════
-       ESTADO AUTOMÁTICO — PANEL VISUAL (NUEVO)
-    ════════════════════════════════════════════ */
-    .estado-auto-panel{
-      border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:12px;
-      display:none;align-items:center;gap:14px;animation:fadeIn .3s ease;
-    }
+    /* ESTADO AUTO PANEL */
+    .estado-auto-panel{border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:12px;display:none;align-items:center;gap:14px;animation:fadeIn .3s ease;}
     @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
     .estado-auto-panel.ingreso{background:rgba(16,185,129,.08);border:1.5px solid rgba(16,185,129,.35);}
     .estado-auto-panel.salida{background:rgba(239,68,68,.07);border:1.5px solid rgba(239,68,68,.3);}
@@ -139,13 +134,45 @@
     .estado-auto-panel.ingreso  .estado-auto-sub{color:#6ee7b7;}
     .estado-auto-panel.salida   .estado-auto-sub{color:#fca5a5;}
     .estado-auto-panel.cargando .estado-auto-sub{color:var(--text-muted);}
-    /* Secuencia visual del día */
     .secuencia-hoy{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px;}
     .seq-dot{display:flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;}
     .seq-dot.ing{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3);}
     .seq-dot.sal{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25);}
     .seq-dot.next{background:rgba(255,255,255,.06);color:var(--text-muted);border:1px dashed var(--border);}
     .seq-arrow{color:var(--text-muted);font-size:12px;}
+
+    /* ═══════════════════════════════════════════
+       PANEL QR MEJORADO — con bloqueo post-scan
+    ═══════════════════════════════════════════ */
+    .qr-scanner-wrap{position:relative;border-radius:var(--radius-sm);overflow:hidden;border:2px solid var(--border);transition:border-color .3s;}
+    .qr-scanner-wrap.scanning{border-color:rgba(16,185,129,.4);}
+    .qr-scanner-wrap.locked{border-color:rgba(245,158,11,.6);}
+    .qr-scanner-wrap.success-lock{border-color:rgba(16,185,129,.8);box-shadow:0 0 20px rgba(16,185,129,.2);}
+    #reader{width:100%;display:none;}
+    /* Overlay de bloqueo sobre la cámara */
+    .qr-lock-overlay{position:absolute;inset:0;background:rgba(15,23,42,.88);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:10;backdrop-filter:blur(4px);}
+    .qr-lock-overlay.show{display:flex;}
+    .qr-lock-icon{font-size:48px;animation:pulse 1.5s ease-in-out infinite;}
+    @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+    .qr-lock-name{font-size:16px;font-weight:800;color:#fff;text-align:center;max-width:200px;line-height:1.3;}
+    .qr-lock-id{font-family:'JetBrains Mono',monospace;font-size:12px;color:#94a3b8;margin-top:-6px;}
+    .qr-lock-status{font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;}
+    .qr-lock-status.ing{background:rgba(16,185,129,.2);color:#34d399;border:1px solid rgba(16,185,129,.4);}
+    .qr-lock-status.sal{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3);}
+    .qr-lock-btn{margin-top:4px;padding:8px 20px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.4);color:#93c5fd;border-radius:8px;font-size:13px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;transition:var(--transition);}
+    .qr-lock-btn:hover{background:rgba(59,130,246,.25);}
+    /* Barra de countdown */
+    .qr-countdown-bar{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(16,185,129,.2);}
+    .qr-countdown-fill{height:100%;background:linear-gradient(90deg,var(--primary),#34d399);width:100%;transition:width linear;}
+
+    /* Área de estado QR compacta */
+    .qr-status-bar{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:var(--radius-sm);margin-bottom:8px;font-size:12px;font-weight:600;}
+    .qr-status-bar.idle{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);color:#93c5fd;}
+    .qr-status-bar.scanning{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:#34d399;}
+    .qr-status-bar.detected{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:#fcd34d;}
+    .qr-status-bar.processing{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);color:#93c5fd;}
+    .qr-pulse{width:8px;height:8px;border-radius:50%;background:currentColor;animation:qrPulse 1s ease-in-out infinite;flex-shrink:0;}
+    @keyframes qrPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.8);}}
 
     /* BOTONES */
     .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;transition:var(--transition);}
@@ -202,7 +229,7 @@
     .dia-libre-counter{font-size:11px;color:var(--text-muted);margin-top:5px;text-align:right;}
     .comentario-extra{font-size:12px;color:#93c5fd;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:help;}
 
-    /* QR */
+    /* QR TOGGLE */
     .camera-toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
     .switch{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;}
     .switch input{opacity:0;width:0;height:0;}
@@ -210,8 +237,6 @@
     .slider:before{content:"";position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:var(--transition);}
     input:checked+.slider{background:var(--primary);}
     input:checked+.slider:before{transform:translateX(20px);}
-    #reader{width:100%;border-radius:var(--radius-sm);overflow:hidden;display:none;border:1px solid var(--border);margin-bottom:10px;}
-    .qr-status{padding:6px 10px;border-radius:var(--radius-sm);background:rgba(59,130,246,.1);color:#93c5fd;font-size:12px;font-weight:500;display:none;margin-bottom:10px;}
 
     /* TABLA */
     .table-wrap{overflow-x:auto;border-radius:var(--radius-sm);border:1px solid var(--border);}
@@ -253,7 +278,7 @@
     .checkbox-item input[type=checkbox]{width:14px;height:14px;accent-color:var(--primary);cursor:pointer;}
     .checkbox-item span{font-size:13px;color:var(--text);font-weight:500;}
 
-    /* HORARIOS POR DÍAS */
+    /* HORARIOS */
     .schedule-section{background:rgba(59,130,246,.04);border:1px solid rgba(59,130,246,.2);border-radius:var(--radius-sm);padding:14px;margin-top:10px;}
     .schedule-section-title{font-size:12px;font-weight:700;color:#93c5fd;margin-bottom:12px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px;}
     .days-selector{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
@@ -358,7 +383,7 @@
       <div class="login-logo">
         <div class="login-logo-icon">🏦</div>
         <h2>Finacorp</h2>
-        <p>Sistema de Control de Asistencia v5.4</p>
+        <p>Sistema de Control de Asistencia v5.5</p>
       </div>
       <div class="login-input-group">
         <label>Usuario</label>
@@ -370,7 +395,7 @@
       </div>
       <button class="login-btn" id="login-btn" onclick="verificarLogin()">Ingresar →</button>
       <div id="login-error" class="login-error">⚠️ Usuario o contraseña incorrectos</div>
-      <div class="login-footer"><p>© 2026 Finacorp — v5.4</p></div>
+      <div class="login-footer"><p>© 2026 Finacorp — v5.5</p></div>
     </div>
   </div>
 </div>
@@ -409,20 +434,49 @@
       <!-- ASISTENCIA -->
       <div class="page-content" id="page-asistencia">
         <div class="scan-grid">
+          <!-- COLUMNA IZQUIERDA: Scanner QR -->
           <div>
             <div class="card">
               <div class="card-title">📷 Escáner QR</div>
+
+              <!-- Barra de estado del QR -->
+              <div class="qr-status-bar idle" id="qr-status-bar">
+                <div class="qr-pulse"></div>
+                <span id="qr-status-text">Iniciando cámara...</span>
+              </div>
+
+              <!-- Toggle cámara -->
               <div class="camera-toggle-row">
                 <span style="font-size:13px;color:var(--text-muted);">Cámara:</span>
                 <label class="switch"><input type="checkbox" id="camera-toggle" checked><span class="slider"></span></label>
                 <span id="camera-status" style="font-size:13px;color:var(--text-muted);">Activada</span>
+                <select id="camera-select" style="display:none;flex:1;max-width:180px;padding:5px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Outfit',sans-serif;font-size:12px;outline:none;"></select>
               </div>
-              <div class="qr-status" id="qr-status">Iniciando...</div>
-              <select id="camera-select" style="display:none;width:100%;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Outfit',sans-serif;margin-bottom:8px;outline:none;"></select>
-              <div id="reader"></div>
-              <button class="btn btn-ghost btn-sm" id="reiniciar-btn" onclick="reiniciarQR()" style="display:none;width:100%;margin-top:4px;">🔄 Reiniciar</button>
+
+              <!-- Wrapper del lector con overlay de bloqueo -->
+              <div class="qr-scanner-wrap" id="qr-scanner-wrap">
+                <div id="reader"></div>
+
+                <!-- Overlay que aparece cuando ya leyó un QR -->
+                <div class="qr-lock-overlay" id="qr-lock-overlay">
+                  <div class="qr-lock-icon" id="qr-lock-icon">✅</div>
+                  <div class="qr-lock-name" id="qr-lock-name">—</div>
+                  <div class="qr-lock-id"   id="qr-lock-id">—</div>
+                  <div class="qr-lock-status" id="qr-lock-status">—</div>
+                  <button class="qr-lock-btn" onclick="desbloquearQR()">📷 Escanear otro QR</button>
+                </div>
+
+                <!-- Barra de countdown para auto-unlock (solo en día libre) -->
+                <div class="qr-countdown-bar" id="qr-countdown-bar" style="display:none;">
+                  <div class="qr-countdown-fill" id="qr-countdown-fill"></div>
+                </div>
+              </div>
+
+              <button class="btn btn-ghost btn-sm" id="reiniciar-btn" onclick="reiniciarQR()" style="display:none;width:100%;margin-top:8px;">🔄 Reiniciar cámara</button>
             </div>
           </div>
+
+          <!-- COLUMNA DERECHA: Formulario -->
           <div>
             <div class="card">
               <div class="card-title">✏️ Registro</div>
@@ -443,7 +497,7 @@
                   <p>Jornada hoy: <span class="val" id="employee-jornada">-</span></p>
                 </div>
 
-                <!-- ★ NUEVO: Panel visual de estado automático (reemplaza el select de Estado) -->
+                <!-- Panel visual de estado automático -->
                 <div class="estado-auto-panel" id="estado-auto-panel">
                   <div class="estado-auto-icon" id="estado-auto-icon">📷</div>
                   <div class="estado-auto-info">
@@ -454,7 +508,7 @@
                   </div>
                 </div>
 
-                <!-- Campo oculto — el estado lo asigna el sistema, no el usuario -->
+                <!-- Estado oculto — lo asigna el sistema -->
                 <input type="hidden" id="estado" value="INGRESO">
 
                 <div class="today-schedule-panel" id="today-schedule-panel">
@@ -466,6 +520,8 @@
                   <div class="schedule-slots" id="schedule-slots-display"></div>
                 </div>
                 <div class="punct-alert" id="punct-alert"></div>
+
+                <!-- Panel día libre -->
                 <div class="dia-libre-panel" id="dia-libre-panel" style="display:none;">
                   <div class="dia-libre-header">
                     <span>📅</span>
@@ -476,14 +532,16 @@
                   </div>
                   <div class="form-group" style="margin-bottom:0;">
                     <label>Motivo de asistencia <span style="color:#f87171;">*</span></label>
-                    <textarea id="comentario-dia-libre" rows="3" placeholder="Ej: Recuperación de horas del día lunes, apoyo en cierre de mes, reunión urgente con cliente..." oninput="validarComentarioDiaLibre()" style="resize:vertical;min-height:72px;"></textarea>
+                    <textarea id="comentario-dia-libre" rows="3" placeholder="Ej: Recuperación de horas del día lunes, apoyo en cierre de mes..." oninput="validarComentarioDiaLibre()" style="resize:vertical;min-height:72px;"></textarea>
                     <div class="dia-libre-counter"><span id="comentario-chars">0</span> caracteres</div>
                   </div>
+                  <button type="submit" class="btn btn-primary btn-full" id="btn-submit-libre" disabled style="margin-top:10px;">📝 Escribe el motivo para registrar</button>
                 </div>
-                <button type="submit" class="btn btn-primary btn-full" id="btn-submit" disabled>✅ Registrar Asistencia</button>
+
               </form>
               <div class="respuesta" id="respuesta"></div>
             </div>
+
             <div class="card">
               <div class="card-title">🕐 Últimos registros de hoy</div>
               <div id="ultimos-registros-wrap"><div class="empty-state"><span>⏳</span><p>Cargando...</p></div></div>
@@ -778,7 +836,12 @@
 const CONFIG = {
   APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxxNz9FhBV3ybKs8CMow5mc1PusG2AybD6_POwWvsUR813pNC60OFS_VDzbpzGs24k/exec',
   ADMIN_USER: 'admin',
-  TIEMPO_TOAST: 3500
+  TIEMPO_TOAST: 3500,
+  // Tiempo en ms que el QR queda bloqueado DESPUÉS de un registro exitoso
+  // antes de poder escanear otro. Evita doble lectura accidental.
+  QR_LOCK_MS_TRAS_REGISTRO: 4000,
+  // Cooldown mínimo entre escaneos del MISMO id (anti-bounce de cámara)
+  QR_DEBOUNCE_MS: 1200
 };
 
 // ════════════════════════════════
@@ -791,9 +854,82 @@ let qrCodeReader=null, isScanning=false;
 let staffData=null, selectedCameraId=null, cameraEnabled=true;
 let _datosEdicionPersonal=null;
 
-// ════════════════════════════════════════════
-// SISTEMA DE HORARIOS POR DÍA
-// ════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// ESTADO DEL QR — bloqueo inteligente post-lectura
+// ═══════════════════════════════════════════════════════════════
+let qrState = {
+  locked: false,          // true = overlay visible, no acepta nuevos escaneos
+  lastScannedId: null,    // último ID escaneado (para debounce)
+  lastScanTime: 0,        // timestamp del último escaneo aceptado
+  procesando: false,      // true mientras se hace la consulta/registro
+  unlockTimer: null       // timer para auto-desbloqueo
+};
+
+function qrSetLocked(locked) {
+  qrState.locked = locked;
+  const wrap = document.getElementById('qr-scanner-wrap');
+  if (!wrap) return;
+  if (locked) {
+    wrap.classList.remove('scanning');
+    wrap.classList.add('locked');
+  } else {
+    wrap.classList.remove('locked','success-lock');
+    wrap.classList.add('scanning');
+    document.getElementById('qr-lock-overlay').classList.remove('show');
+  }
+}
+
+function mostrarOverlayQR(nombre, id, estado, icono) {
+  const overlay = document.getElementById('qr-lock-overlay');
+  document.getElementById('qr-lock-icon').textContent   = icono;
+  document.getElementById('qr-lock-name').textContent   = nombre || '—';
+  document.getElementById('qr-lock-id').textContent     = 'ID: ' + (id || '—');
+  const statusEl = document.getElementById('qr-lock-status');
+  statusEl.textContent = estado === 'INGRESO' ? '📥 INGRESO' : '🚪 SALIDA';
+  statusEl.className   = 'qr-lock-status ' + (estado === 'INGRESO' ? 'ing' : 'sal');
+  overlay.classList.add('show');
+  document.getElementById('qr-scanner-wrap').classList.add('success-lock');
+}
+
+function desbloquearQR() {
+  if (qrState.unlockTimer) { clearTimeout(qrState.unlockTimer); qrState.unlockTimer = null; }
+  qrState.locked      = false;
+  qrState.procesando  = false;
+  qrState.lastScannedId = null;
+  qrSetLocked(false);
+  document.getElementById('qr-countdown-bar').style.display = 'none';
+  setQrStatus('scanning', '📷 Listo para escanear');
+  // Limpiar formulario para el siguiente colaborador
+  ocultarInfoColaborador();
+  document.getElementById('id').value = '';
+  document.getElementById('respuesta').style.display = 'none';
+}
+
+function programarAutoDesbloqueo(ms) {
+  if (qrState.unlockTimer) clearTimeout(qrState.unlockTimer);
+  // Mostrar barra countdown
+  const bar = document.getElementById('qr-countdown-fill');
+  const barWrap = document.getElementById('qr-countdown-bar');
+  barWrap.style.display = 'block';
+  bar.style.transition  = 'none';
+  bar.style.width       = '100%';
+  setTimeout(() => {
+    bar.style.transition = `width ${ms}ms linear`;
+    bar.style.width      = '0%';
+  }, 30);
+  qrState.unlockTimer = setTimeout(() => { desbloquearQR(); }, ms);
+}
+
+function setQrStatus(tipo, texto) {
+  const el = document.getElementById('qr-status-bar');
+  const tx = document.getElementById('qr-status-text');
+  el.className = 'qr-status-bar ' + tipo;
+  tx.textContent = texto;
+}
+
+// ════════════════════════════════════════════════════════════════
+// SISTEMAS DE HORARIOS POR DÍA
+// ════════════════════════════════════════════════════════════════
 const DIAS=[
   {key:'lunes',abbr:'Lun',num:'Lu'},{key:'martes',abbr:'Mar',num:'Ma'},
   {key:'miercoles',abbr:'Mié',num:'Mi'},{key:'jueves',abbr:'Jue',num:'Ju'},
@@ -904,10 +1040,6 @@ function mostrarHorarioColaborador(horario,estadoActual){
   else panel.style.display='none';
 }
 
-function recalcularPuntualidad(){
-  const estado=document.getElementById('estado').value||'INGRESO';
-  recalcularPuntualidadConEstado(estado);
-}
 function recalcularPuntualidadConEstado(estado){
   if(!staffData){ocultarPunctAlert();return;}
   const horario=horarioHoyDeStaff(staffData);
@@ -937,45 +1069,40 @@ function badgePuntualidad(punct){
   return'<span class="badge badge-gray">—</span>';
 }
 
-// ════════════════════════════════════════════════════════════
-// ★ DETECCIÓN AUTOMÁTICA DE ESTADO (INGRESO / SALIDA) — NUEVO
-//
+// ════════════════════════════════════════════════════════════════
+// DETECCIÓN AUTOMÁTICA DE ESTADO (INGRESO / SALIDA)
 // Lógica:
 //   Sin registros hoy          → INGRESO
 //   Último registro = INGRESO  → SALIDA
-//   Último registro = SALIDA   → INGRESO  (regreso/jornada extra)
-//
-// Para jornada completa el ciclo es: I → S → I → S
-// Para medio tiempo:                 I → S
-// ════════════════════════════════════════════════════════════
+//   Último registro = SALIDA   → INGRESO  (regreso/nueva jornada)
+// ════════════════════════════════════════════════════════════════
 async function detectarEstadoAuto(id) {
   mostrarEstadoAutoPanel('cargando','⏳','Detectando...','Consultando registros de hoy','');
   try {
     const res = await llamarAppsScript('obtenerRegistrosHoyColaborador', { id });
-    // Ordenar por hora de más antiguo a más reciente
     const registros = (res?.registros || []).sort((a,b) => (a.hora||'').localeCompare(b.hora||''));
-    const total  = registros.length;
-    const ultimo = total > 0 ? registros[total - 1] : null;
+    const ultimo = registros.length > 0 ? registros[registros.length - 1] : null;
 
     let siguiente;
-    if (!ultimo)                      siguiente = 'INGRESO';  // sin registros → primera entrada
-    else if (ultimo.estado==='INGRESO') siguiente = 'SALIDA';  // último fue entrada → ahora salida
-    else                              siguiente = 'INGRESO';  // último fue salida  → regreso/nueva entrada
+    if (!ultimo)                         siguiente = 'INGRESO';
+    else if (ultimo.estado === 'INGRESO') siguiente = 'SALIDA';
+    else                                 siguiente = 'INGRESO';
 
-    // Guardar en el campo oculto que usará el formulario
     document.getElementById('estado').value = siguiente;
-
     const secHtml = construirSecuenciaHoy(registros, siguiente);
 
     if (siguiente === 'INGRESO') {
-      const sub = total === 0 ? 'Primer registro del día' : `Regreso — ${total} registro${total>1?'s':''} previo${total>1?'s':''} hoy`;
+      const sub = registros.length === 0
+        ? 'Primer registro del día'
+        : `Regreso — ${registros.length} registro${registros.length>1?'s':''} previo${registros.length>1?'s':''} hoy`;
       mostrarEstadoAutoPanel('ingreso','📥','INGRESO',sub,secHtml);
     } else {
-      mostrarEstadoAutoPanel('salida','🚪','SALIDA',`Salida — ${total} registro${total>1?'s':''} previo${total>1?'s':''} hoy`,secHtml);
+      mostrarEstadoAutoPanel('salida','🚪','SALIDA',
+        `Salida — ${registros.length} registro${registros.length>1?'s':''} previo${registros.length>1?'s':''} hoy`,
+        secHtml);
     }
     return siguiente;
   } catch(e) {
-    // Si falla la consulta no bloqueamos — asumimos INGRESO
     document.getElementById('estado').value = 'INGRESO';
     mostrarEstadoAutoPanel('ingreso','📥','INGRESO','No se pudo verificar historial — asumiendo entrada','');
     return 'INGRESO';
@@ -987,7 +1114,7 @@ function mostrarEstadoAutoPanel(tipo, icono, valor, sub, secHtml) {
   panel.className = 'estado-auto-panel ' + tipo;
   panel.style.display = 'flex';
   document.getElementById('estado-auto-icon').textContent  = icono;
-  document.getElementById('estado-auto-label').textContent = (tipo==='cargando') ? 'Detectando tipo...' : 'Tipo de registro detectado';
+  document.getElementById('estado-auto-label').textContent = tipo==='cargando' ? 'Detectando tipo...' : 'Tipo de registro detectado';
   document.getElementById('estado-auto-value').textContent = valor;
   document.getElementById('estado-auto-sub').textContent   = sub;
   document.getElementById('secuencia-hoy').innerHTML       = secHtml;
@@ -999,9 +1126,6 @@ function ocultarEstadoAutoPanel() {
   p.className = 'estado-auto-panel';
 }
 
-/**
- * Línea visual: [📥 08:01] → [🚪 12:30] → [📥 AHora]
- */
 function construirSecuenciaHoy(registros, siguiente) {
   if (!registros.length) {
     return `<span class="seq-dot next">📥 Primer registro</span>`;
@@ -1014,9 +1138,7 @@ function construirSecuenciaHoy(registros, siguiente) {
     html += `<span class="seq-dot ${cls}">${icon} ${(r.hora||'').substring(0,5)}</span>`;
   });
   html += '<span class="seq-arrow">→</span>';
-  const nc = siguiente==='INGRESO' ? 'ing' : 'sal';
-  const ni = siguiente==='INGRESO' ? '📥' : '🚪';
-  html += `<span class="seq-dot next">${ni} Ahora</span>`;
+  html += `<span class="seq-dot next">${siguiente==='INGRESO'?'📥':'🚪'} Ahora</span>`;
   return html;
 }
 
@@ -1108,24 +1230,115 @@ async function llamarAppsScript(fn,params={}){
 }
 function descargarArchivo(base64,filename){try{const d=base64.includes('base64,')?base64.split('base64,')[1]:base64;const link=document.createElement('a');link.href='data:application/pdf;base64,'+d;link.download=filename;document.body.appendChild(link);link.click();setTimeout(()=>document.body.removeChild(link),100);}catch(e){mostrarToast('❌ Error al descargar','error');}}
 
-// ════════════════════════════════
-// CÁMARA / QR
-// ════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// CÁMARA / QR — VERSIÓN MEJORADA
+// ═══════════════════════════════════════════════════════════════
 function esMobile(){return/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);}
-function toggleCamera(e){cameraEnabled=e;document.getElementById('camera-status').textContent=e?'Activada':'Desactivada';if(e){document.getElementById('reader').style.display='block';document.getElementById('qr-status').style.display='block';document.getElementById('reiniciar-btn').style.display='block';cargarCamaras();}else{detenerEscaneo();['reader','qr-status','reiniciar-btn'].forEach(id=>document.getElementById(id).style.display='none');document.getElementById('camera-select').style.display='none';}}
-function detenerEscaneo(){if(qrCodeReader&&isScanning)qrCodeReader.stop().then(()=>{qrCodeReader=null;isScanning=false;}).catch(()=>{});}
-function cargarCamaras(){if(!cameraEnabled)return;Html5Qrcode.getCameras().then(d=>{if(d.length>0){if(esMobile()&&d.length>1)mostrarSelectorCamara(d);else{selectedCameraId=d.find(x=>x.label.toLowerCase().includes('back'))?.id||d[0].id;iniciarEscaneo();}}}).catch(()=>actualizarEstadoQR('❌ Error cámaras',true));}
-function mostrarSelectorCamara(d){const s=document.getElementById('camera-select');s.innerHTML='<option value="">Selecciona...</option>';d.forEach((x,i)=>{const o=document.createElement('option');o.value=x.id;o.textContent=x.label.toLowerCase().includes('back')?'📷 Trasera':`📱 Cámara ${i+1}`;s.appendChild(o);});s.style.display='block';s.onchange=function(){if(this.value){selectedCameraId=this.value;reiniciarQR();}};const r=d.find(x=>x.label.toLowerCase().includes('back'));if(r){s.value=r.id;selectedCameraId=r.id;iniciarEscaneo();}}
-function iniciarEscaneo(){if(isScanning||!selectedCameraId||!cameraEnabled)return;document.getElementById('reader').innerHTML='';qrCodeReader=new Html5Qrcode('reader');qrCodeReader.start(selectedCameraId,{fps:10,qrbox:210},(t)=>{document.getElementById('id').value=t.trim();buscarColaborador(t.trim());mostrarToast('✅ QR detectado');},()=>{}).then(()=>{isScanning=true;actualizarEstadoQR('📷 Escaneando...');}).catch(()=>actualizarEstadoQR('❌ Error cámara',true));}
-function actualizarEstadoQR(m,e){const el=document.getElementById('qr-status');el.textContent=m;el.style.background=e?'rgba(239,68,68,.1)':'rgba(59,130,246,.1)';el.style.color=e?'#f87171':'#93c5fd';}
-function reiniciarQR(){detenerEscaneo();if(selectedCameraId&&cameraEnabled)setTimeout(iniciarEscaneo,500);}
 
-// ════════════════════════════════════════════════════════════
-// ASISTENCIA — buscarColaborador CON DETECCIÓN Y REGISTRO AUTO
-// ════════════════════════════════════════════════════════════
-async function buscarColaborador(id) {
-  if (!id.trim()) return ocultarInfoColaborador();
+function toggleCamera(enabled){
+  cameraEnabled = enabled;
+  document.getElementById('camera-status').textContent = enabled ? 'Activada' : 'Desactivada';
+  document.getElementById('reader').style.display = enabled ? 'block' : 'none';
+  document.getElementById('reiniciar-btn').style.display = enabled ? 'block' : 'none';
+  if (enabled) {
+    document.getElementById('qr-scanner-wrap').classList.remove('locked','success-lock');
+    cargarCamaras();
+  } else {
+    detenerEscaneo();
+    document.getElementById('camera-select').style.display = 'none';
+    setQrStatus('idle','Cámara desactivada');
+  }
+}
 
+function detenerEscaneo(){
+  if(qrCodeReader && isScanning) {
+    qrCodeReader.stop().then(()=>{qrCodeReader=null;isScanning=false;}).catch(()=>{qrCodeReader=null;isScanning=false;});
+  }
+}
+
+function cargarCamaras(){
+  if(!cameraEnabled)return;
+  setQrStatus('idle','Buscando cámaras...');
+  Html5Qrcode.getCameras().then(d=>{
+    if(d.length>0){
+      if(esMobile()&&d.length>1) mostrarSelectorCamara(d);
+      else {
+        selectedCameraId = d.find(x=>x.label.toLowerCase().includes('back'))?.id || d[0].id;
+        iniciarEscaneo();
+      }
+    } else {
+      setQrStatus('idle','❌ No se encontraron cámaras');
+    }
+  }).catch(()=>setQrStatus('idle','❌ Error al acceder a cámaras'));
+}
+
+function mostrarSelectorCamara(d){
+  const s=document.getElementById('camera-select');
+  s.innerHTML='<option value="">Selecciona cámara...</option>';
+  d.forEach((x,i)=>{
+    const o=document.createElement('option');
+    o.value=x.id;
+    o.textContent=x.label.toLowerCase().includes('back')?'📷 Trasera':`📱 Cámara ${i+1}`;
+    s.appendChild(o);
+  });
+  s.style.display='block';
+  s.onchange=function(){ if(this.value){ selectedCameraId=this.value; reiniciarQR(); }};
+  const r=d.find(x=>x.label.toLowerCase().includes('back'));
+  if(r){ s.value=r.id; selectedCameraId=r.id; iniciarEscaneo(); }
+}
+
+function iniciarEscaneo(){
+  if(isScanning || !selectedCameraId || !cameraEnabled) return;
+  document.getElementById('reader').innerHTML = '';
+  document.getElementById('reader').style.display = 'block';
+  document.getElementById('reiniciar-btn').style.display = 'block';
+  document.getElementById('qr-scanner-wrap').classList.add('scanning');
+
+  qrCodeReader = new Html5Qrcode('reader');
+  qrCodeReader.start(
+    selectedCameraId,
+    { fps: 10, qrbox: { width: 220, height: 220 } },
+    (textoDecodificado) => { onQrDetectado(textoDecodificado.trim()); },
+    () => {}  // errores de frame son normales, no los mostramos
+  ).then(() => {
+    isScanning = true;
+    setQrStatus('scanning','📷 Escaneando... apunta al QR del carnet');
+  }).catch(() => {
+    setQrStatus('idle','❌ No se pudo iniciar la cámara');
+    document.getElementById('reiniciar-btn').style.display = 'block';
+  });
+}
+
+/**
+ * Callback central cuando la cámara detecta un QR.
+ * Implementa debounce y bloqueo para evitar lecturas múltiples.
+ */
+function onQrDetectado(texto) {
+  const ahora = Date.now();
+
+  // 1) Si ya está procesando o bloqueado → ignorar
+  if (qrState.locked || qrState.procesando) return;
+
+  // 2) Debounce: mismo ID escaneado hace menos de QR_DEBOUNCE_MS → ignorar
+  if (texto === qrState.lastScannedId && (ahora - qrState.lastScanTime) < CONFIG.QR_DEBOUNCE_MS) return;
+
+  // 3) Aceptar escaneo
+  qrState.lastScannedId = texto;
+  qrState.lastScanTime  = ahora;
+  qrState.procesando    = true;
+
+  setQrStatus('detected', '🎯 QR detectado — procesando...');
+  document.getElementById('id').value = texto;
+  mostrarToast('✅ QR detectado', 'success');
+
+  // Procesar colaborador (async)
+  procesarQrEscaneado(texto);
+}
+
+async function procesarQrEscaneado(id) {
+  setQrStatus('processing','⏳ Buscando colaborador...');
+
+  // Mostrar info básica mientras carga
   document.getElementById('employee-info').style.display = 'block';
   document.getElementById('employee-name').innerHTML = '<span class="loading"></span>';
   ocultarEstadoAutoPanel();
@@ -1133,9 +1346,13 @@ async function buscarColaborador(id) {
   const res = await llamarAppsScript('buscarEstudiante', { id });
 
   if (!res?.encontrado) {
+    // Colaborador no encontrado — desbloquear QR rápido para intentar otro
+    qrState.procesando = false;
+    qrState.locked = false;
     ocultarInfoColaborador();
     mostrarRespuesta(res?.mensaje || 'No encontrado', 'warning');
-    document.getElementById('btn-submit').disabled = true;
+    setQrStatus('scanning','📷 Escaneando...');
+    mostrarToast('⚠️ ' + (res?.mensaje || 'No encontrado'), 'warning');
     return;
   }
 
@@ -1143,7 +1360,6 @@ async function buscarColaborador(id) {
   document.getElementById('employee-name').textContent     = res.datos.nombre  || '-';
   document.getElementById('employee-area').textContent     = res.datos.area    || '-';
   document.getElementById('employee-position').textContent = res.datos.cargo   || '-';
-  document.getElementById('employee-info').style.display   = 'block';
 
   const horario = horarioHoyDeStaff(res.datos);
   const jornLabels = { ninguno:'Sin horario / Día libre', medio:'🌅 Medio tiempo', completo:'☀️ Tiempo completo' };
@@ -1154,7 +1370,8 @@ async function buscarColaborador(id) {
                          Object.keys(res.datos.horario.dias).length > 0;
   const esDiaLibre = tieneHorarioV2 && horario.tipo === 'ninguno';
 
-  // ── Detectar INGRESO/SALIDA consultando registros reales de hoy ──
+  // Detectar INGRESO / SALIDA
+  setQrStatus('processing','⏳ Verificando registros del día...');
   const estadoDetectado = await detectarEstadoAuto(id);
   mostrarHorarioColaborador(horario, estadoDetectado);
   recalcularPuntualidadConEstado(estadoDetectado);
@@ -1163,30 +1380,38 @@ async function buscarColaborador(id) {
     const diasN = {lunes:'Lunes',martes:'Martes',miercoles:'Miércoles',jueves:'Jueves',viernes:'Viernes',sabado:'Sábado',domingo:'Domingo'};
     document.getElementById('employee-jornada').textContent = `📅 ${diasN[diaHoyKey()]||diaHoyKey()} — Día no laboral`;
     mostrarPanelDiaLibre(true);
-    // Día libre requiere motivo → esperar click del usuario
+
+    // Para día libre: bloquear QR pero mostrar overlay y esperar que el usuario
+    // escriba el motivo y haga click en el botón. No hay auto-registro.
+    qrState.locked    = true;
+    qrState.procesando = false;
+    mostrarOverlayQR(res.datos.nombre, id, estadoDetectado, '📅');
+    setQrStatus('detected','📅 Día no laboral — escribe el motivo');
     return;
   }
 
   mostrarPanelDiaLibre(false);
 
-  // ★ REGISTRO AUTOMÁTICO — no necesita click, se registra al instante
+  // ★ BLOQUEAR QR antes de registrar (evita doble lectura mientras procesa)
+  qrState.locked     = true;
+  qrState.procesando = true;
+  mostrarOverlayQR(res.datos.nombre, id, estadoDetectado,
+    estadoDetectado === 'INGRESO' ? '📥' : '🚪');
+  setQrStatus('detected','✅ QR procesado — registrando...');
+
+  // Registrar automáticamente
   await registrarAutomaticamente();
 }
 
-// ════════════════════════════════════════════════════════════
-// REGISTRO AUTOMÁTICO (sin click — solo para días laborales)
-// El día libre sí requiere click porque necesita motivo escrito
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════
+// REGISTRO AUTOMÁTICO (días laborales — sin click del usuario)
+// ════════════════════════════════════════════════════════════════
 async function registrarAutomaticamente() {
   if (!staffData) return;
 
   const estado    = document.getElementById('estado').value;
   const horario   = horarioHoyDeStaff(staffData);
   const evalPunct = evaluarPuntualidad(horario, estado);
-
-  const btn = document.getElementById('btn-submit');
-  btn.innerHTML = '<span class="loading"></span> Registrando...';
-  btn.disabled  = true;
 
   const res = await llamarAppsScript('registrarAsistencia', {
     id:            document.getElementById('id').value.trim(),
@@ -1202,8 +1427,7 @@ async function registrarAutomaticamente() {
     comentario:    ''
   });
 
-  btn.innerHTML = '✅ Registrar Asistencia';
-  btn.disabled  = false;
+  qrState.procesando = false;
 
   if (res?.exito) {
     let msg = res.mensaje;
@@ -1219,15 +1443,26 @@ async function registrarAutomaticamente() {
       tipo
     );
 
-    // Limpiar y quedar listo para el siguiente escaneo
-    document.getElementById('formulario').reset();
-    ocultarInfoColaborador();
+    setQrStatus('detected','✅ Registrado — esperando para nuevo escaneo...');
     cargarUltimosRegistros();
 
+    // Auto-desbloquear después de QR_LOCK_MS_TRAS_REGISTRO
+    programarAutoDesbloqueo(CONFIG.QR_LOCK_MS_TRAS_REGISTRO);
+
   } else {
+    // Error al registrar — desbloquear inmediatamente
     mostrarRespuesta(res?.mensaje || 'Error al registrar', 'error');
     mostrarToast(res?.mensaje || 'Error', 'error');
+    qrState.locked = false;
+    qrSetLocked(false);
+    setQrStatus('scanning','📷 Escaneando...');
   }
+}
+
+function reiniciarQR(){
+  desbloquearQR();
+  detenerEscaneo();
+  if(selectedCameraId && cameraEnabled) setTimeout(iniciarEscaneo, 500);
 }
 
 function ocultarInfoColaborador(){
@@ -1240,80 +1475,86 @@ function ocultarInfoColaborador(){
   ocultarEstadoAutoPanel();
   staffData=null;
 }
-function mostrarRespuesta(msg,tipo){const r=document.getElementById('respuesta');r.textContent=msg;r.className='respuesta '+tipo;r.style.display='block';if(tipo==='success')setTimeout(()=>r.style.display='none',5000);}
 
-// ════════════════════════════════════════════════════════════
-// ENVIAR FORMULARIO — solo se usa para DÍA LIBRE (requiere motivo)
-// Los días laborales normales se registran automáticamente sin click
-// ════════════════════════════════════════════════════════════
-async function enviarFormulario(e){
-  e.preventDefault();
-  if(!staffData) return mostrarRespuesta('ID no válido','error');
+function mostrarRespuesta(msg,tipo){
+  const r=document.getElementById('respuesta');
+  r.textContent=msg;r.className='respuesta '+tipo;r.style.display='block';
+  if(tipo==='success')setTimeout(()=>r.style.display='none',5000);
+}
 
-  const estado  = document.getElementById('estado').value;
-  const horario = horarioHoyDeStaff(staffData);
-  const tieneHorarioV2 = staffData.horario?.version===2 && staffData.horario?.dias && Object.keys(staffData.horario.dias).length>0;
-  const esDiaLibre = tieneHorarioV2 && horario.tipo==='ninguno';
+// ════════════════════════════════════════════════════════════════
+// ENVIAR FORMULARIO — SOLO PARA DÍA LIBRE (requiere motivo escrito)
+// ════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('formulario');
+  if (form) form.addEventListener('submit', e => e.preventDefault()); // prevenir submit nativo
+});
 
-  let comentarioDiaLibre='';
-  if(esDiaLibre){
-    comentarioDiaLibre=(document.getElementById('comentario-dia-libre').value||'').trim();
-    if(!comentarioDiaLibre){
-      document.getElementById('comentario-dia-libre').focus();
-      return mostrarRespuesta('⚠️ Debes escribir el motivo de tu asistencia para poder registrar.','error');
-    }
+async function enviarFormularioDiaLibre(e) {
+  if (e) e.preventDefault();
+  if (!staffData) return mostrarRespuesta('ID no válido','error');
+
+  const estado = document.getElementById('estado').value;
+  const comentarioDiaLibre = (document.getElementById('comentario-dia-libre').value || '').trim();
+
+  if (!comentarioDiaLibre || comentarioDiaLibre.length < 10) {
+    document.getElementById('comentario-dia-libre').focus();
+    return mostrarRespuesta('⚠️ Debes escribir el motivo de tu asistencia (mínimo 10 caracteres).','error');
   }
 
-  const evalPunct=evaluarPuntualidad(horario,estado);
-  const btn=document.getElementById('btn-submit'),orig=btn.innerHTML;
-  btn.innerHTML='<span class="loading"></span> Registrando...';
-  btn.disabled=true;
+  const horario   = horarioHoyDeStaff(staffData);
+  const evalPunct = evaluarPuntualidad(horario, estado);
 
-  const res=await llamarAppsScript('registrarAsistencia',{
+  const btn = document.getElementById('btn-submit-libre');
+  btn.innerHTML = '<span class="loading"></span> Registrando...';
+  btn.disabled  = true;
+
+  const res = await llamarAppsScript('registrarAsistencia', {
     id:            document.getElementById('id').value.trim(),
     nombre:        staffData.nombre,
     area:          staffData.area,
     cargo:         staffData.cargo,
-    telefono:      staffData.telefono||'',
+    telefono:      staffData.telefono || '',
     estado,
     idDispositivo: generarIdDispositivo(),
     puntualidad:   evalPunct.estado,
     minutosDiff:   evalPunct.minutos,
-    slotHorario:   evalPunct.slot||'',
+    slotHorario:   evalPunct.slot || '',
     comentario:    comentarioDiaLibre
   });
 
-  btn.innerHTML=orig;
+  if (res?.exito) {
+    mostrarRespuesta(res.mensaje + ' (día no laboral)', 'success');
+    mostrarToast('📅 Asistencia extraordinaria registrada', 'success');
+    setQrStatus('detected','✅ Registrado');
 
-  if(res?.exito){
-    let msg=res.mensaje;
-    if(evalPunct.estado==='tardanza')   msg+=` — ⏰ Tardanza: ${evalPunct.minutos} min`;
-    if(evalPunct.estado==='anticipada') msg+=` — ⚠️ Salida anticipada: ${evalPunct.minutos} min`;
-    const tipo=(evalPunct.estado==='puntual'||evalPunct.estado==='sin_horario')?'success':'warning';
-    mostrarRespuesta(msg,tipo);
-    mostrarToast(
-      evalPunct.estado==='tardanza'   ? '⏰ Registrado con tardanza' :
-      evalPunct.estado==='anticipada' ? '⚠️ Salida anticipada' :
-      estado==='INGRESO'              ? '📥 Ingreso registrado' : '🚪 Salida registrada',
-      tipo
-    );
-    document.getElementById('formulario').reset();
-    document.getElementById('comentario-dia-libre').value='';
+    // Limpiar y desbloquear QR para el siguiente
+    document.getElementById('comentario-dia-libre').value = '';
+    document.getElementById('comentario-chars').textContent = '0';
     mostrarPanelDiaLibre(false);
     ocultarInfoColaborador();
-    btn.disabled=true;
     cargarUltimosRegistros();
+
+    // Desbloquear QR con un pequeño delay
+    qrState.locked = false;
+    qrState.procesando = false;
+    programarAutoDesbloqueo(CONFIG.QR_LOCK_MS_TRAS_REGISTRO);
+
   } else {
-    mostrarRespuesta(res?.mensaje||'Error','error');
-    mostrarToast(res?.mensaje||'Error','error');
-    btn.disabled=false;
+    mostrarRespuesta(res?.mensaje || 'Error','error');
+    mostrarToast(res?.mensaje || 'Error','error');
+    btn.innerHTML = '✅ Registrar Asistencia';
+    btn.disabled  = false;
   }
 }
 
 async function cargarUltimosRegistros(){
-  const res=await llamarAppsScript('obtenerUltimosRegistros',{limite:8});
-  const wrap=document.getElementById('ultimos-registros-wrap');
-  if(!res?.registros?.length){wrap.innerHTML='<div class="empty-state"><span>📭</span><p>Sin registros hoy</p></div>';return;}
+  const res = await llamarAppsScript('obtenerUltimosRegistros', {limite:8});
+  const wrap = document.getElementById('ultimos-registros-wrap');
+  if (!res?.registros?.length) {
+    wrap.innerHTML='<div class="empty-state"><span>📭</span><p>Sin registros hoy</p></div>';
+    return;
+  }
   wrap.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Hora</th><th>Nombre</th><th>Estado</th><th>Puntualidad</th></tr></thead><tbody>
     ${res.registros.map(r=>`<tr><td class="recent-row-time">${r.hora}</td><td>${r.nombre}</td><td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td><td>${badgePuntualidad(r.puntualidad)}</td></tr>`).join('')}
   </tbody></table></div>`;
@@ -1591,12 +1832,22 @@ async function cambiarMiContrasena(){
 // DÍA LIBRE
 // ════════════════════════════════
 function mostrarPanelDiaLibre(mostrar){
-  const panel=document.getElementById('dia-libre-panel'),btn=document.getElementById('btn-submit');
-  if(mostrar){panel.style.display='block';document.getElementById('comentario-dia-libre').value='';document.getElementById('comentario-chars').textContent='0';btn.disabled=true;btn.textContent='📝 Escribe el motivo para registrar';}
-  else panel.style.display='none';
+  const panel=document.getElementById('dia-libre-panel');
+  if(mostrar){
+    panel.style.display='block';
+    document.getElementById('comentario-dia-libre').value='';
+    document.getElementById('comentario-chars').textContent='0';
+    const btn=document.getElementById('btn-submit-libre');
+    btn.disabled=true;
+    btn.textContent='📝 Escribe el motivo para registrar';
+    // Asignar el handler al botón de día libre
+    btn.onclick = enviarFormularioDiaLibre;
+  } else {
+    panel.style.display='none';
+  }
 }
 function validarComentarioDiaLibre(){
-  const ta=document.getElementById('comentario-dia-libre'),chars=document.getElementById('comentario-chars'),btn=document.getElementById('btn-submit'),texto=ta.value.trim();
+  const ta=document.getElementById('comentario-dia-libre'),chars=document.getElementById('comentario-chars'),btn=document.getElementById('btn-submit-libre'),texto=ta.value.trim();
   chars.textContent=texto.length;
   if(texto.length>=10){ta.classList.add('valido');btn.disabled=false;btn.innerHTML='✅ Registrar Asistencia <small style="opacity:.7;font-size:11px;">(día no laboral)</small>';}
   else{ta.classList.remove('valido');btn.disabled=true;btn.textContent=`📝 Escribe al menos ${10-texto.length} caracteres más`;}
@@ -1608,59 +1859,37 @@ function validarComentarioDiaLibre(){
 function iniciarAplicacion(){
   construirNav();
   initHorarioDias();
-  document.getElementById('formulario').addEventListener('submit',enviarFormulario);
-  document.getElementById('camera-toggle').addEventListener('change',e=>toggleCamera(e.target.checked));
-  setInterval(actualizarReloj,1000);actualizarReloj();
-  setTimeout(()=>{if(cameraEnabled&&SESSION.permisos.includes('asistencia'))cargarCamaras();},800);
-  if(SESSION.permisos.includes('asistencia'))cargarUltimosRegistros();
+  // El form no hace nada por sí solo — todo va por los botones específicos
+  const form = document.getElementById('formulario');
+  if(form) form.addEventListener('submit', e => e.preventDefault());
+  document.getElementById('camera-toggle').addEventListener('change', e => toggleCamera(e.target.checked));
+  setInterval(actualizarReloj,1000); actualizarReloj();
+  setTimeout(()=>{ if(cameraEnabled && SESSION.permisos.includes('asistencia')) cargarCamaras(); }, 800);
+  if(SESSION.permisos.includes('asistencia')) cargarUltimosRegistros();
   generarIdDispositivo();
 }
 
-document.addEventListener('keypress',function(e){if(e.key==='Enter'&&document.getElementById('login-overlay').style.display!=='none')verificarLogin();});
-window.onload=function(){const s=localStorage.getItem('session_pip');if(s){try{const d=JSON.parse(s);if(d.loggedIn){SESSION=d;document.getElementById('login-overlay').style.display='none';document.getElementById('main-content').style.display='block';iniciarAplicacion();return;}}catch(e){}}};
-window.onbeforeunload=function(){detenerEscaneo();};
-</script>
+document.addEventListener('keypress', function(e){
+  if(e.key==='Enter' && document.getElementById('login-overlay').style.display!=='none') verificarLogin();
+});
 
-<!-- ════════════════════════════════════════════════════════════════
-  FUNCIÓN QUE DEBES AGREGAR EN TU Google Apps Script (Code.gs)
-  Agrégala junto a las demás funciones del switch en doPost()
-
-  En el switch añade:
-    case 'obtenerRegistrosHoyColaborador': resultado = obtenerRegistrosHoyColaborador(params.id); break;
-
-  Y agrega esta función:
-
-function obtenerRegistrosHoyColaborador(id) {
-  try {
-    const ss   = SpreadsheetApp.openById(HOJA_ID);
-    const hoja = ss.getSheetByName(NOMBRE_HOJA_DATOS);
-    if (!hoja) return { registros: [] };
-    const datos = hoja.getDataRange().getValues();
-    const enc   = datos[0].map(h => (h||'').toString().trim().toUpperCase());
-    const idxId    = 1;
-    const idxEst   = 5;
-    const hoy      = new Date();
-    const inicioHoy= new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-    const finHoy   = new Date(inicioHoy.getTime() + 24*60*60*1000);
-    const idBuscado= id.toString().trim().toUpperCase();
-    const registros= [];
-    for (let i = 1; i < datos.length; i++) {
-      const fila = datos[i];
-      if (!fila[idxId] || fila[idxId].toString().trim().toUpperCase() !== idBuscado) continue;
-      const f = parseFechaRegistro(fila[0]);
-      if (!f || f < inicioHoy || f >= finHoy) continue;
-      registros.push({
-        hora:   Utilities.formatDate(f, 'America/Lima', 'HH:mm:ss'),
-        estado: fila[idxEst] ? fila[idxEst].toString() : ''
-      });
-    }
-    registros.sort((a,b) => a.hora.localeCompare(b.hora));
-    return { registros };
-  } catch(e) {
-    return { registros: [] };
+window.onload = function(){
+  const s = localStorage.getItem('session_pip');
+  if(s){
+    try{
+      const d = JSON.parse(s);
+      if(d.loggedIn){
+        SESSION = d;
+        document.getElementById('login-overlay').style.display='none';
+        document.getElementById('main-content').style.display='block';
+        iniciarAplicacion();
+        return;
+      }
+    }catch(e){}
   }
-}
-════════════════════════════════════════════════════════════════ -->
+};
 
+window.onbeforeunload = function(){ detenerEscaneo(); };
+</script>
 </body>
 </html>
