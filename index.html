@@ -1121,58 +1121,112 @@ function actualizarEstadoQR(m,e){const el=document.getElementById('qr-status');e
 function reiniciarQR(){detenerEscaneo();if(selectedCameraId&&cameraEnabled)setTimeout(iniciarEscaneo,500);}
 
 // ════════════════════════════════════════════════════════════
-// ASISTENCIA — buscarColaborador CON DETECCIÓN AUTOMÁTICA
+// ASISTENCIA — buscarColaborador CON DETECCIÓN Y REGISTRO AUTO
 // ════════════════════════════════════════════════════════════
 async function buscarColaborador(id) {
   if (!id.trim()) return ocultarInfoColaborador();
 
-  // Mostrar estado de carga
   document.getElementById('employee-info').style.display = 'block';
   document.getElementById('employee-name').innerHTML = '<span class="loading"></span>';
   ocultarEstadoAutoPanel();
 
   const res = await llamarAppsScript('buscarEstudiante', { id });
 
-  if (res?.encontrado) {
-    staffData = res.datos;
-    document.getElementById('employee-name').textContent     = res.datos.nombre   || '-';
-    document.getElementById('employee-area').textContent     = res.datos.area     || '-';
-    document.getElementById('employee-position').textContent = res.datos.cargo    || '-';
-    document.getElementById('employee-info').style.display   = 'block';
-
-    const horario = horarioHoyDeStaff(res.datos);
-    const jornLabels = { ninguno:'Sin horario / Día libre', medio:'🌅 Medio tiempo', completo:'☀️ Tiempo completo' };
-    document.getElementById('employee-jornada').textContent = jornLabels[horario.tipo] || 'Sin horario';
-
-    const tieneHorarioV2 = res.datos.horario?.version === 2 &&
-                           res.datos.horario?.dias && Object.keys(res.datos.horario.dias).length > 0;
-    const esDiaLibre = tieneHorarioV2 && horario.tipo === 'ninguno';
-
-    if (esDiaLibre) {
-      const diasN = {lunes:'Lunes',martes:'Martes',miercoles:'Miércoles',jueves:'Jueves',viernes:'Viernes',sabado:'Sábado',domingo:'Domingo'};
-      document.getElementById('employee-jornada').textContent = `📅 ${diasN[diaHoyKey()]||diaHoyKey()} — Día no laboral`;
-      mostrarPanelDiaLibre(true);
-      mostrarHorarioColaborador(horario, 'INGRESO');
-      // Detectamos estado igual (puede tener registros previos hoy)
-      const estadoDet = await detectarEstadoAuto(id);
-      recalcularPuntualidadConEstado(estadoDet);
-      // btn sigue deshabilitado hasta que escriban el motivo
-      return;
-    }
-
-    mostrarPanelDiaLibre(false);
-
-    // ★ Detectar INGRESO o SALIDA automáticamente según historial del día
-    const estadoDetectado = await detectarEstadoAuto(id);
-
-    mostrarHorarioColaborador(horario, estadoDetectado);
-    recalcularPuntualidadConEstado(estadoDetectado);
-    document.getElementById('btn-submit').disabled = false;
-
-  } else {
+  if (!res?.encontrado) {
     ocultarInfoColaborador();
     mostrarRespuesta(res?.mensaje || 'No encontrado', 'warning');
     document.getElementById('btn-submit').disabled = true;
+    return;
+  }
+
+  staffData = res.datos;
+  document.getElementById('employee-name').textContent     = res.datos.nombre  || '-';
+  document.getElementById('employee-area').textContent     = res.datos.area    || '-';
+  document.getElementById('employee-position').textContent = res.datos.cargo   || '-';
+  document.getElementById('employee-info').style.display   = 'block';
+
+  const horario = horarioHoyDeStaff(res.datos);
+  const jornLabels = { ninguno:'Sin horario / Día libre', medio:'🌅 Medio tiempo', completo:'☀️ Tiempo completo' };
+  document.getElementById('employee-jornada').textContent = jornLabels[horario.tipo] || 'Sin horario';
+
+  const tieneHorarioV2 = res.datos.horario?.version === 2 &&
+                         res.datos.horario?.dias &&
+                         Object.keys(res.datos.horario.dias).length > 0;
+  const esDiaLibre = tieneHorarioV2 && horario.tipo === 'ninguno';
+
+  // ── Detectar INGRESO/SALIDA consultando registros reales de hoy ──
+  const estadoDetectado = await detectarEstadoAuto(id);
+  mostrarHorarioColaborador(horario, estadoDetectado);
+  recalcularPuntualidadConEstado(estadoDetectado);
+
+  if (esDiaLibre) {
+    const diasN = {lunes:'Lunes',martes:'Martes',miercoles:'Miércoles',jueves:'Jueves',viernes:'Viernes',sabado:'Sábado',domingo:'Domingo'};
+    document.getElementById('employee-jornada').textContent = `📅 ${diasN[diaHoyKey()]||diaHoyKey()} — Día no laboral`;
+    mostrarPanelDiaLibre(true);
+    // Día libre requiere motivo → esperar click del usuario
+    return;
+  }
+
+  mostrarPanelDiaLibre(false);
+
+  // ★ REGISTRO AUTOMÁTICO — no necesita click, se registra al instante
+  await registrarAutomaticamente();
+}
+
+// ════════════════════════════════════════════════════════════
+// REGISTRO AUTOMÁTICO (sin click — solo para días laborales)
+// El día libre sí requiere click porque necesita motivo escrito
+// ════════════════════════════════════════════════════════════
+async function registrarAutomaticamente() {
+  if (!staffData) return;
+
+  const estado    = document.getElementById('estado').value;
+  const horario   = horarioHoyDeStaff(staffData);
+  const evalPunct = evaluarPuntualidad(horario, estado);
+
+  const btn = document.getElementById('btn-submit');
+  btn.innerHTML = '<span class="loading"></span> Registrando...';
+  btn.disabled  = true;
+
+  const res = await llamarAppsScript('registrarAsistencia', {
+    id:            document.getElementById('id').value.trim(),
+    nombre:        staffData.nombre,
+    area:          staffData.area,
+    cargo:         staffData.cargo,
+    telefono:      staffData.telefono || '',
+    estado,
+    idDispositivo: generarIdDispositivo(),
+    puntualidad:   evalPunct.estado,
+    minutosDiff:   evalPunct.minutos,
+    slotHorario:   evalPunct.slot || '',
+    comentario:    ''
+  });
+
+  btn.innerHTML = '✅ Registrar Asistencia';
+  btn.disabled  = false;
+
+  if (res?.exito) {
+    let msg = res.mensaje;
+    if (evalPunct.estado === 'tardanza')   msg += ` — ⏰ Tardanza: ${evalPunct.minutos} min`;
+    if (evalPunct.estado === 'anticipada') msg += ` — ⚠️ Salida anticipada: ${evalPunct.minutos} min`;
+
+    const tipo = (evalPunct.estado === 'puntual' || evalPunct.estado === 'sin_horario') ? 'success' : 'warning';
+    mostrarRespuesta(msg, tipo);
+    mostrarToast(
+      evalPunct.estado === 'tardanza'   ? `⏰ ${estado} con tardanza` :
+      evalPunct.estado === 'anticipada' ? `⚠️ ${estado} anticipado`  :
+      estado === 'INGRESO'              ? '📥 Ingreso registrado'     : '🚪 Salida registrada',
+      tipo
+    );
+
+    // Limpiar y quedar listo para el siguiente escaneo
+    document.getElementById('formulario').reset();
+    ocultarInfoColaborador();
+    cargarUltimosRegistros();
+
+  } else {
+    mostrarRespuesta(res?.mensaje || 'Error al registrar', 'error');
+    mostrarToast(res?.mensaje || 'Error', 'error');
   }
 }
 
@@ -1189,41 +1243,70 @@ function ocultarInfoColaborador(){
 function mostrarRespuesta(msg,tipo){const r=document.getElementById('respuesta');r.textContent=msg;r.className='respuesta '+tipo;r.style.display='block';if(tipo==='success')setTimeout(()=>r.style.display='none',5000);}
 
 // ════════════════════════════════════════════════════════════
-// ENVIAR FORMULARIO (usa el campo oculto #estado)
+// ENVIAR FORMULARIO — solo se usa para DÍA LIBRE (requiere motivo)
+// Los días laborales normales se registran automáticamente sin click
 // ════════════════════════════════════════════════════════════
 async function enviarFormulario(e){
-  e.preventDefault();if(!staffData)return mostrarRespuesta('ID no válido','error');
-  const estado = document.getElementById('estado').value;  // ← asignado automáticamente
+  e.preventDefault();
+  if(!staffData) return mostrarRespuesta('ID no válido','error');
+
+  const estado  = document.getElementById('estado').value;
   const horario = horarioHoyDeStaff(staffData);
   const tieneHorarioV2 = staffData.horario?.version===2 && staffData.horario?.dias && Object.keys(staffData.horario.dias).length>0;
   const esDiaLibre = tieneHorarioV2 && horario.tipo==='ninguno';
+
   let comentarioDiaLibre='';
   if(esDiaLibre){
     comentarioDiaLibre=(document.getElementById('comentario-dia-libre').value||'').trim();
-    if(!comentarioDiaLibre){document.getElementById('comentario-dia-libre').focus();return mostrarRespuesta('⚠️ Debes escribir el motivo de tu asistencia para poder registrar.','error');}
+    if(!comentarioDiaLibre){
+      document.getElementById('comentario-dia-libre').focus();
+      return mostrarRespuesta('⚠️ Debes escribir el motivo de tu asistencia para poder registrar.','error');
+    }
   }
+
   const evalPunct=evaluarPuntualidad(horario,estado);
   const btn=document.getElementById('btn-submit'),orig=btn.innerHTML;
-  btn.innerHTML='<span class="loading"></span> Registrando...';btn.disabled=true;
+  btn.innerHTML='<span class="loading"></span> Registrando...';
+  btn.disabled=true;
+
   const res=await llamarAppsScript('registrarAsistencia',{
-    id:document.getElementById('id').value.trim(),
-    nombre:staffData.nombre,area:staffData.area,cargo:staffData.cargo,
-    telefono:staffData.telefono||'',estado,
-    idDispositivo:generarIdDispositivo(),
-    puntualidad:evalPunct.estado,minutosDiff:evalPunct.minutos,slotHorario:evalPunct.slot||'',
-    comentario:comentarioDiaLibre
+    id:            document.getElementById('id').value.trim(),
+    nombre:        staffData.nombre,
+    area:          staffData.area,
+    cargo:         staffData.cargo,
+    telefono:      staffData.telefono||'',
+    estado,
+    idDispositivo: generarIdDispositivo(),
+    puntualidad:   evalPunct.estado,
+    minutosDiff:   evalPunct.minutos,
+    slotHorario:   evalPunct.slot||'',
+    comentario:    comentarioDiaLibre
   });
+
   btn.innerHTML=orig;
+
   if(res?.exito){
     let msg=res.mensaje;
-    if(evalPunct.estado==='tardanza')msg+=` — ⏰ Tardanza: ${evalPunct.minutos} min`;
-    if(evalPunct.estado==='anticipada')msg+=` — ⚠️ Salida anticipada: ${evalPunct.minutos} min`;
-    mostrarRespuesta(msg,evalPunct.estado==='puntual'||evalPunct.estado==='sin_horario'?'success':'warning');
-    mostrarToast(evalPunct.estado==='tardanza'?'⏰ Registrado con tardanza':evalPunct.estado==='anticipada'?'⚠️ Salida anticipada':'✅ Registro exitoso',evalPunct.estado==='puntual'||evalPunct.estado==='sin_horario'?'success':'warning');
-    document.getElementById('formulario').reset();document.getElementById('comentario-dia-libre').value='';
-    mostrarPanelDiaLibre(false);ocultarInfoColaborador();btn.disabled=true;cargarUltimosRegistros();
-  }else{
-    mostrarRespuesta(res?.mensaje||'Error','error');mostrarToast(res?.mensaje||'Error','error');btn.disabled=false;
+    if(evalPunct.estado==='tardanza')   msg+=` — ⏰ Tardanza: ${evalPunct.minutos} min`;
+    if(evalPunct.estado==='anticipada') msg+=` — ⚠️ Salida anticipada: ${evalPunct.minutos} min`;
+    const tipo=(evalPunct.estado==='puntual'||evalPunct.estado==='sin_horario')?'success':'warning';
+    mostrarRespuesta(msg,tipo);
+    mostrarToast(
+      evalPunct.estado==='tardanza'   ? '⏰ Registrado con tardanza' :
+      evalPunct.estado==='anticipada' ? '⚠️ Salida anticipada' :
+      estado==='INGRESO'              ? '📥 Ingreso registrado' : '🚪 Salida registrada',
+      tipo
+    );
+    document.getElementById('formulario').reset();
+    document.getElementById('comentario-dia-libre').value='';
+    mostrarPanelDiaLibre(false);
+    ocultarInfoColaborador();
+    btn.disabled=true;
+    cargarUltimosRegistros();
+  } else {
+    mostrarRespuesta(res?.mensaje||'Error','error');
+    mostrarToast(res?.mensaje||'Error','error');
+    btn.disabled=false;
   }
 }
 
