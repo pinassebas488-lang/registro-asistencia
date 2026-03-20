@@ -4,14 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>FINACORP — Control de Asistencia</title>
-  <!-- Librerías existentes -->
   <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- NUEVAS librerías para PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   <style>
-    /* ... (tu CSS existente se mantiene exactamente igual) ... */
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
     :root {
       --primary:#10b981;--primary-dark:#059669;
@@ -102,8 +99,6 @@
     .stat-icon.amber{background:rgba(245,158,11,.15);}
     .stat-icon.purple{background:rgba(139,92,246,.15);}
     .stat-icon.red{background:rgba(239,68,68,.15);}
-    .stat-value{font-size:24px;font-weight:800;margin-bottom:3px;}
-    .stat-label{font-size:11px;color:var(--text-muted);font-weight:500;}
     .scan-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 
     /* FORMS */
@@ -115,10 +110,42 @@
     .form-group input:focus,.form-group select:focus{border-color:var(--primary);background:rgba(16,185,129,.04);box-shadow:0 0 0 3px rgba(16,185,129,.12);}
     .form-group input:disabled{opacity:.4;cursor:not-allowed;}
     .form-group select option{background:var(--surface2);}
-
     .id-qr-only{position:relative;}
     .id-qr-only input{padding-right:90px;cursor:not-allowed;opacity:.6;background:var(--surface2)!important;border-color:rgba(16,185,129,.2)!important;}
     .id-qr-badge{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#34d399;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;pointer-events:none;letter-spacing:.3px;}
+
+    /* ════════════════════════════════════════════
+       ESTADO AUTOMÁTICO — PANEL VISUAL (NUEVO)
+    ════════════════════════════════════════════ */
+    .estado-auto-panel{
+      border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:12px;
+      display:none;align-items:center;gap:14px;animation:fadeIn .3s ease;
+    }
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+    .estado-auto-panel.ingreso{background:rgba(16,185,129,.08);border:1.5px solid rgba(16,185,129,.35);}
+    .estado-auto-panel.salida{background:rgba(239,68,68,.07);border:1.5px solid rgba(239,68,68,.3);}
+    .estado-auto-panel.cargando{background:rgba(59,130,246,.07);border:1.5px solid rgba(59,130,246,.25);}
+    .estado-auto-icon{font-size:28px;flex-shrink:0;line-height:1;}
+    .estado-auto-info{flex:1;}
+    .estado-auto-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;}
+    .estado-auto-panel.ingreso  .estado-auto-label{color:#34d399;}
+    .estado-auto-panel.salida   .estado-auto-label{color:#f87171;}
+    .estado-auto-panel.cargando .estado-auto-label{color:#93c5fd;}
+    .estado-auto-value{font-size:17px;font-weight:800;line-height:1.2;}
+    .estado-auto-panel.ingreso  .estado-auto-value{color:#ecfdf5;}
+    .estado-auto-panel.salida   .estado-auto-value{color:#fef2f2;}
+    .estado-auto-panel.cargando .estado-auto-value{color:var(--text);}
+    .estado-auto-sub{font-size:11px;margin-top:3px;}
+    .estado-auto-panel.ingreso  .estado-auto-sub{color:#6ee7b7;}
+    .estado-auto-panel.salida   .estado-auto-sub{color:#fca5a5;}
+    .estado-auto-panel.cargando .estado-auto-sub{color:var(--text-muted);}
+    /* Secuencia visual del día */
+    .secuencia-hoy{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px;}
+    .seq-dot{display:flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+    .seq-dot.ing{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3);}
+    .seq-dot.sal{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25);}
+    .seq-dot.next{background:rgba(255,255,255,.06);color:var(--text-muted);border:1px dashed var(--border);}
+    .seq-arrow{color:var(--text-muted);font-size:12px;}
 
     /* BOTONES */
     .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;transition:var(--transition);}
@@ -156,10 +183,8 @@
     .schedule-slot .slot-label{color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-size:10px;margin-bottom:2px;}
     .schedule-slot .slot-time{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:var(--text);}
     .schedule-slot.active-slot{border:1px solid rgba(16,185,129,.4);background:rgba(16,185,129,.07);}
-    .schedule-slot .slot-time.on-time{color:#34d399;}
-    .schedule-slot .slot-time.late{color:#f87171;}
 
-    /* PUNTUALIDAD BADGE EN REGISTRO */
+    /* PUNTUALIDAD BADGE */
     .punct-alert{border-radius:var(--radius-sm);padding:10px 13px;font-size:13px;font-weight:600;margin-bottom:10px;display:none;align-items:center;gap:8px;}
     .punct-alert.on-time{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:#34d399;}
     .punct-alert.tardanza{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:#fcd34d;}
@@ -237,9 +262,9 @@
     .day-toggle label{display:flex;flex-direction:column;align-items:center;padding:7px 10px;min-width:46px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;cursor:pointer;transition:var(--transition);user-select:none;}
     .day-toggle label .day-abbr{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);}
     .day-toggle label .day-num{font-size:9px;color:var(--text-muted);margin-top:1px;}
-    .day-toggle input:checked + label{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.5);color:var(--primary);}
-    .day-toggle input:checked + label .day-abbr{color:var(--primary);}
-    .day-toggle input:checked + label .day-num{color:#34d399;}
+    .day-toggle input:checked+label{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.5);color:var(--primary);}
+    .day-toggle input:checked+label .day-abbr{color:var(--primary);}
+    .day-toggle input:checked+label .day-num{color:#34d399;}
     .day-toggle label:hover{border-color:var(--primary);background:rgba(16,185,129,.06);}
     .day-schedule-list{display:flex;flex-direction:column;gap:8px;}
     .day-schedule-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;transition:var(--transition);}
@@ -311,8 +336,6 @@
     .report-stat .lbl{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
     .recent-row-time{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);}
     ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px;}
-
-    /* CREDENTIAL CARD */
     .cred-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;transition:var(--transition);}
     .cred-card:hover{border-color:var(--primary);}
     .cred-name{font-weight:700;font-size:14px;margin-bottom:2px;}
@@ -321,7 +344,7 @@
     .cred-actions{display:flex;gap:6px;flex-shrink:0;}
 
     @media(max-width:900px){.scan-grid{grid-template-columns:1fr;}.sidebar{width:210px;}.main-area{margin-left:210px;}.day-times-grid{grid-template-columns:1fr;}}
-    @media(max-width:650px){.sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}.main-area{margin-left:0;}.topbar{padding:10px 13px;}.page-content{padding:13px;}.mobile-menu-btn{display:flex;align-items:center;}.form-grid{grid-template-columns:1fr;}.day-times-grid{grid-template-columns:1fr;}}
+    @media(max-width:650px){.sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}.main-area{margin-left:0;}.topbar{padding:10px 13px;}.page-content{padding:13px;}.mobile-menu-btn{display:flex;align-items:center;}.form-grid{grid-template-columns:1fr;}.day-times-grid{grid-column:1fr;}}
   </style>
 </head>
 <body>
@@ -335,7 +358,7 @@
       <div class="login-logo">
         <div class="login-logo-icon">🏦</div>
         <h2>Finacorp</h2>
-        <p>Sistema de Control de Asistencia v5.3</p>
+        <p>Sistema de Control de Asistencia v5.4</p>
       </div>
       <div class="login-input-group">
         <label>Usuario</label>
@@ -347,7 +370,7 @@
       </div>
       <button class="login-btn" id="login-btn" onclick="verificarLogin()">Ingresar →</button>
       <div id="login-error" class="login-error">⚠️ Usuario o contraseña incorrectos</div>
-      <div class="login-footer"><p>© 2026 Finacorp — v5.3</p></div>
+      <div class="login-footer"><p>© 2026 Finacorp — v5.4</p></div>
     </div>
   </div>
 </div>
@@ -356,7 +379,6 @@
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 <div id="main-content">
   <div class="app-layout">
-
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-logo">
         <h1>🏦 Finacorp</h1>
@@ -412,6 +434,7 @@
                     <span class="id-qr-badge">📷 QR</span>
                   </div>
                 </div>
+
                 <div class="employee-info" id="employee-info">
                   <h4>👤 Colaborador encontrado</h4>
                   <p>Nombre: <span class="val" id="employee-name">-</span></p>
@@ -419,6 +442,21 @@
                   <p>Cargo: <span class="val" id="employee-position">-</span></p>
                   <p>Jornada hoy: <span class="val" id="employee-jornada">-</span></p>
                 </div>
+
+                <!-- ★ NUEVO: Panel visual de estado automático (reemplaza el select de Estado) -->
+                <div class="estado-auto-panel" id="estado-auto-panel">
+                  <div class="estado-auto-icon" id="estado-auto-icon">📷</div>
+                  <div class="estado-auto-info">
+                    <div class="estado-auto-label" id="estado-auto-label">Esperando escaneo</div>
+                    <div class="estado-auto-value" id="estado-auto-value">Apunta la cámara al carnet QR</div>
+                    <div class="estado-auto-sub"   id="estado-auto-sub">El sistema detectará automáticamente si es entrada o salida</div>
+                    <div class="secuencia-hoy"     id="secuencia-hoy"></div>
+                  </div>
+                </div>
+
+                <!-- Campo oculto — el estado lo asigna el sistema, no el usuario -->
+                <input type="hidden" id="estado" value="INGRESO">
+
                 <div class="today-schedule-panel" id="today-schedule-panel">
                   <h5>🕐 Horario de hoy</h5>
                   <div class="today-slots-row" id="today-slots-row"></div>
@@ -441,13 +479,6 @@
                     <textarea id="comentario-dia-libre" rows="3" placeholder="Ej: Recuperación de horas del día lunes, apoyo en cierre de mes, reunión urgente con cliente..." oninput="validarComentarioDiaLibre()" style="resize:vertical;min-height:72px;"></textarea>
                     <div class="dia-libre-counter"><span id="comentario-chars">0</span> caracteres</div>
                   </div>
-                </div>
-                <div class="form-group">
-                  <label>Estado</label>
-                  <select id="estado" onchange="recalcularPuntualidad()">
-                    <option value="INGRESO">✅ INGRESO</option>
-                    <option value="SALIDA">🚪 SALIDA</option>
-                  </select>
                 </div>
                 <button type="submit" class="btn btn-primary btn-full" id="btn-submit" disabled>✅ Registrar Asistencia</button>
               </form>
@@ -561,9 +592,7 @@
             <div id="lista-personal-contador" style="font-size:12px;color:var(--text-muted);margin-bottom:8px;"></div>
             <div class="table-wrap">
               <table>
-                <thead>
-                  <tr><th>#</th><th>ID</th><th>Nombre Completo</th><th>Área</th><th>Cargo</th><th>Días Laborales</th><th>Estado</th><th>Acciones</th></tr>
-                </thead>
+                <thead><tr><th>#</th><th>ID</th><th>Nombre Completo</th><th>Área</th><th>Cargo</th><th>Días Laborales</th><th>Estado</th><th>Acciones</th></tr></thead>
                 <tbody id="lista-personal-tbody">
                   <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-muted);"><div class="empty-state"><span>⏳</span><p>Cargando personal...</p></div></td></tr>
                 </tbody>
@@ -592,9 +621,8 @@
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
             <button class="btn btn-secondary" onclick="cargarReporte()">🔍 Ver Reporte</button>
-            <button class="btn btn-excel" id="btn-exportar-excel" onclick="exportarExcel()" disabled>📥 Exportar Excel (por colaborador)</button>
-            <!-- BOTÓN DE PDF AHORA ACTIVADO -->
-            <button class="btn btn-danger" id="btn-exportar-pdf" onclick="exportarPDF()" disabled style="background:#dc2626;">📄 Exportar PDF (detallado)</button>
+            <button class="btn btn-excel" id="btn-exportar-excel" onclick="exportarExcel()" disabled>📥 Exportar Excel</button>
+            <button class="btn btn-danger" id="btn-exportar-pdf" onclick="exportarPDF()" disabled style="background:#dc2626;">📄 Exportar PDF</button>
           </div>
         </div>
         <div id="reporte-resumen" style="display:none;" class="report-summary">
@@ -650,14 +678,7 @@
                 <div class="form-group"><label>Nombre Completo *</label><input type="text" id="cred-nombre" placeholder="Ej: María Torres"></div>
                 <div class="form-group"><label>Usuario (para login) *</label><input type="text" id="cred-usuario" placeholder="Ej: maria.torres" autocomplete="off"></div>
                 <div class="form-group"><label>Contraseña *</label><input type="password" id="cred-pass" placeholder="Mínimo 4 caracteres" autocomplete="new-password"></div>
-                <div class="form-group">
-                  <label>Rol</label>
-                  <select id="cred-rol">
-                    <option value="operador">Operador</option>
-                    <option value="supervisor">Supervisor</option>
-                    <option value="admin">Administrador</option>
-                  </select>
-                </div>
+                <div class="form-group"><label>Rol</label><select id="cred-rol"><option value="operador">Operador</option><option value="supervisor">Supervisor</option><option value="admin">Administrador</option></select></div>
               </div>
               <div class="form-group">
                 <label>Permisos de Acceso</label>
@@ -678,15 +699,12 @@
             </div>
           </div>
           <div class="tab-panel" id="cred-tab-lista">
-            <div class="card">
-              <div class="card-title">👥 Accesos Registrados</div>
-              <div id="cred-lista-wrap"><div class="empty-state"><span>⏳</span><p>Cargando...</p></div></div>
-            </div>
+            <div class="card"><div class="card-title">👥 Accesos Registrados</div><div id="cred-lista-wrap"><div class="empty-state"><span>⏳</span><p>Cargando...</p></div></div></div>
           </div>
           <div class="tab-panel" id="cred-tab-mipass">
             <div class="card" style="max-width:460px;">
               <div class="card-title">🔑 Cambiar Mi Contraseña</div>
-              <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Cambia la contraseña de tu usuario. El cambio se aplica de inmediato.</p>
+              <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Cambia la contraseña de tu usuario.</p>
               <div class="form-group"><label>Contraseña Actual *</label><input type="password" id="mp-actual" placeholder="Tu contraseña actual" autocomplete="current-password"></div>
               <div class="form-group"><label>Nueva Contraseña *</label><input type="password" id="mp-nueva" placeholder="Mínimo 4 caracteres" autocomplete="new-password"></div>
               <div class="form-group"><label>Confirmar Nueva Contraseña *</label><input type="password" id="mp-confirmar" placeholder="Repite la nueva contraseña" autocomplete="new-password"></div>
@@ -696,12 +714,11 @@
           </div>
         </div>
       </div>
-
     </main>
   </div>
 </div>
 
-<!-- Modals -->
+<!-- MODALS -->
 <div class="modal-overlay" id="modal-eliminar">
   <div class="modal-box">
     <div style="font-size:32px;text-align:center;margin-bottom:10px;">⚠️</div>
@@ -738,27 +755,18 @@
 
 <div id="toast" class="toast"></div>
 
-<!-- Modal: crear contraseña admin primera vez -->
 <div id="modal-crear-pass">
   <div class="crear-pass-box">
     <div style="font-size:40px;text-align:center;margin-bottom:12px;">🔐</div>
     <h3>Bienvenido, Administrador</h3>
     <p>Es tu primera vez ingresando.<br>Crea una contraseña segura para proteger tu cuenta.</p>
-    <div class="login-input-group">
-      <label>Nueva Contraseña</label>
-      <div class="login-input-wrap"><span>🔑</span><input type="password" id="cp-nueva" placeholder="Mínimo 6 caracteres" oninput="validarCrearPass()" onkeydown="if(event.key==='Enter')document.getElementById('cp-confirmar').focus()"></div>
-    </div>
-    <div class="login-input-group">
-      <label>Confirmar Contraseña</label>
-      <div class="login-input-wrap"><span>✅</span><input type="password" id="cp-confirmar" placeholder="Repite tu contraseña" oninput="validarCrearPass()" onkeydown="if(event.key==='Enter')confirmarCrearPass()"></div>
-    </div>
+    <div class="login-input-group"><label>Nueva Contraseña</label><div class="login-input-wrap"><span>🔑</span><input type="password" id="cp-nueva" placeholder="Mínimo 6 caracteres" oninput="validarCrearPass()" onkeydown="if(event.key==='Enter')document.getElementById('cp-confirmar').focus()"></div></div>
+    <div class="login-input-group"><label>Confirmar Contraseña</label><div class="login-input-wrap"><span>✅</span><input type="password" id="cp-confirmar" placeholder="Repite tu contraseña" oninput="validarCrearPass()" onkeydown="if(event.key==='Enter')confirmarCrearPass()"></div></div>
     <div class="crear-pass-req" id="cp-requisitos">
       <span id="cp-req-len" class="fail">✗ Al menos 6 caracteres</span>
       <span id="cp-req-match" class="fail">✗ Las contraseñas coinciden</span>
     </div>
-    <div style="margin-top:18px;">
-      <button class="login-btn" id="cp-btn" onclick="confirmarCrearPass()" disabled style="opacity:.5;cursor:not-allowed;">Crear Contraseña →</button>
-    </div>
+    <div style="margin-top:18px;"><button class="login-btn" id="cp-btn" onclick="confirmarCrearPass()" disabled style="opacity:.5;cursor:not-allowed;">Crear Contraseña →</button></div>
     <div id="cp-error" class="login-error" style="margin-top:12px;"></div>
   </div>
 </div>
@@ -768,82 +776,49 @@
 // CONFIG
 // ════════════════════════════════
 const CONFIG = {
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxxNz9FhBV3ybKs8CMow5mc1PusG2AybD6_POwWvsUR813pNC60OFS_VDzbpzGs24k/exec', // <--- REEMPLAZA CON TU URL
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxxNz9FhBV3ybKs8CMow5mc1PusG2AybD6_POwWvsUR813pNC60OFS_VDzbpzGs24k/exec',
   ADMIN_USER: 'admin',
   TIEMPO_TOAST: 3500
 };
 
 // ════════════════════════════════
-// ESTADO
+// ESTADO GLOBAL
 // ════════════════════════════════
 let SESSION = { loggedIn:false, usuario:'', nombre:'', rol:'', permisos:[] };
 let reporteData=[], idAEliminar='', usuarioCredAEliminar='', idToggleActivo='', pendienteActivo=null;
 let modoEdicionPersonal=false, modoEdicionCred=false;
-let qrCodeReader=null, isScanning=false, searchTimeout=null;
+let qrCodeReader=null, isScanning=false;
 let staffData=null, selectedCameraId=null, cameraEnabled=true;
-let _datosEdicionPersonal = null;
+let _datosEdicionPersonal=null;
 
-// ════════════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 // SISTEMA DE HORARIOS POR DÍA
-// ════════════════════════════════════════════════════════════════════════
-const DIAS = [
-  { key:'lunes',     abbr:'Lun', num:'Lu' },
-  { key:'martes',    abbr:'Mar', num:'Ma' },
-  { key:'miercoles', abbr:'Mié', num:'Mi' },
-  { key:'jueves',    abbr:'Jue', num:'Ju' },
-  { key:'viernes',   abbr:'Vie', num:'Vi' },
-  { key:'sabado',    abbr:'Sáb', num:'Sa' },
-  { key:'domingo',   abbr:'Dom', num:'Do' }
+// ════════════════════════════════════════════
+const DIAS=[
+  {key:'lunes',abbr:'Lun',num:'Lu'},{key:'martes',abbr:'Mar',num:'Ma'},
+  {key:'miercoles',abbr:'Mié',num:'Mi'},{key:'jueves',abbr:'Jue',num:'Ju'},
+  {key:'viernes',abbr:'Vie',num:'Vi'},{key:'sabado',abbr:'Sáb',num:'Sa'},
+  {key:'domingo',abbr:'Dom',num:'Do'}
 ];
-
-function diaHoyKey() {
-  const keys = ['domingo','lunes','martes','miercoles','jueves','viernes','sabado'];
-  return keys[new Date().getDay()];
+function diaHoyKey(){const k=['domingo','lunes','martes','miercoles','jueves','viernes','sabado'];return k[new Date().getDay()];}
+let horarioDias={};
+function initHorarioDias(){horarioDias={};DIAS.forEach(d=>{horarioDias[d.key]={activo:false,tipo:'libre',entrada1:'',salida1:'',entrada2:'',salida2:''};});}
+function renderizarSelectorDias(){
+  const sel=document.getElementById('days-selector'),lista=document.getElementById('day-schedule-list');
+  if(!sel||!lista)return;
+  sel.innerHTML=DIAS.map(d=>`<div class="day-toggle"><input type="checkbox" id="day-chk-${d.key}" ${horarioDias[d.key]?.activo?'checked':''} onchange="toggleDiaActivo('${d.key}',this.checked)"><label for="day-chk-${d.key}"><span class="day-abbr">${d.abbr}</span><span class="day-num">${d.num}</span></label></div>`).join('');
+  lista.innerHTML=DIAS.map(d=>renderDayItem(d)).join('');
 }
-
-let horarioDias = {};
-
-function initHorarioDias() {
-  horarioDias = {};
-  DIAS.forEach(d => {
-    horarioDias[d.key] = { activo: false, tipo: 'libre', entrada1:'', salida1:'', entrada2:'', salida2:'' };
-  });
-}
-
-function renderizarSelectorDias() {
-  const selector = document.getElementById('days-selector');
-  const lista = document.getElementById('day-schedule-list');
-  if (!selector || !lista) return;
-  selector.innerHTML = DIAS.map(d => `
-    <div class="day-toggle">
-      <input type="checkbox" id="day-chk-${d.key}" ${horarioDias[d.key]?.activo ? 'checked' : ''}
-        onchange="toggleDiaActivo('${d.key}', this.checked)">
-      <label for="day-chk-${d.key}">
-        <span class="day-abbr">${d.abbr}</span>
-        <span class="day-num">${d.num}</span>
-      </label>
-    </div>`).join('');
-  lista.innerHTML = DIAS.map(d => renderDayItem(d)).join('');
-}
-
-function renderDayItem(d) {
-  const dia = horarioDias[d.key] || { activo:false, tipo:'libre' };
-  const tipo = dia.tipo || 'libre';
-  const badgeClass = tipo === 'completo' ? 'completo' : tipo === 'medio' ? 'medio' : 'libre';
-  const badgeText  = tipo === 'completo' ? '☀️ Completo' : tipo === 'medio' ? '🌅 Medio' : '🚫 No trabaja';
-  const dotClass   = dia.activo ? 'active' : '';
-  const timeSummary = dia.activo && tipo !== 'libre' ? resumenHorarioDia(dia) : '';
-  return `<div class="day-schedule-item ${!dia.activo ? 'day-off' : ''}" id="day-item-${d.key}">
+function renderDayItem(d){
+  const dia=horarioDias[d.key]||{activo:false,tipo:'libre'};
+  const tipo=dia.tipo||'libre';
+  const bClass=tipo==='completo'?'completo':tipo==='medio'?'medio':'libre';
+  const bText=tipo==='completo'?'☀️ Completo':tipo==='medio'?'🌅 Medio':'🚫 No trabaja';
+  const ts=dia.activo&&tipo!=='libre'?resumenHorarioDia(dia):'';
+  return`<div class="day-schedule-item ${!dia.activo?'day-off':''}" id="day-item-${d.key}">
     <div class="day-schedule-header" onclick="toggleDayAccordion('${d.key}')">
-      <div class="day-schedule-label">
-        <div class="day-dot ${dotClass}"></div>
-        <span>${d.abbr}</span>
-      </div>
-      <div class="day-schedule-meta">
-        <span style="font-size:11px;color:var(--text-muted);">${timeSummary}</span>
-        <span class="day-schedule-badge ${badgeClass}">${badgeText}</span>
-        <span class="day-schedule-chevron" id="chevron-${d.key}">▼</span>
-      </div>
+      <div class="day-schedule-label"><div class="day-dot ${dia.activo?'active':''}"></div><span>${d.abbr}</span></div>
+      <div class="day-schedule-meta"><span style="font-size:11px;color:var(--text-muted);">${ts}</span><span class="day-schedule-badge ${bClass}">${bText}</span><span class="day-schedule-chevron" id="chevron-${d.key}">▼</span></div>
     </div>
     <div class="day-schedule-body" id="body-${d.key}">
       <div class="day-type-row">
@@ -851,428 +826,228 @@ function renderDayItem(d) {
         <button type="button" class="day-type-btn ${tipo==='medio'?'active-medio':''}" onclick="setDayType('${d.key}','medio')">🌅 Medio tiempo</button>
         <button type="button" class="day-type-btn ${tipo==='completo'?'active-completo':''}" onclick="setDayType('${d.key}','completo')">☀️ Tiempo completo</button>
       </div>
-      ${tipo !== 'libre' ? renderDayTimeInputs(d.key, dia) : '<p style="font-size:12px;color:var(--text-muted);padding:4px 0;">Este día no es laborable.</p>'}
+      ${tipo!=='libre'?renderDayTimeInputs(d.key,dia):'<p style="font-size:12px;color:var(--text-muted);padding:4px 0;">Este día no es laborable.</p>'}
     </div>
   </div>`;
 }
-
-function resumenHorarioDia(dia) {
-  const tipo = dia.tipo;
-  if (tipo === 'medio')    return `${dia.entrada1||'?'} → ${dia.salida1||'?'}`;
-  if (tipo === 'completo') return `${dia.entrada1||'?'} → ${dia.salida1||'?'} | ${dia.entrada2||'?'} → ${dia.salida2||'?'}`;
-  return '';
+function resumenHorarioDia(dia){if(dia.tipo==='medio')return`${dia.entrada1||'?'} → ${dia.salida1||'?'}`;if(dia.tipo==='completo')return`${dia.entrada1||'?'} → ${dia.salida1||'?'} | ${dia.entrada2||'?'} → ${dia.salida2||'?'}`;return'';}
+function renderDayTimeInputs(key,dia){
+  if(dia.tipo==='medio')return`<div class="day-times-grid"><div class="day-time-input"><div class="day-time-label"><span class="emoji">✅</span> Límite de entrada</div><input type="time" value="${dia.entrada1||''}" onchange="updateDayTime('${key}','entrada1',this.value)" oninput="updateDayTime('${key}','entrada1',this.value)"><div class="day-time-note">Tarde si llega después</div></div><div class="day-time-input"><div class="day-time-label"><span class="emoji">🚪</span> Mínima de salida</div><input type="time" value="${dia.salida1||''}" onchange="updateDayTime('${key}','salida1',this.value)" oninput="updateDayTime('${key}','salida1',this.value)"><div class="day-time-note">Anticipada si sale antes</div></div></div>`;
+  if(dia.tipo==='completo')return`<div class="day-times-grid"><div class="day-time-input"><div class="day-time-label"><span class="emoji">✅</span> Límite entrada AM</div><input type="time" value="${dia.entrada1||''}" onchange="updateDayTime('${key}','entrada1',this.value)" oninput="updateDayTime('${key}','entrada1',this.value)"><div class="day-time-note">Entrada mañana</div></div><div class="day-time-input"><div class="day-time-label"><span class="emoji">🍽️</span> Mín. salida almuerzo</div><input type="time" value="${dia.salida1||''}" onchange="updateDayTime('${key}','salida1',this.value)" oninput="updateDayTime('${key}','salida1',this.value)"><div class="day-time-note">Salida a almorzar</div></div><hr class="day-divider"><div class="day-time-input"><div class="day-time-label"><span class="emoji">🔄</span> Límite retorno</div><input type="time" value="${dia.entrada2||''}" onchange="updateDayTime('${key}','entrada2',this.value)" oninput="updateDayTime('${key}','entrada2',this.value)"><div class="day-time-note">Regreso del almuerzo</div></div><div class="day-time-input"><div class="day-time-label"><span class="emoji">🏁</span> Mín. salida final</div><input type="time" value="${dia.salida2||''}" onchange="updateDayTime('${key}','salida2',this.value)" oninput="updateDayTime('${key}','salida2',this.value)"><div class="day-time-note">Fin de jornada</div></div></div>`;
+  return'';
+}
+function toggleDayAccordion(key){const b=document.getElementById('body-'+key),c=document.getElementById('chevron-'+key);if(!b)return;b.classList.toggle('open');if(c)c.classList.toggle('open');}
+function toggleDiaActivo(key,activo){if(!horarioDias[key])horarioDias[key]={activo:false,tipo:'libre',entrada1:'',salida1:'',entrada2:'',salida2:''};horarioDias[key].activo=activo;if(activo&&horarioDias[key].tipo==='libre')horarioDias[key].tipo='completo';if(!activo)horarioDias[key].tipo='libre';renderizarSelectorDias();}
+function setDayType(key,tipo){if(!horarioDias[key])return;horarioDias[key].tipo=tipo;horarioDias[key].activo=tipo!=='libre';renderizarSelectorDias();setTimeout(()=>{const b=document.getElementById('body-'+key),c=document.getElementById('chevron-'+key);if(b)b.classList.add('open');if(c)c.classList.add('open');},20);}
+function updateDayTime(key,campo,valor){if(!horarioDias[key])return;horarioDias[key][campo]=valor;const di=document.getElementById('day-item-'+key);if(!di)return;const m=di.querySelector('.day-schedule-meta span:first-child');if(m)m.textContent=resumenHorarioDia(horarioDias[key]);}
+function marcarDiasLaborales(){DIAS.forEach(d=>{const e=!['sabado','domingo'].includes(d.key);horarioDias[d.key].activo=e;horarioDias[d.key].tipo=e?'completo':'libre';});renderizarSelectorDias();}
+function marcarTodosLosDias(){DIAS.forEach(d=>{horarioDias[d.key].activo=true;horarioDias[d.key].tipo='completo';});renderizarSelectorDias();}
+function desmarcarTodos(){DIAS.forEach(d=>{horarioDias[d.key].activo=false;horarioDias[d.key].tipo='libre';});renderizarSelectorDias();}
+function serializarHorario(){return JSON.stringify({version:2,dias:horarioDias});}
+function deserializarHorario(raw){
+  initHorarioDias();if(!raw)return;
+  try{
+    const h=typeof raw==='string'?JSON.parse(raw):raw;
+    if(h.version===2&&h.dias){DIAS.forEach(d=>{if(h.dias[d.key])horarioDias[d.key]={...horarioDias[d.key],...h.dias[d.key]};});}
+    else if(h.tipo&&h.tipo!=='ninguno'){['lunes','martes','miercoles','jueves','viernes'].forEach(k=>{horarioDias[k]={activo:true,tipo:h.tipo==='medio'?'medio':'completo',entrada1:h.entrada1||'',salida1:h.salida1||'',entrada2:h.entrada2||'',salida2:h.salida2||''};});}
+  }catch(e){}
+}
+function horarioHoyDeStaff(staff){
+  if(!staff||!staff.horario)return{tipo:'ninguno'};
+  const h=staff.horario;
+  if(h.version===2&&h.dias){const k=diaHoyKey(),d=h.dias[k];if(!d||!d.activo||d.tipo==='libre')return{tipo:'ninguno'};return{tipo:d.tipo,entrada1:d.entrada1||'',salida1:d.salida1||'',entrada2:d.entrada2||'',salida2:d.salida2||''};}
+  if(h.tipo&&h.tipo!=='ninguno')return h;
+  return{tipo:'ninguno'};
 }
 
-function renderDayTimeInputs(key, dia) {
-  const tipo = dia.tipo;
-  if (tipo === 'medio') {
-    return `<div class="day-times-grid">
-      <div class="day-time-input">
-        <div class="day-time-label"><span class="emoji">✅</span> Límite de entrada</div>
-        <input type="time" value="${dia.entrada1||''}" onchange="updateDayTime('${key}','entrada1',this.value)" oninput="updateDayTime('${key}','entrada1',this.value)">
-        <div class="day-time-note">Tarde si llega después</div>
-      </div>
-      <div class="day-time-input">
-        <div class="day-time-label"><span class="emoji">🚪</span> Mínima de salida</div>
-        <input type="time" value="${dia.salida1||''}" onchange="updateDayTime('${key}','salida1',this.value)" oninput="updateDayTime('${key}','salida1',this.value)">
-        <div class="day-time-note">Anticipada si sale antes</div>
-      </div>
-    </div>`;
-  }
-  if (tipo === 'completo') {
-    return `<div class="day-times-grid">
-      <div class="day-time-input">
-        <div class="day-time-label"><span class="emoji">✅</span> Límite entrada AM</div>
-        <input type="time" value="${dia.entrada1||''}" onchange="updateDayTime('${key}','entrada1',this.value)" oninput="updateDayTime('${key}','entrada1',this.value)">
-        <div class="day-time-note">Entrada mañana</div>
-      </div>
-      <div class="day-time-input">
-        <div class="day-time-label"><span class="emoji">🍽️</span> Mín. salida almuerzo</div>
-        <input type="time" value="${dia.salida1||''}" onchange="updateDayTime('${key}','salida1',this.value)" oninput="updateDayTime('${key}','salida1',this.value)">
-        <div class="day-time-note">Salida a almorzar</div>
-      </div>
-      <hr class="day-divider">
-      <div class="day-time-input">
-        <div class="day-time-label"><span class="emoji">🔄</span> Límite retorno</div>
-        <input type="time" value="${dia.entrada2||''}" onchange="updateDayTime('${key}','entrada2',this.value)" oninput="updateDayTime('${key}','entrada2',this.value)">
-        <div class="day-time-note">Regreso del almuerzo</div>
-      </div>
-      <div class="day-time-input">
-        <div class="day-time-label"><span class="emoji">🏁</span> Mín. salida final</div>
-        <input type="time" value="${dia.salida2||''}" onchange="updateDayTime('${key}','salida2',this.value)" oninput="updateDayTime('${key}','salida2',this.value)">
-        <div class="day-time-note">Fin de jornada</div>
-      </div>
-    </div>`;
-  }
-  return '';
-}
-
-function toggleDayAccordion(key) {
-  const body = document.getElementById('body-' + key);
-  const chevron = document.getElementById('chevron-' + key);
-  if (!body) return;
-  const isOpen = body.classList.contains('open');
-  body.classList.toggle('open', !isOpen);
-  if (chevron) chevron.classList.toggle('open', !isOpen);
-}
-
-function toggleDiaActivo(key, activo) {
-  if (!horarioDias[key]) horarioDias[key] = { activo:false, tipo:'libre', entrada1:'', salida1:'', entrada2:'', salida2:'' };
-  horarioDias[key].activo = activo;
-  if (activo && horarioDias[key].tipo === 'libre') horarioDias[key].tipo = 'completo';
-  if (!activo) horarioDias[key].tipo = 'libre';
-  renderizarSelectorDias();
-}
-
-function setDayType(key, tipo) {
-  if (!horarioDias[key]) return;
-  horarioDias[key].tipo = tipo;
-  horarioDias[key].activo = tipo !== 'libre';
-  renderizarSelectorDias();
-  setTimeout(() => {
-    const body = document.getElementById('body-' + key);
-    const chevron = document.getElementById('chevron-' + key);
-    if (body) body.classList.add('open');
-    if (chevron) chevron.classList.add('open');
-  }, 20);
-}
-
-function updateDayTime(key, campo, valor) {
-  if (!horarioDias[key]) return;
-  horarioDias[key][campo] = valor;
-  const dia = document.getElementById('day-item-' + key);
-  if (!dia) return;
-  const meta = dia.querySelector('.day-schedule-meta span:first-child');
-  if (meta) meta.textContent = resumenHorarioDia(horarioDias[key]);
-}
-
-function marcarDiasLaborales() {
-  DIAS.forEach(d => {
-    const esLaboral = !['sabado','domingo'].includes(d.key);
-    horarioDias[d.key].activo = esLaboral;
-    horarioDias[d.key].tipo = esLaboral ? 'completo' : 'libre';
-  });
-  renderizarSelectorDias();
-}
-
-function marcarTodosLosDias() {
-  DIAS.forEach(d => { horarioDias[d.key].activo = true; horarioDias[d.key].tipo = 'completo'; });
-  renderizarSelectorDias();
-}
-
-function desmarcarTodos() {
-  DIAS.forEach(d => { horarioDias[d.key].activo = false; horarioDias[d.key].tipo = 'libre'; });
-  renderizarSelectorDias();
-}
-
-function serializarHorario() {
-  return JSON.stringify({ version: 2, dias: horarioDias });
-}
-
-function deserializarHorario(raw) {
-  initHorarioDias();
-  if (!raw) return;
-  try {
-    const h = typeof raw === 'string' ? JSON.parse(raw) : raw;
-    if (h.version === 2 && h.dias) {
-      DIAS.forEach(d => {
-        if (h.dias[d.key]) {
-          horarioDias[d.key] = { ...horarioDias[d.key], ...h.dias[d.key] };
-        }
-      });
-    } else if (h.tipo && h.tipo !== 'ninguno') {
-      const diasLaborales = ['lunes','martes','miercoles','jueves','viernes'];
-      diasLaborales.forEach(key => {
-        horarioDias[key] = {
-          activo: true,
-          tipo: h.tipo === 'medio' ? 'medio' : 'completo',
-          entrada1: h.entrada1 || '',
-          salida1:  h.salida1  || '',
-          entrada2: h.entrada2 || '',
-          salida2:  h.salida2  || ''
-        };
-      });
-    }
-  } catch(e) {}
-}
-
-function horarioHoy() {
-  const key = diaHoyKey();
-  const dia = horarioDias[key];
-  if (!dia || !dia.activo || dia.tipo === 'libre') return { tipo: 'ninguno' };
-  return { tipo: dia.tipo, entrada1: dia.entrada1||'', salida1: dia.salida1||'', entrada2: dia.entrada2||'', salida2: dia.salida2||'' };
-}
-
-function horarioHoyDeStaff(staff) {
-  if (!staff || !staff.horario) return { tipo: 'ninguno' };
-  const h = staff.horario;
-  if (h.version === 2 && h.dias) {
-    const key = diaHoyKey();
-    const dia = h.dias[key];
-    if (!dia || !dia.activo || dia.tipo === 'libre') return { tipo: 'ninguno' };
-    return { tipo: dia.tipo, entrada1: dia.entrada1||'', salida1: dia.salida1||'', entrada2: dia.entrada2||'', salida2: dia.salida2||'' };
-  }
-  if (h.tipo && h.tipo !== 'ninguno') return h;
-  return { tipo: 'ninguno' };
-}
-
-// ════════════════════════════════════════════════════════════
-// SISTEMA DE PUNTUALIDAD
-// ════════════════════════════════════════════════════════════
-function horaAMinutos(hhmm) {
-  if (!hhmm) return null;
-  const partes = hhmm.split(':');
-  if (partes.length < 2) return null;
-  return parseInt(partes[0]) * 60 + parseInt(partes[1]);
-}
-
-function minutosAhora() {
-  const ahora = new Date();
-  return ahora.getHours() * 60 + ahora.getMinutes();
-}
-
-function detectarSlotActivo(horario, estado) {
-  if (!horario || horario.tipo === 'ninguno') return null;
-  const min = minutosAhora();
-  if (horario.tipo === 'medio') {
-    return estado === 'INGRESO' ? 'entrada1' : 'salida1';
-  }
-  if (horario.tipo === 'completo') {
-    if (estado === 'INGRESO') {
-      const e1 = horaAMinutos(horario.entrada1), e2 = horaAMinutos(horario.entrada2);
-      if (e1 !== null && e2 !== null) return min < (e1+e2)/2 ? 'entrada1' : 'entrada2';
-      return 'entrada1';
-    }
-    if (estado === 'SALIDA') {
-      const s1 = horaAMinutos(horario.salida1), s2 = horaAMinutos(horario.salida2);
-      if (s1 !== null && s2 !== null) return min < (s1+s2)/2 ? 'salida1' : 'salida2';
-      return 'salida1';
-    }
+// ════════════════════════════════
+// PUNTUALIDAD
+// ════════════════════════════════
+function horaAMinutos(hhmm){if(!hhmm)return null;const p=hhmm.split(':');if(p.length<2)return null;return parseInt(p[0])*60+parseInt(p[1]);}
+function minutosAhora(){const a=new Date();return a.getHours()*60+a.getMinutes();}
+function detectarSlotActivo(horario,estado){
+  if(!horario||horario.tipo==='ninguno')return null;
+  const min=minutosAhora();
+  if(horario.tipo==='medio')return estado==='INGRESO'?'entrada1':'salida1';
+  if(horario.tipo==='completo'){
+    if(estado==='INGRESO'){const e1=horaAMinutos(horario.entrada1),e2=horaAMinutos(horario.entrada2);if(e1!==null&&e2!==null)return min<(e1+e2)/2?'entrada1':'entrada2';return'entrada1';}
+    if(estado==='SALIDA'){const s1=horaAMinutos(horario.salida1),s2=horaAMinutos(horario.salida2);if(s1!==null&&s2!==null)return min<(s1+s2)/2?'salida1':'salida2';return'salida1';}
   }
   return null;
 }
+function evaluarPuntualidad(horario,estado){
+  if(!horario||horario.tipo==='ninguno')return{estado:'sin_horario',minutos:0,slot:null};
+  const slot=detectarSlotActivo(horario,estado);if(!slot)return{estado:'sin_horario',minutos:0,slot:null};
+  const lim=horaAMinutos(horario[slot]);if(lim===null)return{estado:'sin_horario',minutos:0,slot};
+  const diff=minutosAhora()-lim;
+  if(estado==='INGRESO')return diff>0?{estado:'tardanza',minutos:diff,slot}:{estado:'puntual',minutos:Math.abs(diff),slot};
+  return diff<0?{estado:'anticipada',minutos:Math.abs(diff),slot}:{estado:'puntual',minutos:diff,slot};
+}
+const SLOT_LABELS={entrada1:'1ª Entrada',salida1:'1ª Salida (Almuerzo)',entrada2:'Retorno Almuerzo',salida2:'Salida Final'};
+const SLOT_LABELS_MEDIO={entrada1:'Entrada',salida1:'Salida'};
+function slotLabel(slot,tipo){return tipo==='medio'?(SLOT_LABELS_MEDIO[slot]||slot):(SLOT_LABELS[slot]||slot);}
 
-function evaluarPuntualidad(horario, estado) {
-  if (!horario || horario.tipo === 'ninguno') return { estado:'sin_horario', minutos:0, slot:null };
-  const slot = detectarSlotActivo(horario, estado);
-  if (!slot) return { estado:'sin_horario', minutos:0, slot:null };
-  const horaLimite = horaAMinutos(horario[slot]);
-  if (horaLimite === null) return { estado:'sin_horario', minutos:0, slot };
-  const minActual = minutosAhora();
-  const diff = minActual - horaLimite;
-  if (estado === 'INGRESO') {
-    return diff > 0 ? { estado:'tardanza', minutos:diff, slot } : { estado:'puntual', minutos:Math.abs(diff), slot };
-  } else {
-    return diff < 0 ? { estado:'anticipada', minutos:Math.abs(diff), slot } : { estado:'puntual', minutos:diff, slot };
-  }
+function mostrarHorarioColaborador(horario,estadoActual){
+  if(!estadoActual)estadoActual=document.getElementById('estado').value||'INGRESO';
+  const panel=document.getElementById('schedule-info'),slotsDiv=document.getElementById('schedule-slots-display');
+  const todayPanel=document.getElementById('today-schedule-panel'),todayRow=document.getElementById('today-slots-row');
+  if(!horario||horario.tipo==='ninguno'){panel.style.display='none';todayPanel.style.display='none';return;}
+  const slots=[];
+  if(horario.tipo==='medio'){if(horario.entrada1)slots.push({label:'Entrada',hora:horario.entrada1,key:'entrada1'});if(horario.salida1)slots.push({label:'Salida',hora:horario.salida1,key:'salida1'});}
+  else if(horario.tipo==='completo'){if(horario.entrada1)slots.push({label:'Entrada AM',hora:horario.entrada1,key:'entrada1'});if(horario.salida1)slots.push({label:'Sal. Alm.',hora:horario.salida1,key:'salida1'});if(horario.entrada2)slots.push({label:'Retorno',hora:horario.entrada2,key:'entrada2'});if(horario.salida2)slots.push({label:'Salida Final',hora:horario.salida2,key:'salida2'});}
+  if(!slots.length){panel.style.display='none';todayPanel.style.display='none';return;}
+  todayPanel.style.display='block';
+  const slotActivo=detectarSlotActivo(horario,estadoActual);
+  todayRow.innerHTML=slots.map(s=>`<div class="today-slot-pill ${s.key===slotActivo?'active-pill':''}">${s.label}: <b>${s.hora}</b></div>`).join('');
+  const slotInfo=slots.find(s=>s.key===slotActivo);
+  if(slotInfo){panel.style.display='block';slotsDiv.innerHTML=`<div class="schedule-slot active-slot"><div class="slot-label">Slot activo — ${slotInfo.label}</div><div class="slot-time">${slotInfo.hora}</div></div>`;}
+  else panel.style.display='none';
 }
 
-const SLOT_LABELS = { entrada1:'1ª Entrada', salida1:'1ª Salida (Almuerzo)', entrada2:'Retorno Almuerzo', salida2:'Salida Final' };
-const SLOT_LABELS_MEDIO = { entrada1:'Entrada', salida1:'Salida' };
-function slotLabel(slot, tipo) {
-  return tipo === 'medio' ? (SLOT_LABELS_MEDIO[slot]||slot) : (SLOT_LABELS[slot]||slot);
+function recalcularPuntualidad(){
+  const estado=document.getElementById('estado').value||'INGRESO';
+  recalcularPuntualidadConEstado(estado);
 }
-
-function mostrarHorarioColaborador(horario) {
-  const panel    = document.getElementById('schedule-info');
-  const slotsDiv = document.getElementById('schedule-slots-display');
-  const todayPanel = document.getElementById('today-schedule-panel');
-  const todayRow   = document.getElementById('today-slots-row');
-  if (!horario || horario.tipo === 'ninguno') {
-    panel.style.display = 'none';
-    todayPanel.style.display = 'none';
+function recalcularPuntualidadConEstado(estado){
+  if(!staffData){ocultarPunctAlert();return;}
+  const horario=horarioHoyDeStaff(staffData);
+  mostrarPunctAlert(evaluarPuntualidad(horario,estado),estado,horario);
+  mostrarHorarioColaborador(horario,estado);
+}
+function mostrarPunctAlert(eval_,estado,horario){
+  const el=document.getElementById('punct-alert');el.style.display='flex';
+  if(eval_.estado==='sin_horario'){
+    const key=diaHoyKey(),esV2=staffData?.horario?.version===2,diaConf=esV2?staffData.horario.dias?.[key]:null,esDiaLibre=esV2&&(!diaConf||!diaConf.activo||diaConf.tipo==='libre');
+    if(esDiaLibre){el.className='punct-alert dia-libre';const dn=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'][new Date().getDay()];el.innerHTML=`📅 <b>${dn} no es día laborable</b> para este colaborador`;}
+    else{el.className='punct-alert sin-horario';el.innerHTML='📋 Sin horario configurado — se registrará sin evaluación de puntualidad';}
     return;
   }
-  const slots = [];
-  if (horario.tipo === 'medio') {
-    if (horario.entrada1) slots.push({ label:'Entrada', hora:horario.entrada1, key:'entrada1' });
-    if (horario.salida1)  slots.push({ label:'Salida',  hora:horario.salida1,  key:'salida1' });
-  } else if (horario.tipo === 'completo') {
-    if (horario.entrada1) slots.push({ label:'Entrada AM',  hora:horario.entrada1, key:'entrada1' });
-    if (horario.salida1)  slots.push({ label:'Sal. Alm.',   hora:horario.salida1,  key:'salida1' });
-    if (horario.entrada2) slots.push({ label:'Retorno',     hora:horario.entrada2, key:'entrada2' });
-    if (horario.salida2)  slots.push({ label:'Salida Final',hora:horario.salida2,  key:'salida2' });
-  }
-  if (!slots.length) { panel.style.display='none'; todayPanel.style.display='none'; return; }
-  todayPanel.style.display = 'block';
-  const estadoActual = document.getElementById('estado').value;
-  const slotActivo   = detectarSlotActivo(horario, estadoActual);
-  todayRow.innerHTML = slots.map(s => `
-    <div class="today-slot-pill ${s.key === slotActivo ? 'active-pill' : ''}">
-      ${s.label}: <b>${s.hora}</b>
-    </div>`).join('');
-  const slotInfo = slots.find(s => s.key === slotActivo);
-  if (slotInfo) {
-    panel.style.display = 'block';
-    slotsDiv.innerHTML = `
-      <div class="schedule-slot active-slot">
-        <div class="slot-label">Slot activo — ${slotInfo.label}</div>
-        <div class="slot-time">${slotInfo.hora}</div>
-      </div>`;
-  } else {
-    panel.style.display = 'none';
-  }
+  const sn=slotLabel(eval_.slot,horario?.tipo);
+  if(eval_.estado==='puntual'){el.className='punct-alert on-time';el.innerHTML=estado==='INGRESO'?`✅ <b>Puntual</b> — ${eval_.minutos} min antes del límite (${sn})`:`✅ <b>A tiempo</b> — ${eval_.minutos} min después de hora mínima (${sn})`;}
+  else if(eval_.estado==='tardanza'){el.className='punct-alert tardanza';el.innerHTML=`⏰ <b>TARDANZA</b> — ${eval_.minutos} min de retraso en ${sn}`;}
+  else if(eval_.estado==='anticipada'){el.className='punct-alert anticipada';el.innerHTML=`⚠️ <b>SALIDA ANTICIPADA</b> — ${eval_.minutos} min antes de hora mínima (${sn})`;}
+}
+function ocultarPunctAlert(){document.getElementById('punct-alert').style.display='none';}
+function badgePuntualidad(punct){
+  if(!punct||punct==='sin_horario')return'<span class="badge badge-gray">—</span>';
+  if(punct==='puntual')return'<span class="badge badge-green">✅ Puntual</span>';
+  if(punct==='tardanza')return'<span class="badge badge-amber">⏰ Tardanza</span>';
+  if(punct==='anticipada')return'<span class="badge badge-purple">⚠️ Anticipada</span>';
+  if(punct==='extraordinario')return'<span class="badge badge-blue">📅 Día Extra</span>';
+  return'<span class="badge badge-gray">—</span>';
 }
 
-function recalcularPuntualidad() {
-  if (!staffData) { ocultarPunctAlert(); return; }
-  const horario = horarioHoyDeStaff(staffData);
-  const estado  = document.getElementById('estado').value;
-  const eval_   = evaluarPuntualidad(horario, estado);
-  mostrarPunctAlert(eval_, estado, horario);
-  mostrarHorarioColaborador(horario);
-}
+// ════════════════════════════════════════════════════════════
+// ★ DETECCIÓN AUTOMÁTICA DE ESTADO (INGRESO / SALIDA) — NUEVO
+//
+// Lógica:
+//   Sin registros hoy          → INGRESO
+//   Último registro = INGRESO  → SALIDA
+//   Último registro = SALIDA   → INGRESO  (regreso/jornada extra)
+//
+// Para jornada completa el ciclo es: I → S → I → S
+// Para medio tiempo:                 I → S
+// ════════════════════════════════════════════════════════════
+async function detectarEstadoAuto(id) {
+  mostrarEstadoAutoPanel('cargando','⏳','Detectando...','Consultando registros de hoy','');
+  try {
+    const res = await llamarAppsScript('obtenerRegistrosHoyColaborador', { id });
+    // Ordenar por hora de más antiguo a más reciente
+    const registros = (res?.registros || []).sort((a,b) => (a.hora||'').localeCompare(b.hora||''));
+    const total  = registros.length;
+    const ultimo = total > 0 ? registros[total - 1] : null;
 
-function mostrarPunctAlert(eval_, estado, horario) {
-  const el = document.getElementById('punct-alert');
-  el.style.display = 'flex';
-  if (eval_.estado === 'sin_horario') {
-    const key = diaHoyKey();
-    const esStaff = staffData?.horario?.version === 2;
-    const diaConf = esStaff ? staffData.horario.dias?.[key] : null;
-    const esDiaLibre = esStaff && (!diaConf || !diaConf.activo || diaConf.tipo === 'libre');
-    if (esDiaLibre) {
-      el.className = 'punct-alert dia-libre';
-      const diaHoy = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'][new Date().getDay()];
-      el.innerHTML = `📅 <b>${diaHoy} no es día laborable</b> para este colaborador`;
+    let siguiente;
+    if (!ultimo)                      siguiente = 'INGRESO';  // sin registros → primera entrada
+    else if (ultimo.estado==='INGRESO') siguiente = 'SALIDA';  // último fue entrada → ahora salida
+    else                              siguiente = 'INGRESO';  // último fue salida  → regreso/nueva entrada
+
+    // Guardar en el campo oculto que usará el formulario
+    document.getElementById('estado').value = siguiente;
+
+    const secHtml = construirSecuenciaHoy(registros, siguiente);
+
+    if (siguiente === 'INGRESO') {
+      const sub = total === 0 ? 'Primer registro del día' : `Regreso — ${total} registro${total>1?'s':''} previo${total>1?'s':''} hoy`;
+      mostrarEstadoAutoPanel('ingreso','📥','INGRESO',sub,secHtml);
     } else {
-      el.className = 'punct-alert sin-horario';
-      el.innerHTML = '📋 Sin horario configurado — se registrará sin evaluación de puntualidad';
+      mostrarEstadoAutoPanel('salida','🚪','SALIDA',`Salida — ${total} registro${total>1?'s':''} previo${total>1?'s':''} hoy`,secHtml);
     }
-    return;
-  }
-  const slotNombre = slotLabel(eval_.slot, horario?.tipo);
-  if (eval_.estado === 'puntual') {
-    el.className = 'punct-alert on-time';
-    el.innerHTML = estado === 'INGRESO'
-      ? `✅ <b>Puntual</b> — ${eval_.minutos} min antes del límite (${slotNombre})`
-      : `✅ <b>A tiempo</b> — ${eval_.minutos} min después de hora mínima (${slotNombre})`;
-  } else if (eval_.estado === 'tardanza') {
-    el.className = 'punct-alert tardanza';
-    el.innerHTML = `⏰ <b>TARDANZA</b> — ${eval_.minutos} min de retraso en ${slotNombre}`;
-  } else if (eval_.estado === 'anticipada') {
-    el.className = 'punct-alert anticipada';
-    el.innerHTML = `⚠️ <b>SALIDA ANTICIPADA</b> — ${eval_.minutos} min antes de hora mínima (${slotNombre})`;
+    return siguiente;
+  } catch(e) {
+    // Si falla la consulta no bloqueamos — asumimos INGRESO
+    document.getElementById('estado').value = 'INGRESO';
+    mostrarEstadoAutoPanel('ingreso','📥','INGRESO','No se pudo verificar historial — asumiendo entrada','');
+    return 'INGRESO';
   }
 }
 
-function ocultarPunctAlert() {
-  document.getElementById('punct-alert').style.display = 'none';
+function mostrarEstadoAutoPanel(tipo, icono, valor, sub, secHtml) {
+  const panel = document.getElementById('estado-auto-panel');
+  panel.className = 'estado-auto-panel ' + tipo;
+  panel.style.display = 'flex';
+  document.getElementById('estado-auto-icon').textContent  = icono;
+  document.getElementById('estado-auto-label').textContent = (tipo==='cargando') ? 'Detectando tipo...' : 'Tipo de registro detectado';
+  document.getElementById('estado-auto-value').textContent = valor;
+  document.getElementById('estado-auto-sub').textContent   = sub;
+  document.getElementById('secuencia-hoy').innerHTML       = secHtml;
 }
 
-function badgePuntualidad(punct) {
-  if (!punct || punct==='sin_horario')  return '<span class="badge badge-gray">—</span>';
-  if (punct==='puntual')                return '<span class="badge badge-green">✅ Puntual</span>';
-  if (punct==='tardanza')               return '<span class="badge badge-amber">⏰ Tardanza</span>';
-  if (punct==='anticipada')             return '<span class="badge badge-purple">⚠️ Anticipada</span>';
-  if (punct==='extraordinario')         return '<span class="badge badge-blue">📅 Día Extra</span>';
-  return '<span class="badge badge-gray">—</span>';
+function ocultarEstadoAutoPanel() {
+  const p = document.getElementById('estado-auto-panel');
+  p.style.display = 'none';
+  p.className = 'estado-auto-panel';
+}
+
+/**
+ * Línea visual: [📥 08:01] → [🚪 12:30] → [📥 AHora]
+ */
+function construirSecuenciaHoy(registros, siguiente) {
+  if (!registros.length) {
+    return `<span class="seq-dot next">📥 Primer registro</span>`;
+  }
+  let html = '';
+  registros.forEach((r,i) => {
+    if (i > 0) html += '<span class="seq-arrow">→</span>';
+    const cls  = r.estado==='INGRESO' ? 'ing' : 'sal';
+    const icon = r.estado==='INGRESO' ? '📥' : '🚪';
+    html += `<span class="seq-dot ${cls}">${icon} ${(r.hora||'').substring(0,5)}</span>`;
+  });
+  html += '<span class="seq-arrow">→</span>';
+  const nc = siguiente==='INGRESO' ? 'ing' : 'sal';
+  const ni = siguiente==='INGRESO' ? '📥' : '🚪';
+  html += `<span class="seq-dot next">${ni} Ahora</span>`;
+  return html;
 }
 
 // ════════════════════════════════
 // LOGIN
 // ════════════════════════════════
-async function verificarLogin() {
-  const user   = document.getElementById('login-user').value.trim();
-  const pass   = document.getElementById('login-pass').value.trim();
-  const btn    = document.getElementById('login-btn');
-  if (!user) { mostrarErrorLogin('Ingresa tu usuario'); return; }
-  if (user === CONFIG.ADMIN_USER) {
-    btn.textContent = 'Verificando...'; btn.disabled = true;
-    try {
-      const resAdmin = await llamarAppsScript('verificarCredencial', {usuario: user, pass});
-      btn.textContent = 'Ingresar →'; btn.disabled = false;
-      if (resAdmin?.ok) {
-        iniciarSesion({usuario:user,nombre:'Administrador',rol:'admin',permisos:['asistencia','dashboard','personal','reportes','carnets','credenciales']});
-        return;
-      }
-      if (resAdmin && !resAdmin.ok) { mostrarErrorLogin('Contraseña incorrecta'); return; }
-    } catch(e) { btn.textContent = 'Ingresar →'; btn.disabled = false; }
-    mostrarModalCrearPass();
-    return;
+async function verificarLogin(){
+  const user=document.getElementById('login-user').value.trim(),pass=document.getElementById('login-pass').value.trim(),btn=document.getElementById('login-btn');
+  if(!user){mostrarErrorLogin('Ingresa tu usuario');return;}
+  if(user===CONFIG.ADMIN_USER){
+    btn.textContent='Verificando...';btn.disabled=true;
+    try{const r=await llamarAppsScript('verificarCredencial',{usuario:user,pass});btn.textContent='Ingresar →';btn.disabled=false;if(r?.ok){iniciarSesion({usuario:user,nombre:'Administrador',rol:'admin',permisos:['asistencia','dashboard','personal','reportes','carnets','credenciales']});return;}if(r&&!r.ok){mostrarErrorLogin('Contraseña incorrecta');return;}}
+    catch(e){btn.textContent='Ingresar →';btn.disabled=false;}
+    mostrarModalCrearPass();return;
   }
-  if (!pass) { mostrarErrorLogin('Ingresa tu contraseña'); return; }
-  btn.textContent = 'Verificando...'; btn.disabled = true;
-  const res = await llamarAppsScript('verificarCredencial', {usuario: user, pass});
-  btn.textContent = 'Ingresar →'; btn.disabled = false;
-  if (res?.ok) { iniciarSesion(res.datos); }
-  else { mostrarErrorLogin('Usuario o contraseña incorrectos'); document.getElementById('login-pass').value = ''; }
+  if(!pass){mostrarErrorLogin('Ingresa tu contraseña');return;}
+  btn.textContent='Verificando...';btn.disabled=true;
+  const res=await llamarAppsScript('verificarCredencial',{usuario:user,pass});
+  btn.textContent='Ingresar →';btn.disabled=false;
+  if(res?.ok)iniciarSesion(res.datos);
+  else{mostrarErrorLogin('Usuario o contraseña incorrectos');document.getElementById('login-pass').value='';}
 }
-
-function mostrarErrorLogin(msg) {
-  const errEl = document.getElementById('login-error');
-  errEl.textContent = '⚠️ ' + msg;
-  errEl.style.display = 'block';
-  setTimeout(() => errEl.style.display = 'none', 3500);
-}
-
-function mostrarModalCrearPass() {
-  document.getElementById('cp-nueva').value = '';
-  document.getElementById('cp-confirmar').value = '';
-  document.getElementById('cp-error').style.display = 'none';
-  document.getElementById('cp-btn').disabled = true;
-  document.getElementById('cp-btn').style.opacity = '.5';
-  document.getElementById('cp-btn').style.cursor = 'not-allowed';
-  document.getElementById('cp-req-len').className   = 'fail';
-  document.getElementById('cp-req-len').textContent  = '✗ Al menos 6 caracteres';
-  document.getElementById('cp-req-match').className  = 'fail';
-  document.getElementById('cp-req-match').textContent= '✗ Las contraseñas coinciden';
-  document.getElementById('modal-crear-pass').classList.add('show');
-  setTimeout(() => document.getElementById('cp-nueva').focus(), 200);
-}
-
-function validarCrearPass() {
-  const nueva     = document.getElementById('cp-nueva').value;
-  const confirmar = document.getElementById('cp-confirmar').value;
-  const lenOk     = nueva.length >= 6;
-  const matchOk   = nueva === confirmar && confirmar.length > 0;
-  const reqLen    = document.getElementById('cp-req-len');
-  const reqMatch  = document.getElementById('cp-req-match');
-  reqLen.className   = lenOk   ? 'ok' : 'fail';
-  reqLen.textContent  = lenOk   ? '✓ Al menos 6 caracteres' : '✗ Al menos 6 caracteres';
-  reqMatch.className  = matchOk ? 'ok' : 'fail';
-  reqMatch.textContent= matchOk ? '✓ Las contraseñas coinciden' : '✗ Las contraseñas coinciden';
-  const ok = lenOk && matchOk;
-  document.getElementById('cp-btn').disabled     = !ok;
-  document.getElementById('cp-btn').style.opacity = ok ? '1' : '.5';
-  document.getElementById('cp-btn').style.cursor  = ok ? 'pointer' : 'not-allowed';
-}
-
-async function confirmarCrearPass() {
-  const nueva = document.getElementById('cp-nueva').value.trim();
-  if (nueva.length < 6) return;
-  const btn = document.getElementById('cp-btn');
-  btn.textContent = 'Guardando...'; btn.disabled = true;
-  const res = await llamarAppsScript('guardarContrasenaAdmin', {passNueva: nueva});
-  if (res?.exito) {
-    document.getElementById('modal-crear-pass').classList.remove('show');
-    iniciarSesion({usuario:CONFIG.ADMIN_USER,nombre:'Administrador',rol:'admin',
-      permisos:['asistencia','dashboard','personal','reportes','carnets','credenciales']});
-    mostrarToast('🔐 Contraseña creada. ¡Bienvenido!', 'success');
-  } else {
-    const cpErr = document.getElementById('cp-error');
-    cpErr.textContent = '❌ ' + (res?.mensaje || 'Error al guardar');
-    cpErr.style.display = 'block';
-    btn.textContent = 'Crear Contraseña →'; btn.disabled = false;
-  }
-}
-
-function iniciarSesion(d) {
-  SESSION={loggedIn:true,usuario:d.usuario,nombre:d.nombre,rol:d.rol,permisos:d.permisos||[]};
-  if(SESSION.rol==='admin'&&!SESSION.permisos.includes('credenciales'))SESSION.permisos.push('credenciales');
-  localStorage.setItem('session_pip',JSON.stringify(SESSION));
-  document.getElementById('login-overlay').style.display='none';
-  document.getElementById('main-content').style.display='block';
-  mostrarToast('¡Bienvenido, '+SESSION.nombre+'!','success');
-  iniciarAplicacion();
-}
-
-function cerrarSesion() {
-  localStorage.removeItem('session_pip');mostrarToast('Sesión cerrada','warning');setTimeout(()=>location.reload(),900);
-}
+function mostrarErrorLogin(msg){const e=document.getElementById('login-error');e.textContent='⚠️ '+msg;e.style.display='block';setTimeout(()=>e.style.display='none',3500);}
+function mostrarModalCrearPass(){document.getElementById('cp-nueva').value='';document.getElementById('cp-confirmar').value='';document.getElementById('cp-error').style.display='none';document.getElementById('cp-btn').disabled=true;document.getElementById('cp-btn').style.opacity='.5';document.getElementById('cp-btn').style.cursor='not-allowed';document.getElementById('cp-req-len').className='fail';document.getElementById('cp-req-len').textContent='✗ Al menos 6 caracteres';document.getElementById('cp-req-match').className='fail';document.getElementById('cp-req-match').textContent='✗ Las contraseñas coinciden';document.getElementById('modal-crear-pass').classList.add('show');setTimeout(()=>document.getElementById('cp-nueva').focus(),200);}
+function validarCrearPass(){const n=document.getElementById('cp-nueva').value,c=document.getElementById('cp-confirmar').value,lOk=n.length>=6,mOk=n===c&&c.length>0;document.getElementById('cp-req-len').className=lOk?'ok':'fail';document.getElementById('cp-req-len').textContent=lOk?'✓ Al menos 6 caracteres':'✗ Al menos 6 caracteres';document.getElementById('cp-req-match').className=mOk?'ok':'fail';document.getElementById('cp-req-match').textContent=mOk?'✓ Las contraseñas coinciden':'✗ Las contraseñas coinciden';const ok=lOk&&mOk;document.getElementById('cp-btn').disabled=!ok;document.getElementById('cp-btn').style.opacity=ok?'1':'.5';document.getElementById('cp-btn').style.cursor=ok?'pointer':'not-allowed';}
+async function confirmarCrearPass(){const n=document.getElementById('cp-nueva').value.trim();if(n.length<6)return;const btn=document.getElementById('cp-btn');btn.textContent='Guardando...';btn.disabled=true;const r=await llamarAppsScript('guardarContrasenaAdmin',{passNueva:n});if(r?.exito){document.getElementById('modal-crear-pass').classList.remove('show');iniciarSesion({usuario:CONFIG.ADMIN_USER,nombre:'Administrador',rol:'admin',permisos:['asistencia','dashboard','personal','reportes','carnets','credenciales']});mostrarToast('🔐 Contraseña creada. ¡Bienvenido!','success');}else{const e=document.getElementById('cp-error');e.textContent='❌ '+(r?.mensaje||'Error al guardar');e.style.display='block';btn.textContent='Crear Contraseña →';btn.disabled=false;}}
+function iniciarSesion(d){SESSION={loggedIn:true,usuario:d.usuario,nombre:d.nombre,rol:d.rol,permisos:d.permisos||[]};if(SESSION.rol==='admin'&&!SESSION.permisos.includes('credenciales'))SESSION.permisos.push('credenciales');localStorage.setItem('session_pip',JSON.stringify(SESSION));document.getElementById('login-overlay').style.display='none';document.getElementById('main-content').style.display='block';mostrarToast('¡Bienvenido, '+SESSION.nombre+'!','success');iniciarAplicacion();}
+function cerrarSesion(){localStorage.removeItem('session_pip');mostrarToast('Sesión cerrada','warning');setTimeout(()=>location.reload(),900);}
 
 // ════════════════════════════════
-// PÁGINAS Y NAVEGACIÓN
+// NAVEGACIÓN
 // ════════════════════════════════
 const PAGES=[
   {id:'asistencia',label:'Registrar Asistencia',icon:'📷',section:'Principal'},
@@ -1282,10 +1057,8 @@ const PAGES=[
   {id:'carnets',   label:'Generar Carnets',       icon:'🪪',section:'Admin'},
   {id:'credenciales',label:'Accesos & Credenciales',icon:'🔐',section:'Admin'}
 ];
-
-function construirNav() {
-  const nav=document.getElementById('sidebar-nav');nav.innerHTML='';
-  let sec='';
+function construirNav(){
+  const nav=document.getElementById('sidebar-nav');nav.innerHTML='';let sec='';
   PAGES.forEach(p=>{
     if(!SESSION.permisos.includes(p.id))return;
     if(p.section!==sec){const l=document.createElement('div');l.className='nav-section-label';l.textContent=p.section;nav.appendChild(l);sec=p.section;}
@@ -1299,8 +1072,7 @@ function construirNav() {
   const primera=PAGES.find(p=>SESSION.permisos.includes(p.id));
   if(primera)showPage(primera.id,document.getElementById('nav-'+primera.id));
 }
-
-function showPage(page,btn) {
+function showPage(page,btn){
   if(!SESSION.permisos.includes(page))return;
   document.querySelectorAll('.page-content').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -1314,44 +1086,33 @@ function showPage(page,btn) {
   if(page==='credenciales'){switchCredTab('crear');cargarListaCredenciales();}
   if(page==='personal'){initHorarioDias();renderizarSelectorDias();}
 }
-
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebar-overlay').classList.toggle('show');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('show');}
 
 // ════════════════════════════════
-// TOAST / API / MISC
+// UTILIDADES
 // ════════════════════════════════
 function mostrarToast(msg,tipo='info'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+tipo;setTimeout(()=>t.className='toast',CONFIG.TIEMPO_TOAST);}
 function cerrarModal(id){document.getElementById(id).classList.remove('show');}
 function mostrarRespuestaEl(elId,msg,tipo){const el=document.getElementById(elId);el.textContent=msg;el.className='respuesta '+tipo;el.style.display='block';if(tipo==='success')setTimeout(()=>el.style.display='none',5000);}
 function actualizarReloj(){document.getElementById('reloj-tiempo').textContent=new Date().toLocaleTimeString('es-PE');}
 function generarIdDispositivo(){let id=localStorage.getItem('device_id');if(!id){const c=[navigator.userAgent,navigator.language,screen.width,screen.height].join('|');let h=0;for(let i=0;i<c.length;i++){h=((h<<5)-h)+c.charCodeAt(i);h|=0;}id='dev_'+Math.abs(h).toString(36)+'_'+Date.now().toString(36);localStorage.setItem('device_id',id);}return id;}
-
 async function llamarAppsScript(fn,params={}){
   try{
-    const url=new URL(CONFIG.APPS_SCRIPT_URL);
-    url.searchParams.append('funcion',fn);url.searchParams.append('datos',JSON.stringify(params));
-    const ctrl=new AbortController();const tmt=setTimeout(()=>ctrl.abort(),30000);
+    const url=new URL(CONFIG.APPS_SCRIPT_URL);url.searchParams.append('funcion',fn);url.searchParams.append('datos',JSON.stringify(params));
+    const ctrl=new AbortController(),tmt=setTimeout(()=>ctrl.abort(),30000);
     const res=await fetch(url.toString(),{method:'GET',mode:'cors',signal:ctrl.signal});
     clearTimeout(tmt);if(!res.ok)throw new Error('HTTP '+res.status);
     return JSON.parse(await res.text());
   }catch(e){return{error:true,mensaje:e.message};}
 }
-
-function descargarArchivo(base64,filename){
-  try{const d=base64.includes('base64,')?base64.split('base64,')[1]:base64;const link=document.createElement('a');link.href='data:application/pdf;base64,'+d;link.download=filename;document.body.appendChild(link);link.click();setTimeout(()=>document.body.removeChild(link),100);}
-  catch(e){mostrarToast('❌ Error al descargar','error');}
-}
+function descargarArchivo(base64,filename){try{const d=base64.includes('base64,')?base64.split('base64,')[1]:base64;const link=document.createElement('a');link.href='data:application/pdf;base64,'+d;link.download=filename;document.body.appendChild(link);link.click();setTimeout(()=>document.body.removeChild(link),100);}catch(e){mostrarToast('❌ Error al descargar','error');}}
 
 // ════════════════════════════════
-// QR / CÁMARA
+// CÁMARA / QR
 // ════════════════════════════════
-function esMobile(){return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);}
-function toggleCamera(e){
-  cameraEnabled=e;document.getElementById('camera-status').textContent=e?'Activada':'Desactivada';
-  if(e){document.getElementById('reader').style.display='block';document.getElementById('qr-status').style.display='block';document.getElementById('reiniciar-btn').style.display='block';cargarCamaras();}
-  else{detenerEscaneo();['reader','qr-status','reiniciar-btn'].forEach(id=>document.getElementById(id).style.display='none');document.getElementById('camera-select').style.display='none';}
-}
+function esMobile(){return/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);}
+function toggleCamera(e){cameraEnabled=e;document.getElementById('camera-status').textContent=e?'Activada':'Desactivada';if(e){document.getElementById('reader').style.display='block';document.getElementById('qr-status').style.display='block';document.getElementById('reiniciar-btn').style.display='block';cargarCamaras();}else{detenerEscaneo();['reader','qr-status','reiniciar-btn'].forEach(id=>document.getElementById(id).style.display='none');document.getElementById('camera-select').style.display='none';}}
 function detenerEscaneo(){if(qrCodeReader&&isScanning)qrCodeReader.stop().then(()=>{qrCodeReader=null;isScanning=false;}).catch(()=>{});}
 function cargarCamaras(){if(!cameraEnabled)return;Html5Qrcode.getCameras().then(d=>{if(d.length>0){if(esMobile()&&d.length>1)mostrarSelectorCamara(d);else{selectedCameraId=d.find(x=>x.label.toLowerCase().includes('back'))?.id||d[0].id;iniciarEscaneo();}}}).catch(()=>actualizarEstadoQR('❌ Error cámaras',true));}
 function mostrarSelectorCamara(d){const s=document.getElementById('camera-select');s.innerHTML='<option value="">Selecciona...</option>';d.forEach((x,i)=>{const o=document.createElement('option');o.value=x.id;o.textContent=x.label.toLowerCase().includes('back')?'📷 Trasera':`📱 Cámara ${i+1}`;s.appendChild(o);});s.style.display='block';s.onchange=function(){if(this.value){selectedCameraId=this.value;reiniciarQR();}};const r=d.find(x=>x.label.toLowerCase().includes('back'));if(r){s.value=r.id;selectedCameraId=r.id;iniciarEscaneo();}}
@@ -1359,42 +1120,59 @@ function iniciarEscaneo(){if(isScanning||!selectedCameraId||!cameraEnabled)retur
 function actualizarEstadoQR(m,e){const el=document.getElementById('qr-status');el.textContent=m;el.style.background=e?'rgba(239,68,68,.1)':'rgba(59,130,246,.1)';el.style.color=e?'#f87171':'#93c5fd';}
 function reiniciarQR(){detenerEscaneo();if(selectedCameraId&&cameraEnabled)setTimeout(iniciarEscaneo,500);}
 
-// ════════════════════════════════
-// ASISTENCIA
-// ════════════════════════════════
-async function buscarColaborador(id){
-  if(!id.trim())return ocultarInfoColaborador();
-  document.getElementById('employee-info').style.display='block';
-  document.getElementById('employee-name').innerHTML='<span class="loading"></span>';
-  const res=await llamarAppsScript('buscarEstudiante',{id});
-  if(res?.encontrado){
-    staffData=res.datos;
-    document.getElementById('employee-name').textContent=res.datos.nombre||'-';
-    document.getElementById('employee-area').textContent=res.datos.area||'-';
-    document.getElementById('employee-position').textContent=res.datos.cargo||'-';
-    document.getElementById('employee-info').style.display='block';
-    document.getElementById('btn-submit').disabled=false;
-    const horario=horarioHoyDeStaff(res.datos);
-    const jornLabels={ninguno:'Sin horario / Día libre',medio:'🌅 Medio tiempo',completo:'☀️ Tiempo completo'};
-    document.getElementById('employee-jornada').textContent=jornLabels[horario.tipo]||'Sin horario';
-    const tieneHorarioV2 = res.datos.horario && res.datos.horario.version === 2 &&
-                           res.datos.horario.dias && Object.keys(res.datos.horario.dias).length > 0;
+// ════════════════════════════════════════════════════════════
+// ASISTENCIA — buscarColaborador CON DETECCIÓN AUTOMÁTICA
+// ════════════════════════════════════════════════════════════
+async function buscarColaborador(id) {
+  if (!id.trim()) return ocultarInfoColaborador();
+
+  // Mostrar estado de carga
+  document.getElementById('employee-info').style.display = 'block';
+  document.getElementById('employee-name').innerHTML = '<span class="loading"></span>';
+  ocultarEstadoAutoPanel();
+
+  const res = await llamarAppsScript('buscarEstudiante', { id });
+
+  if (res?.encontrado) {
+    staffData = res.datos;
+    document.getElementById('employee-name').textContent     = res.datos.nombre   || '-';
+    document.getElementById('employee-area').textContent     = res.datos.area     || '-';
+    document.getElementById('employee-position').textContent = res.datos.cargo    || '-';
+    document.getElementById('employee-info').style.display   = 'block';
+
+    const horario = horarioHoyDeStaff(res.datos);
+    const jornLabels = { ninguno:'Sin horario / Día libre', medio:'🌅 Medio tiempo', completo:'☀️ Tiempo completo' };
+    document.getElementById('employee-jornada').textContent = jornLabels[horario.tipo] || 'Sin horario';
+
+    const tieneHorarioV2 = res.datos.horario?.version === 2 &&
+                           res.datos.horario?.dias && Object.keys(res.datos.horario.dias).length > 0;
     const esDiaLibre = tieneHorarioV2 && horario.tipo === 'ninguno';
+
     if (esDiaLibre) {
-      const diasNombres={lunes:'Lunes',martes:'Martes',miercoles:'Miércoles',jueves:'Jueves',viernes:'Viernes',sabado:'Sábado',domingo:'Domingo'};
-      const diaHoy = diasNombres[diaHoyKey()] || diaHoyKey();
-      document.getElementById('employee-jornada').textContent = `📅 ${diaHoy} — Día no laboral`;
+      const diasN = {lunes:'Lunes',martes:'Martes',miercoles:'Miércoles',jueves:'Jueves',viernes:'Viernes',sabado:'Sábado',domingo:'Domingo'};
+      document.getElementById('employee-jornada').textContent = `📅 ${diasN[diaHoyKey()]||diaHoyKey()} — Día no laboral`;
       mostrarPanelDiaLibre(true);
-      mostrarHorarioColaborador(horario);
+      mostrarHorarioColaborador(horario, 'INGRESO');
+      // Detectamos estado igual (puede tener registros previos hoy)
+      const estadoDet = await detectarEstadoAuto(id);
+      recalcularPuntualidadConEstado(estadoDet);
+      // btn sigue deshabilitado hasta que escriban el motivo
       return;
     }
+
     mostrarPanelDiaLibre(false);
-    mostrarHorarioColaborador(horario);
-    recalcularPuntualidad();
-  }else{
+
+    // ★ Detectar INGRESO o SALIDA automáticamente según historial del día
+    const estadoDetectado = await detectarEstadoAuto(id);
+
+    mostrarHorarioColaborador(horario, estadoDetectado);
+    recalcularPuntualidadConEstado(estadoDetectado);
+    document.getElementById('btn-submit').disabled = false;
+
+  } else {
     ocultarInfoColaborador();
-    mostrarRespuesta(res?.mensaje||'No encontrado','warning');
-    document.getElementById('btn-submit').disabled=true;
+    mostrarRespuesta(res?.mensaje || 'No encontrado', 'warning');
+    document.getElementById('btn-submit').disabled = true;
   }
 }
 
@@ -1405,28 +1183,27 @@ function ocultarInfoColaborador(){
   document.getElementById('dia-libre-panel').style.display='none';
   document.getElementById('comentario-dia-libre').value='';
   ocultarPunctAlert();
+  ocultarEstadoAutoPanel();
   staffData=null;
 }
-
 function mostrarRespuesta(msg,tipo){const r=document.getElementById('respuesta');r.textContent=msg;r.className='respuesta '+tipo;r.style.display='block';if(tipo==='success')setTimeout(()=>r.style.display='none',5000);}
 
+// ════════════════════════════════════════════════════════════
+// ENVIAR FORMULARIO (usa el campo oculto #estado)
+// ════════════════════════════════════════════════════════════
 async function enviarFormulario(e){
   e.preventDefault();if(!staffData)return mostrarRespuesta('ID no válido','error');
-  const estado=document.getElementById('estado').value;
-  const horario=horarioHoyDeStaff(staffData);
-  const tieneHorarioV2 = staffData.horario && staffData.horario.version === 2 &&
-                         staffData.horario.dias && Object.keys(staffData.horario.dias).length > 0;
-  const esDiaLibre = tieneHorarioV2 && horario.tipo === 'ninguno';
-  let comentarioDiaLibre = '';
-  if (esDiaLibre) {
-    comentarioDiaLibre = (document.getElementById('comentario-dia-libre').value || '').trim();
-    if (!comentarioDiaLibre) {
-      document.getElementById('comentario-dia-libre').focus();
-      return mostrarRespuesta('⚠️ Debes escribir el motivo de tu asistencia para poder registrar.', 'error');
-    }
+  const estado = document.getElementById('estado').value;  // ← asignado automáticamente
+  const horario = horarioHoyDeStaff(staffData);
+  const tieneHorarioV2 = staffData.horario?.version===2 && staffData.horario?.dias && Object.keys(staffData.horario.dias).length>0;
+  const esDiaLibre = tieneHorarioV2 && horario.tipo==='ninguno';
+  let comentarioDiaLibre='';
+  if(esDiaLibre){
+    comentarioDiaLibre=(document.getElementById('comentario-dia-libre').value||'').trim();
+    if(!comentarioDiaLibre){document.getElementById('comentario-dia-libre').focus();return mostrarRespuesta('⚠️ Debes escribir el motivo de tu asistencia para poder registrar.','error');}
   }
   const evalPunct=evaluarPuntualidad(horario,estado);
-  const btn=document.getElementById('btn-submit');const orig=btn.innerHTML;
+  const btn=document.getElementById('btn-submit'),orig=btn.innerHTML;
   btn.innerHTML='<span class="loading"></span> Registrando...';btn.disabled=true;
   const res=await llamarAppsScript('registrarAsistencia',{
     id:document.getElementById('id').value.trim(),
@@ -1443,7 +1220,8 @@ async function enviarFormulario(e){
     if(evalPunct.estado==='anticipada')msg+=` — ⚠️ Salida anticipada: ${evalPunct.minutos} min`;
     mostrarRespuesta(msg,evalPunct.estado==='puntual'||evalPunct.estado==='sin_horario'?'success':'warning');
     mostrarToast(evalPunct.estado==='tardanza'?'⏰ Registrado con tardanza':evalPunct.estado==='anticipada'?'⚠️ Salida anticipada':'✅ Registro exitoso',evalPunct.estado==='puntual'||evalPunct.estado==='sin_horario'?'success':'warning');
-    document.getElementById('formulario').reset();document.getElementById('comentario-dia-libre').value='';mostrarPanelDiaLibre(false);ocultarInfoColaborador();btn.disabled=true;cargarUltimosRegistros();
+    document.getElementById('formulario').reset();document.getElementById('comentario-dia-libre').value='';
+    mostrarPanelDiaLibre(false);ocultarInfoColaborador();btn.disabled=true;cargarUltimosRegistros();
   }else{
     mostrarRespuesta(res?.mensaje||'Error','error');mostrarToast(res?.mensaje||'Error','error');btn.disabled=false;
   }
@@ -1454,11 +1232,7 @@ async function cargarUltimosRegistros(){
   const wrap=document.getElementById('ultimos-registros-wrap');
   if(!res?.registros?.length){wrap.innerHTML='<div class="empty-state"><span>📭</span><p>Sin registros hoy</p></div>';return;}
   wrap.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Hora</th><th>Nombre</th><th>Estado</th><th>Puntualidad</th></tr></thead><tbody>
-    ${res.registros.map(r=>`<tr>
-      <td class="recent-row-time">${r.hora}</td><td>${r.nombre}</td>
-      <td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td>
-      <td>${badgePuntualidad(r.puntualidad)}</td>
-    </tr>`).join('')}
+    ${res.registros.map(r=>`<tr><td class="recent-row-time">${r.hora}</td><td>${r.nombre}</td><td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td><td>${badgePuntualidad(r.puntualidad)}</td></tr>`).join('')}
   </tbody></table></div>`;
 }
 
@@ -1468,207 +1242,70 @@ async function cargarUltimosRegistros(){
 async function cargarDashboard(){
   ['stat-ingresos','stat-salidas','stat-unicos','stat-tardanzas','stat-total','stat-personal'].forEach(id=>document.getElementById(id).textContent='...');
   const [stats,rec,pers]=await Promise.all([llamarAppsScript('obtenerEstadisticasHoy'),llamarAppsScript('obtenerUltimosRegistros',{limite:15}),llamarAppsScript('contarUsuarios')]);
-  if(stats&&!stats.error){
-    document.getElementById('stat-ingresos').textContent=stats.ingresosHoy??0;
-    document.getElementById('stat-salidas').textContent=stats.salidasHoy??0;
-    document.getElementById('stat-unicos').textContent=stats.estudiantesUnicos??0;
-    document.getElementById('stat-tardanzas').textContent=stats.tardanzasHoy??0;
-    document.getElementById('stat-total').textContent=stats.totalRegistros??0;
-  }
+  if(stats&&!stats.error){document.getElementById('stat-ingresos').textContent=stats.ingresosHoy??0;document.getElementById('stat-salidas').textContent=stats.salidasHoy??0;document.getElementById('stat-unicos').textContent=stats.estudiantesUnicos??0;document.getElementById('stat-tardanzas').textContent=stats.tardanzasHoy??0;document.getElementById('stat-total').textContent=stats.totalRegistros??0;}
   if(pers&&!pers.error)document.getElementById('stat-personal').textContent=pers.total??0;
   const wrap=document.getElementById('dash-registros-wrap');
-  if(rec?.registros?.length){
-    wrap.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Hora</th><th>ID</th><th>Nombre</th><th>Área</th><th>Estado</th><th>Puntualidad</th></tr></thead><tbody>
-      ${rec.registros.map(r=>`<tr>
-        <td class="recent-row-time">${r.hora}</td>
-        <td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${r.id}</td>
-        <td>${r.nombre}</td><td>${r.area}</td>
-        <td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td>
-        <td>${badgePuntualidad(r.puntualidad)}</td>
-      </tr>`).join('')}
-    </tbody></table></div>`;
-  }else{wrap.innerHTML='<div class="empty-state"><span>📭</span><p>Sin actividad hoy</p></div>';}
+  if(rec?.registros?.length){wrap.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Hora</th><th>ID</th><th>Nombre</th><th>Área</th><th>Estado</th><th>Puntualidad</th></tr></thead><tbody>${rec.registros.map(r=>`<tr><td class="recent-row-time">${r.hora}</td><td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${r.id}</td><td>${r.nombre}</td><td>${r.area}</td><td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td><td>${badgePuntualidad(r.puntualidad)}</td></tr>`).join('')}</tbody></table></div>`;}
+  else wrap.innerHTML='<div class="empty-state"><span>📭</span><p>Sin actividad hoy</p></div>';
 }
 
 // ════════════════════════════════
 // GESTIÓN DE PERSONAL
 // ════════════════════════════════
-function switchPersonalTab(t){
-  ['nuevo','buscar','lista'].forEach(x=>{
-    const p=document.getElementById('tab-'+x);const b=document.getElementById('tab-'+x+'-btn');
-    if(p)p.classList.toggle('active',x===t);if(b)b.classList.toggle('active',x===t);
-  });
-  if(t==='buscar')setTimeout(()=>document.getElementById('buscar-personal-id').focus(),100);
-  if(t==='lista')cargarListaPersonal();
-  if(t==='nuevo'&&!modoEdicionPersonal){initHorarioDias();renderizarSelectorDias();}
-}
-
+function switchPersonalTab(t){['nuevo','buscar','lista'].forEach(x=>{const p=document.getElementById('tab-'+x),b=document.getElementById('tab-'+x+'-btn');if(p)p.classList.toggle('active',x===t);if(b)b.classList.toggle('active',x===t);});if(t==='buscar')setTimeout(()=>document.getElementById('buscar-personal-id').focus(),100);if(t==='lista')cargarListaPersonal();if(t==='nuevo'&&!modoEdicionPersonal){initHorarioDias();renderizarSelectorDias();}}
 async function guardarPersonal(){if(modoEdicionPersonal)await actualizarPersonal();else await registrarNuevoPersonal();}
-
 async function registrarNuevoPersonal(){
-  const id=document.getElementById('p-id').value.trim();
-  const nombres=document.getElementById('p-nombres').value.trim();
-  const apellidos=document.getElementById('p-apellidos').value.trim();
-  const area=document.getElementById('p-area').value.trim();
+  const id=document.getElementById('p-id').value.trim(),nombres=document.getElementById('p-nombres').value.trim(),apellidos=document.getElementById('p-apellidos').value.trim(),area=document.getElementById('p-area').value.trim();
   if(!id||!nombres||!apellidos||!area){mostrarRespuestaEl('respuesta-personal','⚠️ ID, Nombres, Apellidos y Área son obligatorios','error');return;}
   const btn=document.getElementById('btn-guardar-personal');btn.innerHTML='<span class="loading"></span> Guardando...';btn.disabled=true;
-  const res=await llamarAppsScript('registrarNuevoUsuario',{
-    id,nombres,apellidos,grado:area,
-    perfil:document.getElementById('p-cargo').value.trim(),
-    telefono:document.getElementById('p-telefono').value.trim(),
-    foto:document.getElementById('p-foto').value.trim(),
-    correo:document.getElementById('p-correo').value.trim(),
-    horario:serializarHorario()
-  });
+  const res=await llamarAppsScript('registrarNuevoUsuario',{id,nombres,apellidos,grado:area,perfil:document.getElementById('p-cargo').value.trim(),telefono:document.getElementById('p-telefono').value.trim(),foto:document.getElementById('p-foto').value.trim(),correo:document.getElementById('p-correo').value.trim(),horario:serializarHorario()});
   btn.innerHTML='💾 Guardar';btn.disabled=false;
   if(res?.exito){mostrarRespuestaEl('respuesta-personal','✅ '+res.mensaje,'success');mostrarToast('✅ Colaborador registrado','success');limpiarFormPersonal();}
-  else{mostrarRespuestaEl('respuesta-personal','❌ '+(res?.mensaje||'Error'),'error');}
+  else mostrarRespuestaEl('respuesta-personal','❌ '+(res?.mensaje||'Error'),'error');
 }
-
 async function actualizarPersonal(){
-  const idO=document.getElementById('p-id-original').value;
-  const nombres=document.getElementById('p-nombres').value.trim();
-  const apellidos=document.getElementById('p-apellidos').value.trim();
-  const area=document.getElementById('p-area').value.trim();
+  const idO=document.getElementById('p-id-original').value,nombres=document.getElementById('p-nombres').value.trim(),apellidos=document.getElementById('p-apellidos').value.trim(),area=document.getElementById('p-area').value.trim();
   if(!nombres||!apellidos||!area){mostrarRespuestaEl('respuesta-personal','⚠️ Nombres, Apellidos y Área son obligatorios','error');return;}
   const btn=document.getElementById('btn-guardar-personal');btn.innerHTML='<span class="loading"></span> Actualizando...';btn.disabled=true;
-  const res=await llamarAppsScript('actualizarUsuario',{
-    id:idO,nombres,apellidos,grado:area,
-    perfil:document.getElementById('p-cargo').value.trim(),
-    telefono:document.getElementById('p-telefono').value.trim(),
-    foto:document.getElementById('p-foto').value.trim(),
-    correo:document.getElementById('p-correo').value.trim(),
-    horario:serializarHorario()
-  });
+  const res=await llamarAppsScript('actualizarUsuario',{id:idO,nombres,apellidos,grado:area,perfil:document.getElementById('p-cargo').value.trim(),telefono:document.getElementById('p-telefono').value.trim(),foto:document.getElementById('p-foto').value.trim(),correo:document.getElementById('p-correo').value.trim(),horario:serializarHorario()});
   btn.innerHTML='💾 Actualizar';btn.disabled=false;
   if(res?.exito){mostrarRespuestaEl('respuesta-personal','✅ '+res.mensaje,'success');mostrarToast('✅ Actualizado','success');cancelarEdicionPersonal();}
-  else{mostrarRespuestaEl('respuesta-personal','❌ '+(res?.mensaje||'Error'),'error');}
+  else mostrarRespuestaEl('respuesta-personal','❌ '+(res?.mensaje||'Error'),'error');
 }
-
-function limpiarFormPersonal(){
-  ['p-id','p-nombres','p-apellidos','p-area','p-cargo','p-telefono','p-correo','p-foto','p-id-original','p-id-display'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('respuesta-personal').style.display='none';
-  _datosEdicionPersonal = null;
-  initHorarioDias();renderizarSelectorDias();
-}
-
-function cargarFormEdicionPersonal(d){
-  _datosEdicionPersonal = d;
-  modoEdicionPersonal=true;
-  document.getElementById('p-id-original').value  = d.id;
-  document.getElementById('p-id-display').value   = d.id;
-  document.getElementById('p-nombres').value      = d.nombres    || '';
-  document.getElementById('p-apellidos').value    = d.apellidos  || '';
-  document.getElementById('p-area').value         = d.area       || '';
-  document.getElementById('p-cargo').value        = d.cargo      || '';
-  document.getElementById('p-telefono').value     = d.telefono   || '';
-  document.getElementById('p-correo').value       = d.correo     || '';
-  document.getElementById('p-foto').value         = d.foto       || '';
-  let horarioRaw = null;
-  try {
-    if (d.horario) {
-      horarioRaw = (typeof d.horario === 'string') ? JSON.parse(d.horario) : d.horario;
-    }
-  } catch(e) { horarioRaw = null; }
-  deserializarHorario(horarioRaw);
-  renderizarSelectorDias();
-  document.getElementById('grupo-id-nuevo').style.display   = 'none';
-  document.getElementById('grupo-id-editar').style.display  = 'block';
-  document.getElementById('form-personal-titulo').textContent = '✏️ Editar: ' + d.nombres + ' ' + d.apellidos;
-  document.getElementById('btn-guardar-personal').innerHTML  = '💾 Actualizar';
-  document.getElementById('btn-cancelar-edicion-p').style.display = 'inline-flex';
-  switchPersonalTab('nuevo');
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-function cancelarEdicionPersonal(){
-  modoEdicionPersonal=false;
-  _datosEdicionPersonal=null;
-  limpiarFormPersonal();
-  document.getElementById('grupo-id-nuevo').style.display   = 'block';
-  document.getElementById('grupo-id-editar').style.display  = 'none';
-  document.getElementById('form-personal-titulo').textContent = '➕ Registrar Nuevo Colaborador';
-  document.getElementById('btn-guardar-personal').innerHTML  = '💾 Guardar';
-  document.getElementById('btn-cancelar-edicion-p').style.display = 'none';
-}
-
+function limpiarFormPersonal(){['p-id','p-nombres','p-apellidos','p-area','p-cargo','p-telefono','p-correo','p-foto','p-id-original','p-id-display'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('respuesta-personal').style.display='none';_datosEdicionPersonal=null;initHorarioDias();renderizarSelectorDias();}
+function cargarFormEdicionPersonal(d){_datosEdicionPersonal=d;modoEdicionPersonal=true;document.getElementById('p-id-original').value=d.id;document.getElementById('p-id-display').value=d.id;document.getElementById('p-nombres').value=d.nombres||'';document.getElementById('p-apellidos').value=d.apellidos||'';document.getElementById('p-area').value=d.area||'';document.getElementById('p-cargo').value=d.cargo||'';document.getElementById('p-telefono').value=d.telefono||'';document.getElementById('p-correo').value=d.correo||'';document.getElementById('p-foto').value=d.foto||'';let hRaw=null;try{if(d.horario)hRaw=typeof d.horario==='string'?JSON.parse(d.horario):d.horario;}catch(e){}deserializarHorario(hRaw);renderizarSelectorDias();document.getElementById('grupo-id-nuevo').style.display='none';document.getElementById('grupo-id-editar').style.display='block';document.getElementById('form-personal-titulo').textContent='✏️ Editar: '+d.nombres+' '+d.apellidos;document.getElementById('btn-guardar-personal').innerHTML='💾 Actualizar';document.getElementById('btn-cancelar-edicion-p').style.display='inline-flex';switchPersonalTab('nuevo');window.scrollTo({top:0,behavior:'smooth'});}
+function cancelarEdicionPersonal(){modoEdicionPersonal=false;_datosEdicionPersonal=null;limpiarFormPersonal();document.getElementById('grupo-id-nuevo').style.display='block';document.getElementById('grupo-id-editar').style.display='none';document.getElementById('form-personal-titulo').textContent='➕ Registrar Nuevo Colaborador';document.getElementById('btn-guardar-personal').innerHTML='💾 Guardar';document.getElementById('btn-cancelar-edicion-p').style.display='none';}
 async function buscarPersonalAdmin(){
   const id=document.getElementById('buscar-personal-id').value.trim();if(!id)return;
   const wrap=document.getElementById('busqueda-personal-resultado');wrap.innerHTML='<p style="color:var(--text-muted);font-size:13px;">🔍 Buscando...</p>';
   const res=await llamarAppsScript('buscarUsuarioCompleto',{id});
   if(res?.encontrado){
-    const d=res.datos;
-    let diasResumen = '—';
-    try {
-      const h = d.horario ? (typeof d.horario === 'string' ? JSON.parse(d.horario) : d.horario) : null;
-      if (h?.version === 2 && h.dias) {
-        const activos = DIAS.filter(day => h.dias[day.key]?.activo).map(day => day.abbr);
-        diasResumen = activos.length ? activos.join(', ') : 'Ninguno';
-      } else if (h?.tipo && h.tipo !== 'ninguno') {
-        diasResumen = 'Lun–Vie (' + (h.tipo === 'medio' ? 'Medio' : 'Completo') + ')';
-      }
-    } catch(e) {}
-    _datosEdicionPersonal = d;
-    wrap.innerHTML=`<div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:var(--radius-sm);padding:15px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
-        <h4 style="color:var(--primary);font-size:14px;">👤 ${d.nombres} ${d.apellidos}</h4>
-        <div style="display:flex;gap:7px;">
-          <button class="btn btn-secondary btn-sm" onclick="cargarFormEdicionPersonal(_datosEdicionPersonal)">✏️ Editar</button>
-          <button class="btn btn-danger btn-sm" onclick="abrirModalEliminar('${d.id}','${d.nombres} ${d.apellidos}')">🗑️ Eliminar</button>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;">
-        <div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">ID</span><br><b style="font-family:'JetBrains Mono',monospace;">${d.id}</b></div>
-        <div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Área</span><br><b>${d.area||'-'}</b></div>
-        <div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Cargo</span><br><b>${d.cargo||'-'}</b></div>
-        <div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Días laborales</span><br><b>${diasResumen}</b></div>
-        <div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Teléfono</span><br><b>${d.telefono||'-'}</b></div>
-        <div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Correo</span><br><b>${d.correo||'-'}</b></div>
-      </div>
-    </div>`;
-  }else{wrap.innerHTML=`<div class="respuesta error" style="display:block;">❌ ${res?.mensaje||'No encontrado'}</div>`;}
+    const d=res.datos;let diasResumen='—';
+    try{const h=d.horario?(typeof d.horario==='string'?JSON.parse(d.horario):d.horario):null;if(h?.version===2&&h.dias){const ac=DIAS.filter(day=>h.dias[day.key]?.activo).map(day=>day.abbr);diasResumen=ac.length?ac.join(', '):'Ninguno';}else if(h?.tipo&&h.tipo!=='ninguno')diasResumen='Lun–Vie ('+(h.tipo==='medio'?'Medio':'Completo')+')';}catch(e){}
+    _datosEdicionPersonal=d;
+    wrap.innerHTML=`<div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:var(--radius-sm);padding:15px;"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px;"><h4 style="color:var(--primary);font-size:14px;">👤 ${d.nombres} ${d.apellidos}</h4><div style="display:flex;gap:7px;"><button class="btn btn-secondary btn-sm" onclick="cargarFormEdicionPersonal(_datosEdicionPersonal)">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="abrirModalEliminar('${d.id}','${d.nombres} ${d.apellidos}')">🗑️ Eliminar</button></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;"><div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">ID</span><br><b style="font-family:'JetBrains Mono',monospace;">${d.id}</b></div><div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Área</span><br><b>${d.area||'-'}</b></div><div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Cargo</span><br><b>${d.cargo||'-'}</b></div><div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Días laborales</span><br><b>${diasResumen}</b></div><div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Teléfono</span><br><b>${d.telefono||'-'}</b></div><div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Correo</span><br><b>${d.correo||'-'}</b></div></div></div>`;
+  }else wrap.innerHTML=`<div class="respuesta error" style="display:block;">❌ ${res?.mensaje||'No encontrado'}</div>`;
 }
-
 function abrirModalEliminar(id,nombre){idAEliminar=id;document.getElementById('modal-eliminar-nombre').textContent=`Se eliminará: ${nombre} (ID: ${id})`;document.getElementById('modal-eliminar').classList.add('show');}
+async function confirmarEliminar(){if(!idAEliminar)return;const btn=document.getElementById('btn-confirmar-eliminar');btn.innerHTML='<span class="loading"></span>';btn.disabled=true;const res=await llamarAppsScript('eliminarUsuario',{id:idAEliminar});btn.innerHTML='🗑️ Sí, eliminar';btn.disabled=false;cerrarModal('modal-eliminar');if(res?.exito){mostrarToast('🗑️ Eliminado','success');document.getElementById('busqueda-personal-resultado').innerHTML=`<div class="respuesta success" style="display:block;">✅ ${res.mensaje}</div>`;document.getElementById('buscar-personal-id').value='';cargarListaPersonal();}else mostrarToast('❌ '+(res?.mensaje||'Error'),'error');idAEliminar='';}
 
-async function confirmarEliminar(){
-  if(!idAEliminar)return;
-  const btn=document.getElementById('btn-confirmar-eliminar');btn.innerHTML='<span class="loading"></span>';btn.disabled=true;
-  const res=await llamarAppsScript('eliminarUsuario',{id:idAEliminar});
-  btn.innerHTML='🗑️ Sí, eliminar';btn.disabled=false;cerrarModal('modal-eliminar');
-  if(res?.exito){mostrarToast('🗑️ Eliminado','success');document.getElementById('busqueda-personal-resultado').innerHTML=`<div class="respuesta success" style="display:block;">✅ ${res.mensaje}</div>`;document.getElementById('buscar-personal-id').value='';cargarListaPersonal();}
-  else{mostrarToast('❌ '+(res?.mensaje||'Error'),'error');}
-  idAEliminar='';
-}
-
-// ════════════════════════════════
-// LISTA COMPLETA DE PERSONAL
-// ════════════════════════════════
+// LISTA PERSONAL
 let listaPersonalData=[];
-
 async function cargarListaPersonal(){
-  const tbody=document.getElementById('lista-personal-tbody');
-  tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text-muted);"><div class="empty-state"><span>⏳</span><p>Cargando...</p></div></td></tr>';
-  document.getElementById('lista-personal-contador').textContent='';
+  const tbody=document.getElementById('lista-personal-tbody');tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text-muted);"><div class="empty-state"><span>⏳</span><p>Cargando...</p></div></td></tr>';document.getElementById('lista-personal-contador').textContent='';
   const res=await llamarAppsScript('listarTodoElPersonal');
   if(res?.error||!res?.personal){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text-muted);">❌ Error al cargar</td></tr>';return;}
   listaPersonalData=res.personal;
   const areas=[...new Set(res.personal.map(p=>p.area).filter(Boolean))].sort();
-  const selArea=document.getElementById('filtro-lista-area');
-  const areaActual=selArea.value;selArea.innerHTML='<option value="">Todas las áreas</option>';
-  areas.forEach(a=>selArea.innerHTML+=`<option value="${a}">${a}</option>`);
-  if(areaActual)selArea.value=areaActual;
+  const selArea=document.getElementById('filtro-lista-area'),areaActual=selArea.value;selArea.innerHTML='<option value="">Todas las áreas</option>';areas.forEach(a=>selArea.innerHTML+=`<option value="${a}">${a}</option>`);if(areaActual)selArea.value=areaActual;
   filtrarTablaPersonal();
 }
-
 function filtrarTablaPersonal(){
   const busq=(document.getElementById('filtro-lista-nombre').value||'').toLowerCase().trim();
   const area=(document.getElementById('filtro-lista-area').value||'').toLowerCase();
   const estado=(document.getElementById('filtro-lista-estado').value||'');
   const filtrado=listaPersonalData.filter(p=>{
-    const nombre=((p.nombres||'')+(p.apellidos||'')).toLowerCase();
-    const pid=(p.id||'').toLowerCase();
-    const pArea=(p.area||'').toLowerCase();
+    const nombre=((p.nombres||'')+(p.apellidos||'')).toLowerCase(),pid=(p.id||'').toLowerCase(),pArea=(p.area||'').toLowerCase();
     const activo=p.activo!==false&&p.activo!=='false'&&p.activo!==0;
     if(busq&&!nombre.includes(busq)&&!pid.includes(busq))return false;
     if(area&&pArea!==area)return false;
@@ -1678,704 +1315,208 @@ function filtrarTablaPersonal(){
   });
   renderizarTablaPersonal(filtrado);
 }
-
 function renderizarTablaPersonal(data){
-  const tbody=document.getElementById('lista-personal-tbody');
-  const contador=document.getElementById('lista-personal-contador');
-  const activos=data.filter(p=>p.activo!==false&&p.activo!=='false').length;
-  const inactivos=data.length-activos;
+  const tbody=document.getElementById('lista-personal-tbody'),contador=document.getElementById('lista-personal-contador');
+  const activos=data.filter(p=>p.activo!==false&&p.activo!=='false').length,inactivos=data.length-activos;
   contador.innerHTML=`<span style="color:var(--text-muted);">Mostrando <b style="color:var(--text);">${data.length}</b> — <span style="color:#34d399;">✅ ${activos} activos</span> · <span style="color:#f87171;">🔴 ${inactivos} inactivos</span></span>`;
   if(!data.length){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:28px;"><div class="empty-state"><span>🔍</span><p>Sin resultados</p></div></td></tr>';return;}
   tbody.innerHTML=data.map((p,i)=>{
-    const activo=p.activo!==false&&p.activo!=='false'&&p.activo!==0;
-    const nombre=(p.nombres||'')+' '+(p.apellidos||'');
-    let diasResumen='—';
-    try{
-      const h=p.horario?(typeof p.horario==='string'?JSON.parse(p.horario):p.horario):null;
-      if(h?.version===2&&h.dias){
-        const activosDias=DIAS.filter(d=>h.dias[d.key]?.activo);
-        diasResumen=activosDias.length?activosDias.map(d=>d.abbr).join(' '):'Ninguno';
-      }else if(h?.tipo&&h.tipo!=='ninguno'){
-        diasResumen='L–V ('+(h.tipo==='medio'?'½':'☀️')+')';
-      }
-    }catch(e){}
-    const dataIdx = listaPersonalData.indexOf(p);
-    return `<tr style="${activo?'':'opacity:0.55;'}">
-      <td style="color:var(--text-muted);font-size:12px;">${i+1}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;">${p.id}</td>
-      <td><span style="font-weight:600;">${nombre.trim()}</span></td>
-      <td style="font-size:13px;">${p.area||'-'}</td>
-      <td style="font-size:12px;color:var(--text-muted);">${p.cargo||'-'}</td>
-      <td style="font-size:12px;">${diasResumen}</td>
-      <td><span class="badge ${activo?'badge-green':'badge-red'}">${activo?'✅ Activo':'🔴 Inactivo'}</span></td>
-      <td>
-        <div style="display:flex;gap:5px;flex-wrap:wrap;">
-          <button class="btn btn-secondary btn-sm" onclick="cargarFormEdicionPersonal(listaPersonalData[${dataIdx}])" title="Editar">✏️</button>
-          <button class="btn btn-sm ${activo?'btn-ghost':'btn-primary'}"
-            onclick="toggleActivoPersonal('${p.id}','${nombre.trim()}',${activo})"
-            title="${activo?'Inactivar':'Reactivar'}"
-            style="${activo?'color:#f87171;':''}">
-            ${activo?'🔴':'✅'}
-          </button>
-          <button class="btn btn-danger btn-sm" onclick="abrirModalEliminar('${p.id}','${nombre.trim()}')" title="Eliminar">🗑️</button>
-        </div>
-      </td>
-    </tr>`;
+    const activo=p.activo!==false&&p.activo!=='false'&&p.activo!==0,nombre=(p.nombres||'')+' '+(p.apellidos||'');
+    let diasResumen='—';try{const h=p.horario?(typeof p.horario==='string'?JSON.parse(p.horario):p.horario):null;if(h?.version===2&&h.dias){const ac=DIAS.filter(d=>h.dias[d.key]?.activo);diasResumen=ac.length?ac.map(d=>d.abbr).join(' '):'Ninguno';}else if(h?.tipo&&h.tipo!=='ninguno')diasResumen='L–V ('+(h.tipo==='medio'?'½':'☀️')+')';}catch(e){}
+    const idx=listaPersonalData.indexOf(p);
+    return`<tr style="${activo?'':'opacity:0.55;'}"><td style="color:var(--text-muted);font-size:12px;">${i+1}</td><td style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;">${p.id}</td><td><span style="font-weight:600;">${nombre.trim()}</span></td><td style="font-size:13px;">${p.area||'-'}</td><td style="font-size:12px;color:var(--text-muted);">${p.cargo||'-'}</td><td style="font-size:12px;">${diasResumen}</td><td><span class="badge ${activo?'badge-green':'badge-red'}">${activo?'✅ Activo':'🔴 Inactivo'}</span></td><td><div style="display:flex;gap:5px;flex-wrap:wrap;"><button class="btn btn-secondary btn-sm" onclick="cargarFormEdicionPersonal(listaPersonalData[${idx}])" title="Editar">✏️</button><button class="btn btn-sm ${activo?'btn-ghost':'btn-primary'}" onclick="toggleActivoPersonal('${p.id}','${nombre.trim()}',${activo})" title="${activo?'Inactivar':'Reactivar'}" style="${activo?'color:#f87171;':''}">${activo?'🔴':'✅'}</button><button class="btn btn-danger btn-sm" onclick="abrirModalEliminar('${p.id}','${nombre.trim()}')" title="Eliminar">🗑️</button></div></td></tr>`;
   }).join('');
 }
-
-function toggleActivoPersonal(id,nombre,estaActivo){
-  idToggleActivo=id;
-  const accion=estaActivo?'inactivar':'reactivar';
-  const emoji=estaActivo?'🔴':'✅';
-  document.getElementById('modal-toggle-nombre').textContent=`${emoji} ${accion.charAt(0).toUpperCase()+accion.slice(1)} a: ${nombre} (ID: ${id})`;
-  document.getElementById('btn-confirmar-toggle').textContent=`${emoji} Sí, ${accion}`;
-  document.getElementById('btn-confirmar-toggle').className=estaActivo?'btn btn-danger':'btn btn-primary';
-  document.getElementById('modal-toggle-activo').classList.add('show');
-  pendienteActivo=!estaActivo;
-}
-
-async function confirmarToggleActivo(){
-  if(!idToggleActivo)return;
-  const btn=document.getElementById('btn-confirmar-toggle');btn.innerHTML='<span class="loading"></span>';btn.disabled=true;
-  const res=await llamarAppsScript('cambiarEstadoPersonal',{id:idToggleActivo,activo:pendienteActivo});
-  btn.innerHTML=btn.textContent;btn.disabled=false;cerrarModal('modal-toggle-activo');
-  if(res?.exito){mostrarToast(res.mensaje,'success');cargarListaPersonal();}
-  else{mostrarToast('❌ '+(res?.mensaje||'Error'),'error');}
-  idToggleActivo='';pendienteActivo=null;
-}
+function toggleActivoPersonal(id,nombre,estaActivo){idToggleActivo=id;const ac=estaActivo?'inactivar':'reactivar',em=estaActivo?'🔴':'✅';document.getElementById('modal-toggle-nombre').textContent=`${em} ${ac.charAt(0).toUpperCase()+ac.slice(1)} a: ${nombre} (ID: ${id})`;document.getElementById('btn-confirmar-toggle').textContent=`${em} Sí, ${ac}`;document.getElementById('btn-confirmar-toggle').className=estaActivo?'btn btn-danger':'btn btn-primary';document.getElementById('modal-toggle-activo').classList.add('show');pendienteActivo=!estaActivo;}
+async function confirmarToggleActivo(){if(!idToggleActivo)return;const btn=document.getElementById('btn-confirmar-toggle');btn.innerHTML='<span class="loading"></span>';btn.disabled=true;const res=await llamarAppsScript('cambiarEstadoPersonal',{id:idToggleActivo,activo:pendienteActivo});btn.innerHTML=btn.textContent;btn.disabled=false;cerrarModal('modal-toggle-activo');if(res?.exito){mostrarToast(res.mensaje,'success');cargarListaPersonal();}else mostrarToast('❌ '+(res?.mensaje||'Error'),'error');idToggleActivo='';pendienteActivo=null;}
 
 // ════════════════════════════════
 // REPORTES
 // ════════════════════════════════
 async function cargarAreasEnFiltro(){
-  const res=await llamarAppsScript('listarGrados');
-  const sel=document.getElementById('rep-area');
+  const res=await llamarAppsScript('listarGrados'),sel=document.getElementById('rep-area');
   if(res?.grados){sel.innerHTML='<option value="">Todas</option>';res.grados.forEach(g=>sel.innerHTML+=`<option value="${g}">${g}</option>`);}
-  const hoy=new Date();const ini=new Date(hoy.getFullYear(),hoy.getMonth(),1);
+  const hoy=new Date(),ini=new Date(hoy.getFullYear(),hoy.getMonth(),1);
   document.getElementById('rep-fecha-inicio').value=ini.toISOString().split('T')[0];
   document.getElementById('rep-fecha-fin').value=hoy.toISOString().split('T')[0];
 }
-
 async function cargarReporte(){
-  const fI=document.getElementById('rep-fecha-inicio').value;const fF=document.getElementById('rep-fecha-fin').value;
+  const fI=document.getElementById('rep-fecha-inicio').value,fF=document.getElementById('rep-fecha-fin').value;
   if(!fI||!fF){mostrarToast('⚠️ Selecciona fechas','warning');return;}
-  const inc=document.getElementById('rep-ingreso').checked;const sal=document.getElementById('rep-salida').checked;
+  const inc=document.getElementById('rep-ingreso').checked,sal=document.getElementById('rep-salida').checked;
   if(!inc&&!sal){mostrarToast('⚠️ Selecciona tipo','warning');return;}
   mostrarToast('🔍 Cargando...','info');
   const res=await llamarAppsScript('obtenerReporte',{fechaIni:fI,fechaFin:fF,idUsuario:document.getElementById('rep-id-usuario').value.trim(),area:document.getElementById('rep-area').value,inclIngreso:inc,inclSalida:sal});
   if(res?.error||!res?.registros){mostrarToast('❌ Error al cargar','error');return;}
   reporteData=res.registros;renderizarTablaReporte(reporteData);
-  document.getElementById('btn-exportar-excel').disabled = reporteData.length === 0;
-  document.getElementById('btn-exportar-pdf').disabled = reporteData.length === 0; // HABILITAR PDF
+  document.getElementById('btn-exportar-excel').disabled=reporteData.length===0;
+  document.getElementById('btn-exportar-pdf').disabled=reporteData.length===0;
 }
-
 function renderizarTablaReporte(registros){
-  const card=document.getElementById('reporte-tabla-card');const res=document.getElementById('reporte-resumen');const tbody=document.getElementById('reporte-tbody');
+  const card=document.getElementById('reporte-tabla-card'),res=document.getElementById('reporte-resumen'),tbody=document.getElementById('reporte-tbody');
   if(!registros.length){tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:26px;color:var(--text-muted)">Sin registros</td></tr>';card.style.display='block';res.style.display='none';return;}
-  const ing=registros.filter(r=>r.estado==='INGRESO').length;
-  const sal=registros.filter(r=>r.estado==='SALIDA').length;
-  const pers=new Set(registros.map(r=>r.id)).size;
-  const tard=registros.filter(r=>r.puntualidad==='tardanza').length;
-  const anti=registros.filter(r=>r.puntualidad==='anticipada').length;
-  document.getElementById('rep-stat-total').textContent=registros.length;
-  document.getElementById('rep-stat-ingresos').textContent=ing;
-  document.getElementById('rep-stat-salidas').textContent=sal;
-  document.getElementById('rep-stat-personas').textContent=pers;
-  document.getElementById('rep-stat-tardanzas').textContent=tard;
-  document.getElementById('rep-stat-anticipadas').textContent=anti;
+  const ing=registros.filter(r=>r.estado==='INGRESO').length,sal=registros.filter(r=>r.estado==='SALIDA').length,pers=new Set(registros.map(r=>r.id)).size,tard=registros.filter(r=>r.puntualidad==='tardanza').length,anti=registros.filter(r=>r.puntualidad==='anticipada').length;
+  document.getElementById('rep-stat-total').textContent=registros.length;document.getElementById('rep-stat-ingresos').textContent=ing;document.getElementById('rep-stat-salidas').textContent=sal;document.getElementById('rep-stat-personas').textContent=pers;document.getElementById('rep-stat-tardanzas').textContent=tard;document.getElementById('rep-stat-anticipadas').textContent=anti;
   res.style.display='flex';
   tbody.innerHTML=registros.map((r,i)=>{
-    let detalleMin='';
-    if(r.puntualidad==='tardanza')detalleMin=`<span style="color:#fcd34d;font-size:11px;">+${r.minutosDiff||0} min</span>`;
-    else if(r.puntualidad==='anticipada')detalleMin=`<span style="color:#c4b5fd;font-size:11px;">-${r.minutosDiff||0} min</span>`;
-    else if(r.puntualidad==='puntual')detalleMin=`<span style="color:#34d399;font-size:11px;">✓</span>`;
-    const comentarioCell = r.comentario
-      ? `<td><div class="comentario-extra" title="${r.comentario.replace(/"/g,'&quot;')}">💬 ${r.comentario}</div></td>`
-      : `<td style="color:var(--text-muted);font-size:12px;">—</td>`;
-    return `<tr>
-      <td style="color:var(--text-muted);font-size:12px;">${i+1}</td>
-      <td class="recent-row-time">${r.fechaHora}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${r.id}</td>
-      <td>${r.nombre}</td><td>${r.area}</td><td>${r.perfil}</td>
-      <td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td>
-      <td>${badgePuntualidad(r.puntualidad)}</td>
-      <td>${detalleMin}</td>
-      ${comentarioCell}
-    </tr>`;
+    let dm='';if(r.puntualidad==='tardanza')dm=`<span style="color:#fcd34d;font-size:11px;">+${r.minutosDiff||0} min</span>`;else if(r.puntualidad==='anticipada')dm=`<span style="color:#c4b5fd;font-size:11px;">-${r.minutosDiff||0} min</span>`;else if(r.puntualidad==='puntual')dm=`<span style="color:#34d399;font-size:11px;">✓</span>`;
+    const cc=r.comentario?`<td><div class="comentario-extra" title="${r.comentario.replace(/"/g,'&quot;')}">💬 ${r.comentario}</div></td>`:`<td style="color:var(--text-muted);font-size:12px;">—</td>`;
+    return`<tr><td style="color:var(--text-muted);font-size:12px;">${i+1}</td><td class="recent-row-time">${r.fechaHora}</td><td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${r.id}</td><td>${r.nombre}</td><td>${r.area}</td><td>${r.perfil}</td><td><span class="badge ${r.estado==='INGRESO'?'badge-green':'badge-red'}">${r.estado}</span></td><td>${badgePuntualidad(r.puntualidad)}</td><td>${dm}</td>${cc}</tr>`;
   }).join('');
   card.style.display='block';mostrarToast(`✅ ${registros.length} registros`,'success');
 }
 
-// ══════════════════════════════════════════════════════════════════
-// EXPORTAR PDF - UN SOLO ARCHIVO CON TODOS LOS COLABORADORES
-// (NOMBRES EN NEGRITA - VERSIÓN CORREGIDA)
-// ══════════════════════════════════════════════════════════════════
-async function exportarPDF() {
-  if (!reporteData.length) {
-    mostrarToast('⚠️ No hay datos para exportar', 'warning');
-    return;
-  }
-
-  const { jsPDF } = window.jspdf;
-  const fI = document.getElementById('rep-fecha-inicio').value;
-  const fF = document.getElementById('rep-fecha-fin').value;
-  const fechaGeneracion = new Date().toLocaleString('es-PE');
-
-  // ── Agrupar todos los registros por colaborador ──────────────────
-  const usuariosMap = {};
-  reporteData.forEach(r => {
-    if (!usuariosMap[r.id])
-      usuariosMap[r.id] = { 
-        id: r.id, 
-        nombre: r.nombre, 
-        area: r.area, 
-        cargo: r.perfil, 
-        registros: [] 
-      };
-    usuariosMap[r.id].registros.push(r);
+// ════════════════════════════════
+// EXPORTAR PDF
+// ════════════════════════════════
+async function exportarPDF(){
+  if(!reporteData.length){mostrarToast('⚠️ No hay datos para exportar','warning');return;}
+  const{jsPDF}=window.jspdf;const fI=document.getElementById('rep-fecha-inicio').value,fF=document.getElementById('rep-fecha-fin').value,fechaGen=new Date().toLocaleString('es-PE');
+  const uMap={};reporteData.forEach(r=>{if(!uMap[r.id])uMap[r.id]={id:r.id,nombre:r.nombre,area:r.area,cargo:r.perfil,registros:[]};uMap[r.id].registros.push(r);});
+  const usuarios=Object.values(uMap);const doc=new jsPDF({orientation:'landscape'});
+  usuarios.forEach((u,idx)=>{
+    if(idx>0)doc.addPage();
+    const dias=agruparPorDia(u.registros);
+    const tard=u.registros.filter(r=>r.puntualidad==='tardanza').length;
+    const anti=u.registros.filter(r=>r.puntualidad==='anticipada').length;
+    const punt=u.registros.filter(r=>r.puntualidad==='puntual').length;
+    const extr=u.registros.filter(r=>r.puntualidad==='extraordinario').length;
+    doc.setFontSize(16);doc.setTextColor(16,185,129);doc.setFont('helvetica','bold');doc.text('REPORTE DE ASISTENCIA — FINACORP',14,15);
+    doc.setFontSize(16);doc.setTextColor(0,0,0);doc.setFont('helvetica','bold');doc.text(`${u.nombre}`,14,25);
+    doc.setFontSize(10);doc.setTextColor(148,163,184);doc.setFont('helvetica','normal');doc.text(`ID: ${u.id}   |   Área: ${u.area}   |   Cargo: ${u.cargo||'—'}`,14,32);doc.text(`Período: ${fI} al ${fF}`,14,38);doc.text(`Generado: ${fechaGen}`,14,44);
+    doc.setFillColor(30,41,59);doc.rect(14,48,260,16,'F');doc.setTextColor(241,245,249);doc.setFontSize(9);doc.setFont('helvetica','normal');doc.text(`Total: ${u.registros.length}`,18,58);doc.setTextColor(52,211,153);doc.text(`Puntuales: ${punt}`,58,58);doc.setTextColor(252,211,77);doc.text(`Tardanzas: ${tard}`,108,58);doc.setTextColor(248,113,113);doc.text(`Anticipadas: ${anti}`,158,58);doc.setTextColor(196,181,253);doc.text(`Días extra: ${extr}`,208,58);
+    const cols=['#','Fecha','Entrada AM','Puntualidad','Salida Alm.','Puntualidad','Retorno','Puntualidad','Salida Final','Puntualidad','Comentario'];
+    const rows=dias.map((f,i)=>[i+1,f.fecha,f.horaEntrada,f.punctEntrada,f.horaSalida1,f.punctSalida1,f.horaEntrada2,f.punctEntrada2,f.horaSalida,f.punctSalida,f.comentario||'—']);
+    doc.autoTable({startY:68,head:[cols],body:rows,theme:'grid',styles:{fontSize:8,cellPadding:2,lineColor:[44,55,74],lineWidth:0.1},headStyles:{fillColor:[16,185,129],textColor:[255,255,255],fontStyle:'bold',halign:'center'},columnStyles:{0:{cellWidth:8,halign:'center'},1:{cellWidth:20},2:{cellWidth:18,halign:'center'},3:{cellWidth:22,halign:'center'},4:{cellWidth:18,halign:'center'},5:{cellWidth:22,halign:'center'},6:{cellWidth:18,halign:'center'},7:{cellWidth:22,halign:'center'},8:{cellWidth:18,halign:'center'},9:{cellWidth:22,halign:'center'},10:{cellWidth:'auto'}},didParseCell:function(data){if([3,5,7,9].includes(data.column.index)&&data.row.index>=0){const p=data.cell.raw;let c=[255,255,255];if(p.includes('Tardanza'))c=[254,243,199];else if(p.includes('Anticipada'))c=[254,226,226];else if(p.includes('Puntual'))c=[209,250,229];else if(p.includes('Extra'))c=[237,233,254];data.cell.styles.fillColor=c;data.cell.styles.halign='center';}if([0,1,2,4,6,8].includes(data.column.index))data.cell.styles.halign='center';},margin:{left:14,right:14}});
   });
-  const usuarios = Object.values(usuariosMap);
-
-  // ── Crear un solo documento PDF ───────────────────────────────────
-  const doc = new jsPDF({ orientation: 'landscape' });
-
-  // ── Iterar sobre cada usuario y agregar una página ───────────────
-  usuarios.forEach((usuario, index) => {
-    // Si no es el primer usuario, agregar una nueva página
-    if (index > 0) {
-      doc.addPage();
-    }
-
-    // Agrupar registros por día para este usuario
-    const diasAgrupados = agruparPorDia(usuario.registros);
-    
-    // Calcular estadísticas para el resumen
-    const totalRegistros = usuario.registros.length;
-    const tardanzas = usuario.registros.filter(r => r.puntualidad === 'tardanza').length;
-    const anticipadas = usuario.registros.filter(r => r.puntualidad === 'anticipada').length;
-    const puntuales = usuario.registros.filter(r => r.puntualidad === 'puntual').length;
-    const extraordinarios = usuario.registros.filter(r => r.puntualidad === 'extraordinario').length;
-
-    // --- Título principal del reporte ---
-    doc.setFontSize(16);
-    doc.setTextColor(16, 185, 129); // Verde primary
-    doc.setFont('helvetica', 'bold'); // <-- CORREGIDO: así se pone negrita en jsPDF
-    doc.text('REPORTE DE ASISTENCIA — FINACORP', 14, 15);
-    
-    // --- NOMBRE DEL COLABORADOR EN NEGRITA (CORREGIDO) ---
-    doc.setFontSize(16);
-    doc.setTextColor(0, 0, 0); // Texto blanco
-    doc.setFont('helvetica', 'bold'); // <-- CORREGIDO: activar negrita
-    doc.text(`${usuario.nombre}`, 14, 25);
-    
-    // --- Información adicional (sin negrita) ---
-    doc.setFontSize(10);
-    doc.setTextColor(148, 163, 184); // text-muted
-    doc.setFont('helvetica', 'normal'); // <-- CORREGIDO: desactivar negrita
-    doc.text(`ID: ${usuario.id}   |   Área: ${usuario.area}   |   Cargo: ${usuario.cargo || '—'}`, 14, 32);
-    doc.text(`Período: ${fI} al ${fF}`, 14, 38);
-    doc.text(`Generado: ${fechaGeneracion}`, 14, 44);
-
-    // --- Resumen estadístico del colaborador ---
-    doc.setFillColor(30, 41, 59); // surface
-    doc.rect(14, 48, 260, 16, 'F');
-    doc.setTextColor(241, 245, 249); // text
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Total registros: ${totalRegistros}`, 18, 58);
-    doc.setTextColor(52, 211, 153); // verde
-    doc.text(`Puntuales: ${puntuales}`, 58, 58);
-    doc.setTextColor(252, 211, 77); // amarillo
-    doc.text(`Tardanzas: ${tardanzas}`, 108, 58);
-    doc.setTextColor(248, 113, 113); // rojo
-    doc.text(`Anticipadas: ${anticipadas}`, 158, 58);
-    doc.setTextColor(196, 181, 253); // lila
-    doc.text(`Días extra: ${extraordinarios}`, 208, 58);
-
-    // --- Preparar datos para la tabla (agrupados por día) ---
-    const tableColumn = [
-      '#', 'Fecha',
-      'Entrada AM', 'Puntualidad',
-      'Salida Alm.', 'Puntualidad',
-      'Retorno', 'Puntualidad',
-      'Salida Final', 'Puntualidad',
-      'Comentario'
-    ];
-
-    const tableRows = [];
-    
-    diasAgrupados.forEach((dia, idx) => {
-      tableRows.push([
-        (idx + 1).toString(),
-        dia.fecha,
-        dia.horaEntrada,
-        dia.punctEntrada,
-        dia.horaSalida1,
-        dia.punctSalida1,
-        dia.horaEntrada2,
-        dia.punctEntrada2,
-        dia.horaSalida,
-        dia.punctSalida,
-        dia.comentario || '—'
-      ]);
-    });
-
-    // --- Generar tabla con autoTable ---
-    doc.autoTable({
-      startY: 68,
-      head: [tableColumn],
-      body: tableRows,
-      theme: 'grid',
-      styles: {
-        fontSize: 8,
-        cellPadding: 2,
-        lineColor: [44, 55, 74],
-        lineWidth: 0.1,
-      },
-      headStyles: {
-        fillColor: [16, 185, 129],
-        textColor: [255, 255, 255],
-        fontStyle: 'bold',
-        halign: 'center',
-      },
-      columnStyles: {
-        0: { cellWidth: 8, halign: 'center' },
-        1: { cellWidth: 20 },
-        2: { cellWidth: 18, halign: 'center' },
-        3: { cellWidth: 22, halign: 'center' },
-        4: { cellWidth: 18, halign: 'center' },
-        5: { cellWidth: 22, halign: 'center' },
-        6: { cellWidth: 18, halign: 'center' },
-        7: { cellWidth: 22, halign: 'center' },
-        8: { cellWidth: 18, halign: 'center' },
-        9: { cellWidth: 22, halign: 'center' },
-        10: { cellWidth: 'auto' },
-      },
-      didParseCell: function (data) {
-        // Aplicar color según puntualidad (solo en columnas de puntualidad: 3, 5, 7, 9)
-        if ([3, 5, 7, 9].includes(data.column.index) && data.row.index >= 0) {
-          const puntualidad = data.cell.raw;
-          let color = [255, 255, 255]; // blanco por defecto
-          
-          if (puntualidad.includes('Tardanza')) color = [254, 243, 199];
-          else if (puntualidad.includes('Anticipada')) color = [254, 226, 226];
-          else if (puntualidad.includes('Puntual')) color = [209, 250, 229];
-          else if (puntualidad.includes('Extra')) color = [237, 233, 254];
-          
-          data.cell.styles.fillColor = color;
-          data.cell.styles.halign = 'center';
-        }
-        
-        // Centrar columnas de números y fechas
-        if ([0, 1, 2, 4, 6, 8].includes(data.column.index)) {
-          data.cell.styles.halign = 'center';
-        }
-      },
-      margin: { left: 14, right: 14 },
-    });
-  });
-
-  // --- Guardar el PDF único con todas las páginas ---
-  const nombreArchivo = `reporte_asistencia_completo_${new Date().toISOString().split('T')[0]}.pdf`;
-  doc.save(nombreArchivo);
-  mostrarToast(`📄 PDF generado con ${usuarios.length} colaboradores`, 'success');
+  doc.save(`reporte_asistencia_${new Date().toISOString().split('T')[0]}.pdf`);
+  mostrarToast(`📄 PDF con ${usuarios.length} colaboradores`,'success');
 }
 
-// ══════════════════════════════════════════════════════════════════
-// EXPORTAR EXCEL — (sin cambios, igual que antes)
-// ══════════════════════════════════════════════════════════════════
-function estiloCelda(bold, bgHex, fontHex, fontSize, hAlign) {
-  return {
-    font:      { bold: !!bold, color: { rgb: (fontHex||'000000') }, sz: fontSize||11, name:'Calibri' },
-    fill:      bgHex ? { patternType:'solid', fgColor:{ rgb: bgHex } } : { patternType:'none' },
-    alignment: { horizontal: hAlign||'left', vertical:'center', wrapText:true },
-    border: {
-      top:    { style:'thin', color:{ rgb:'D0D7DE' } },
-      bottom: { style:'thin', color:{ rgb:'D0D7DE' } },
-      left:   { style:'thin', color:{ rgb:'D0D7DE' } },
-      right:  { style:'thin', color:{ rgb:'D0D7DE' } }
-    }
-  };
+// ════════════════════════════════
+// EXPORTAR EXCEL
+// ════════════════════════════════
+function estiloCelda(bold,bgHex,fontHex,fontSize,hAlign){return{font:{bold:!!bold,color:{rgb:(fontHex||'000000')},sz:fontSize||11,name:'Calibri'},fill:bgHex?{patternType:'solid',fgColor:{rgb:bgHex}}:{patternType:'none'},alignment:{horizontal:hAlign||'left',vertical:'center',wrapText:true},border:{top:{style:'thin',color:{rgb:'D0D7DE'}},bottom:{style:'thin',color:{rgb:'D0D7DE'}},left:{style:'thin',color:{rgb:'D0D7DE'}},right:{style:'thin',color:{rgb:'D0D7DE'}}}};}
+function colorPunct(txt){if(!txt||txt==='—')return null;if(txt.toLowerCase().includes('puntual'))return{bg:'D1FAE5',fg:'065F46'};if(txt.toLowerCase().includes('tardanza'))return{bg:'FEF3C7',fg:'92400E'};if(txt.toLowerCase().includes('anticipada'))return{bg:'FEE2E2',fg:'991B1B'};if(txt.toLowerCase().includes('extra'))return{bg:'EDE9FE',fg:'5B21B6'};return null;}
+function aplicarEstilosHoja(ws,numMetaRows,numColsHeader,totalDataRows,ncols,esResumen){
+  const R=(r,c)=>XLSX.utils.encode_cell({r,c});
+  if(ws[R(0,0)])ws[R(0,0)].s=estiloCelda(true,'0F4C35','FFFFFF',esResumen?16:18,'center');
+  [1,2].forEach(ri=>{if(ws[R(ri,0)])ws[R(ri,0)].s=estiloCelda(false,'1A6348','A7F3D0',11,'center');});
+  if(!esResumen){for(let c=0;c<4;c++){if(ws[R(4,c)])ws[R(4,c)].s=estiloCelda(true,'1E3A5F','93C5FD',11,'center');}}
+  const hdrRow=numMetaRows;for(let c=0;c<ncols;c++){if(ws[R(hdrRow,c)])ws[R(hdrRow,c)].s=estiloCelda(true,'064E3B','6EE7B7',11,'center');}
+  for(let ri=0;ri<totalDataRows;ri++){const row=hdrRow+1+ri,isAlt=ri%2===1,bgBase=isAlt?'F0FDF4':'FFFFFF';for(let c=0;c<ncols;c++){const cell=ws[R(row,c)];if(!cell)continue;const val=cell.v?cell.v.toString():'';const cp=colorPunct(val);if(cp)cell.s=estiloCelda(false,cp.bg,cp.fg,10,'center');else if(c===0)cell.s=estiloCelda(true,bgBase,'6B7280',10,'center');else if(c===1)cell.s=estiloCelda(false,bgBase,'374151',11,'center');else cell.s=estiloCelda(false,bgBase,'1F2937',11,c<=1?'left':'center');}}
+  ws['!rows']=[];ws['!rows'][0]={hpt:30};ws['!rows'][1]={hpt:20};ws['!rows'][2]={hpt:18};ws['!rows'][hdrRow]={hpt:22};
 }
-
-function colorPunct(txt) {
-  if (!txt || txt === '—') return null;
-  if (txt.toLowerCase().includes('puntual'))   return { bg:'D1FAE5', fg:'065F46' }; // verde
-  if (txt.toLowerCase().includes('tardanza'))  return { bg:'FEF3C7', fg:'92400E' }; // amarillo
-  if (txt.toLowerCase().includes('anticipada'))return { bg:'FEE2E2', fg:'991B1B' }; // rojo
-  if (txt.toLowerCase().includes('extra'))     return { bg:'EDE9FE', fg:'5B21B6' }; // lila
-  return null;
-}
-
-function aplicarEstilosHoja(ws, numMetaRows, numColsHeader, totalDataRows, ncols, esResumen) {
-  const R = (r,c) => XLSX.utils.encode_cell({r,c});
-
-  if (ws[R(0,0)]) ws[R(0,0)].s = estiloCelda(true,'0F4C35','FFFFFF', esResumen?16:18,'center');
-
-  [1,2].forEach(ri => {
-    if (ws[R(ri,0)]) ws[R(ri,0)].s = estiloCelda(false,'1A6348','A7F3D0',11,'center');
+function exportarExcel(){
+  if(!reporteData.length)return mostrarToast('⚠️ Sin datos','warning');
+  const fI=document.getElementById('rep-fecha-inicio').value,fF=document.getElementById('rep-fecha-fin').value,wb=XLSX.utils.book_new();
+  const uMap={};reporteData.forEach(r=>{if(!uMap[r.id])uMap[r.id]={id:r.id,nombre:r.nombre,area:r.area,cargo:r.perfil,registros:[]};uMap[r.id].registros.push(r);});
+  const usuarios=Object.values(uMap);
+  const COLS_R=['#','Fecha','ID','Nombre','Área','Cargo','Entrada AM','Punt. Entrada','Salida Alm.','Punt. Sal. Alm.','Retorno','Punt. Retorno','Salida Final','Punt. Sal. Final','Comentario'];
+  const filasG=[];let nG=1;usuarios.forEach(u=>{agruparPorDia(u.registros).forEach(f=>{filasG.push([nG++,f.fecha,f.id,f.nombre,f.area,f.cargo,f.horaEntrada,f.punctEntrada,f.horaSalida1,f.punctSalida1,f.horaEntrada2,f.punctEntrada2,f.horaSalida,f.punctSalida,f.comentario]);});});
+  const wsAll=XLSX.utils.aoa_to_sheet([['REPORTE DE ASISTENCIA — FINACORP'],[`Período: ${fI}  al  ${fF}`],[`Generado: ${new Date().toLocaleString('es-PE')}`],[],COLS_R,...filasG]);
+  wsAll['!cols']=[{wch:5},{wch:12},{wch:12},{wch:28},{wch:20},{wch:18},{wch:11},{wch:20},{wch:14},{wch:20},{wch:11},{wch:20},{wch:13},{wch:20},{wch:35}];
+  wsAll['!merges']=[{s:{r:0,c:0},e:{r:0,c:14}},{s:{r:1,c:0},e:{r:1,c:14}},{s:{r:2,c:0},e:{r:2,c:14}}];
+  aplicarEstilosHoja(wsAll,4,15,filasG.length,15,true);XLSX.utils.book_append_sheet(wb,wsAll,'Todos');
+  usuarios.forEach(u=>{
+    const dias=agruparPorDia(u.registros),tard=u.registros.filter(r=>r.puntualidad==='tardanza').length,anti=u.registros.filter(r=>r.puntualidad==='anticipada').length;
+    const COLS_U=['#','Fecha','Entrada AM','Punt. Entrada','Salida Alm.','Punt. Sal. Alm.','Retorno','Punt. Retorno','Salida Final','Punt. Sal. Final','Comentario'];
+    const wsU=XLSX.utils.aoa_to_sheet([[u.nombre],[`ID: ${u.id}   |   Área: ${u.area}   |   Cargo: ${u.cargo||'—'}`],[`Período: ${fI}  al  ${fF}`],[],[`📅 Días: ${dias.length}`,`⏰ Tardanzas: ${tard}`,`⚠️ Anticipadas: ${anti}`,`📋 Total: ${u.registros.length}`],[],COLS_U,...dias.map((f,i)=>[i+1,f.fecha,f.horaEntrada,f.punctEntrada,f.horaSalida1,f.punctSalida1,f.horaEntrada2,f.punctEntrada2,f.horaSalida,f.punctSalida,f.comentario])]);
+    wsU['!cols']=[{wch:4},{wch:12},{wch:11},{wch:22},{wch:14},{wch:22},{wch:11},{wch:22},{wch:13},{wch:22},{wch:35}];
+    wsU['!merges']=[{s:{r:0,c:0},e:{r:0,c:10}},{s:{r:1,c:0},e:{r:1,c:10}},{s:{r:2,c:0},e:{r:2,c:10}}];
+    aplicarEstilosHoja(wsU,6,11,dias.length,11,false);
+    XLSX.utils.book_append_sheet(wb,wsU,(u.nombre||u.id).replace(/[:\\\/\?\*\[\]]/g,'').substring(0,28).trim()||u.id);
   });
-
-  if (!esResumen) {
-    for (let c=0; c<4; c++) {
-      if (ws[R(4,c)]) ws[R(4,c)].s = estiloCelda(true,'1E3A5F','93C5FD',11,'center');
-    }
-  }
-
-  const hdrRow = numMetaRows;
-  for (let c=0; c<ncols; c++) {
-    if (ws[R(hdrRow,c)]) ws[R(hdrRow,c)].s = estiloCelda(true,'064E3B','6EE7B7',11,'center');
-  }
-
-  for (let ri=0; ri<totalDataRows; ri++) {
-    const row = hdrRow + 1 + ri;
-    const isAlt = ri % 2 === 1;
-    const bgBase = isAlt ? 'F0FDF4' : 'FFFFFF';
-    for (let c=0; c<ncols; c++) {
-      const cell = ws[R(row,c)];
-      if (!cell) continue;
-      const val = cell.v ? cell.v.toString() : '';
-      const cp = colorPunct(val);
-      if (cp) {
-        cell.s = estiloCelda(false, cp.bg, cp.fg, 10, 'center');
-      } else if (c===0) {
-        cell.s = estiloCelda(true, bgBase, '6B7280', 10, 'center');
-      } else if (c===1) {
-        cell.s = estiloCelda(false, bgBase, '374151', 11, 'center');
-      } else {
-        cell.s = estiloCelda(false, bgBase, '1F2937', 11, c<=1?'left':'center');
-      }
-    }
-  }
-
-  ws['!rows'] = [];
-  ws['!rows'][0] = { hpt: 30 };
-  ws['!rows'][1] = { hpt: 20 };
-  ws['!rows'][2] = { hpt: 18 };
-  ws['!rows'][hdrRow] = { hpt: 22 };
+  XLSX.writeFile(wb,`reporte_asistencia_${new Date().toISOString().split('T')[0]}.xlsx`);mostrarToast(`📥 Excel descargado — ${usuarios.length} colaboradores`,'success');
 }
 
-function exportarExcel() {
-  if (!reporteData.length) return mostrarToast('⚠️ Sin datos', 'warning');
-
-  const fI = document.getElementById('rep-fecha-inicio').value;
-  const fF = document.getElementById('rep-fecha-fin').value;
-
-  const wb = XLSX.utils.book_new();
-
-  // ── Agrupar todos los registros por colaborador ──────────────────
-  const usuariosMap = {};
-  reporteData.forEach(r => {
-    if (!usuariosMap[r.id])
-      usuariosMap[r.id] = { id:r.id, nombre:r.nombre, area:r.area, cargo:r.perfil, registros:[] };
-    usuariosMap[r.id].registros.push(r);
-  });
-  const usuarios = Object.values(usuariosMap);
-
-  // ── Hoja 1: Resumen general ──────────────────────────────────────
-  const COLS_RESUMEN = [
-    '#','Fecha','ID','Nombre','Área','Cargo',
-    'Entrada AM','Puntualidad Entrada',
-    'Salida Almuerzo','Puntualidad Sal. Alm.',
-    'Retorno','Puntualidad Retorno',
-    'Salida Final','Puntualidad Sal. Final',
-    'Comentario'
-  ];
-
-  const filasGeneral = [];
-  let numGen = 1;
-  usuarios.forEach(u => {
-    agruparPorDia(u.registros).forEach(f => {
-      filasGeneral.push([
-        numGen++,
-        f.fecha, f.id, f.nombre, f.area, f.cargo,
-        f.horaEntrada,  f.punctEntrada,
-        f.horaSalida1,  f.punctSalida1,
-        f.horaEntrada2, f.punctEntrada2,
-        f.horaSalida,   f.punctSalida,
-        f.comentario
-      ]);
-    });
-  });
-
-  const wsAll = XLSX.utils.aoa_to_sheet([
-    ['REPORTE DE ASISTENCIA — FINACORP'],
-    [`Período: ${fI}  al  ${fF}`],
-    [`Generado: ${new Date().toLocaleString('es-PE')}`],
-    [],
-    COLS_RESUMEN,
-    ...filasGeneral
-  ]);
-  wsAll['!cols'] = [
-    {wch:5},{wch:12},{wch:12},{wch:28},{wch:20},{wch:18},
-    {wch:11},{wch:20},{wch:14},{wch:20},{wch:11},{wch:20},{wch:13},{wch:20},{wch:35}
-  ];
-  wsAll['!merges'] = [
-    {s:{r:0,c:0},e:{r:0,c:14}},
-    {s:{r:1,c:0},e:{r:1,c:14}},
-    {s:{r:2,c:0},e:{r:2,c:14}}
-  ];
-  aplicarEstilosHoja(wsAll, 4, 15, filasGeneral.length, 15, true);
-  XLSX.utils.book_append_sheet(wb, wsAll, 'Todos');
-
-  // ── Una hoja por colaborador ─────────────────────────────────────
-  usuarios.forEach(u => {
-    const diasAgrupados = agruparPorDia(u.registros);
-    const tardanzas   = u.registros.filter(r => r.puntualidad === 'tardanza').length;
-    const anticipadas = u.registros.filter(r => r.puntualidad === 'anticipada').length;
-    const diasAsistidos = diasAgrupados.length;
-
-    const COLS_USER = [
-      '#','Fecha',
-      'Entrada AM','Puntualidad Entrada',
-      'Salida Almuerzo','Puntualidad Sal. Alm.',
-      'Retorno','Puntualidad Retorno',
-      'Salida Final','Puntualidad Sal. Final',
-      'Comentario'
-    ];
-
-    const wsU = XLSX.utils.aoa_to_sheet([
-      [u.nombre],
-      [`ID: ${u.id}   |   Área: ${u.area}   |   Cargo: ${u.cargo || '—'}`],
-      [`Período: ${fI}  al  ${fF}`],
-      [],
-      [
-        `📅 Días asistidos: ${diasAsistidos}`,
-        `⏰ Tardanzas: ${tardanzas}`,
-        `⚠️ Sal. Anticipadas: ${anticipadas}`,
-        `📋 Total registros: ${u.registros.length}`
-      ],
-      [],
-      COLS_USER,
-      ...diasAgrupados.map((f, i) => [
-        i + 1, f.fecha,
-        f.horaEntrada,  f.punctEntrada,
-        f.horaSalida1,  f.punctSalida1,
-        f.horaEntrada2, f.punctEntrada2,
-        f.horaSalida,   f.punctSalida,
-        f.comentario
-      ])
-    ]);
-
-    wsU['!cols'] = [
-      {wch:4},{wch:12},
-      {wch:11},{wch:22},
-      {wch:14},{wch:22},
-      {wch:11},{wch:22},
-      {wch:13},{wch:22},
-      {wch:35}
-    ];
-    wsU['!merges'] = [
-      {s:{r:0,c:0},e:{r:0,c:10}},
-      {s:{r:1,c:0},e:{r:1,c:10}},
-      {s:{r:2,c:0},e:{r:2,c:10}}
-    ];
-    aplicarEstilosHoja(wsU, 6, 11, diasAgrupados.length, 11, false);
-
-    const nombreHoja = (u.nombre || u.id)
-      .replace(/[:\\\/\?\*\[\]]/g, '')
-      .substring(0, 28).trim() || u.id;
-
-    XLSX.utils.book_append_sheet(wb, wsU, nombreHoja);
-  });
-
-  XLSX.writeFile(wb, `reporte_asistencia_${new Date().toISOString().split('T')[0]}.xlsx`);
-  mostrarToast(`📥 Excel descargado — ${usuarios.length} colaboradores`, 'success');
-}
-
-// ══════════════════════════════════════════════════════════════════
-// HELPER: parsea cualquier formato de fecha a objeto Date
-// ══════════════════════════════════════════════════════════════════
-function parsearFechaHora(fechaHoraStr) {
-  if (!fechaHoraStr) return null;
-  const s = fechaHoraStr.toString().trim();
-  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
-  if (m) {
-    const [,d,mo,y,h='0',mi='0',se='0'] = m;
-    return new Date(+y, +mo-1, +d, +h, +mi, +se);
-  }
-  const dt = new Date(s);
-  return isNaN(dt) ? null : dt;
-}
-
-function extraerHora(fechaHoraStr) {
-  const dt = parsearFechaHora(fechaHoraStr);
-  if (!dt) return '—';
-  return dt.getHours().toString().padStart(2,'0') + ':' + dt.getMinutes().toString().padStart(2,'0');
-}
-
-function extraerFecha(fechaHoraStr) {
-  const dt = parsearFechaHora(fechaHoraStr);
-  if (!dt) return '—';
-  return dt.getDate().toString().padStart(2,'0') + '/' +
-         (dt.getMonth()+1).toString().padStart(2,'0') + '/' +
-         dt.getFullYear();
-}
-
-function textoPuntualidad(punct, minutos) {
-  if (!punct || punct === 'sin_horario') return '—';
-  if (punct === 'puntual')        return 'Puntual';
-  if (punct === 'tardanza')       return `Tardanza +${minutos || 0} min`;
-  if (punct === 'anticipada')     return `Anticipada -${minutos || 0} min`;
-  if (punct === 'extraordinario') return 'Día Extra';
-  return '—';
-}
-
-function agruparPorDia(registros) {
-  const porFecha = {};
-  registros.forEach(r => {
-    const fecha = extraerFecha(r.fechaHora);
-    if (!porFecha[fecha]) porFecha[fecha] = { entrada1:null, salida1:null, entrada2:null, salida2:null };
-    const slot = r.slotHorario;
-    if (slot && porFecha[fecha].hasOwnProperty(slot) && porFecha[fecha][slot] === null) {
-      porFecha[fecha][slot] = r;
-    } else {
-      if (r.estado === 'INGRESO') {
-        if (!porFecha[fecha].entrada1) porFecha[fecha].entrada1 = r;
-        else if (!porFecha[fecha].entrada2) porFecha[fecha].entrada2 = r;
-      } else {
-        if (!porFecha[fecha].salida1) porFecha[fecha].salida1 = r;
-        else if (!porFecha[fecha].salida2) porFecha[fecha].salida2 = r;
-      }
-    }
-  });
-
-  const fechasOrdenadas = Object.keys(porFecha).sort((a, b) => {
-    const pa = a.split('/'), pb = b.split('/');
-    return new Date(pa[2], pa[1]-1, pa[0]) - new Date(pb[2], pb[1]-1, pb[0]);
-  });
-
-  const filas = [];
-  fechasOrdenadas.forEach(fecha => {
-    const { entrada1: ing1, salida1: sal1, entrada2: ing2, salida2: sal2 } = porFecha[fecha];
-    const ref = ing1 || sal1 || ing2 || sal2;
-    if (!ref) return;
-
-    filas.push({
-      fecha,
-      id:            ref.id,
-      nombre:        ref.nombre,
-      area:          ref.area,
-      cargo:         ref.perfil,
-      horaEntrada:   ing1 ? extraerHora(ing1.fechaHora) : '—',
-      punctEntrada:  ing1 ? textoPuntualidad(ing1.puntualidad, ing1.minutosDiff) : '—',
-      horaSalida1:   sal1 ? extraerHora(sal1.fechaHora) : '—',
-      punctSalida1:  sal1 ? textoPuntualidad(sal1.puntualidad, sal1.minutosDiff) : '—',
-      horaEntrada2:  ing2 ? extraerHora(ing2.fechaHora) : '—',
-      punctEntrada2: ing2 ? textoPuntualidad(ing2.puntualidad, ing2.minutosDiff) : '—',
-      horaSalida:    sal2 ? extraerHora(sal2.fechaHora) : '—',
-      punctSalida:   sal2 ? textoPuntualidad(sal2.puntualidad, sal2.minutosDiff) : '—',
-      comentario:    (ing1||sal1||ing2||sal2)?.comentario || ''
-    });
-  });
-  return filas;
+// HELPERS REPORTES
+function parsearFechaHora(s){if(!s)return null;const st=s.toString().trim(),m=st.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);if(m){const[,d,mo,y,h='0',mi='0',se='0']=m;return new Date(+y,+mo-1,+d,+h,+mi,+se);}const dt=new Date(st);return isNaN(dt)?null:dt;}
+function extraerHora(s){const dt=parsearFechaHora(s);if(!dt)return'—';return dt.getHours().toString().padStart(2,'0')+':'+dt.getMinutes().toString().padStart(2,'0');}
+function extraerFecha(s){const dt=parsearFechaHora(s);if(!dt)return'—';return dt.getDate().toString().padStart(2,'0')+'/'+(dt.getMonth()+1).toString().padStart(2,'0')+'/'+dt.getFullYear();}
+function textoPuntualidad(p,m){if(!p||p==='sin_horario')return'—';if(p==='puntual')return'Puntual';if(p==='tardanza')return`Tardanza +${m||0} min`;if(p==='anticipada')return`Anticipada -${m||0} min`;if(p==='extraordinario')return'Día Extra';return'—';}
+function agruparPorDia(registros){
+  const pF={};registros.forEach(r=>{const f=extraerFecha(r.fechaHora);if(!pF[f])pF[f]={entrada1:null,salida1:null,entrada2:null,salida2:null};const sl=r.slotHorario;if(sl&&pF[f].hasOwnProperty(sl)&&pF[f][sl]===null)pF[f][sl]=r;else{if(r.estado==='INGRESO'){if(!pF[f].entrada1)pF[f].entrada1=r;else if(!pF[f].entrada2)pF[f].entrada2=r;}else{if(!pF[f].salida1)pF[f].salida1=r;else if(!pF[f].salida2)pF[f].salida2=r;}}});
+  return Object.keys(pF).sort((a,b)=>{const pa=a.split('/'),pb=b.split('/');return new Date(pa[2],pa[1]-1,pa[0])-new Date(pb[2],pb[1]-1,pb[0]);}).map(fecha=>{
+    const{entrada1:i1,salida1:s1,entrada2:i2,salida2:s2}=pF[fecha],ref=i1||s1||i2||s2;if(!ref)return null;
+    return{fecha,id:ref.id,nombre:ref.nombre,area:ref.area,cargo:ref.perfil,horaEntrada:i1?extraerHora(i1.fechaHora):'—',punctEntrada:i1?textoPuntualidad(i1.puntualidad,i1.minutosDiff):'—',horaSalida1:s1?extraerHora(s1.fechaHora):'—',punctSalida1:s1?textoPuntualidad(s1.puntualidad,s1.minutosDiff):'—',horaEntrada2:i2?extraerHora(i2.fechaHora):'—',punctEntrada2:i2?textoPuntualidad(i2.puntualidad,i2.minutosDiff):'—',horaSalida:s2?extraerHora(s2.fechaHora):'—',punctSalida:s2?textoPuntualidad(s2.puntualidad,s2.minutosDiff):'—',comentario:(i1||s1||i2||s2)?.comentario||''};
+  }).filter(Boolean);
 }
 
 // ════════════════════════════════
 // CARNETS
 // ════════════════════════════════
-async function cargarGradosCarnets(){const res=await llamarAppsScript('listarGrados');const s=document.getElementById('carnet-grado');if(res?.grados){s.innerHTML='<option value="">Seleccione área...</option>';res.grados.forEach(g=>s.innerHTML+=`<option value="${g}">${g}</option>`);}}
-async function generarCarnetIndividual(){const id=document.getElementById('carnet-id').value.trim();if(!id)return mostrarRespuestaEl('resp-carnet-ind','⚠️ Ingrese ID','error');const btn=document.getElementById('btn-carnet-ind');btn.innerHTML='<span class="loading"></span> Generando...';btn.disabled=true;setProg('ind',30);mostrarRespuestaEl('resp-carnet-ind','📄 Generando...','warning');const res=await llamarAppsScript('generarCarnet',{id});setProg('ind',90);btn.innerHTML='📄 Generar PDF';btn.disabled=false;ocultarProg('ind');if(res?.ok){descargarArchivo(res.data,res.filename);mostrarRespuestaEl('resp-carnet-ind','✅ Descargado','success');}else{mostrarRespuestaEl('resp-carnet-ind','❌ '+(res?.mensaje||'Error'),'error');}}
-async function generarCarnetLote(){const g=document.getElementById('carnet-grado').value;if(!g)return mostrarRespuestaEl('resp-carnet-lote','⚠️ Seleccione área','error');const btn=document.getElementById('btn-carnet-lote');btn.innerHTML='<span class="loading"></span> Generando...';btn.disabled=true;setProg('lote',20);mostrarRespuestaEl('resp-carnet-lote','📚 Generando...','warning');const res=await llamarAppsScript('generarLote',{grado:g});setProg('lote',90);btn.innerHTML='📚 Generar Lote';btn.disabled=false;ocultarProg('lote');if(res?.ok){descargarArchivo(res.data,res.filename);mostrarRespuestaEl('resp-carnet-lote','✅ Descargado','success');}else{mostrarRespuestaEl('resp-carnet-lote','❌ '+(res?.mensaje||'Error'),'error');}}
+async function cargarGradosCarnets(){const res=await llamarAppsScript('listarGrados'),s=document.getElementById('carnet-grado');if(res?.grados){s.innerHTML='<option value="">Seleccione área...</option>';res.grados.forEach(g=>s.innerHTML+=`<option value="${g}">${g}</option>`);}}
+async function generarCarnetIndividual(){const id=document.getElementById('carnet-id').value.trim();if(!id)return mostrarRespuestaEl('resp-carnet-ind','⚠️ Ingrese ID','error');const btn=document.getElementById('btn-carnet-ind');btn.innerHTML='<span class="loading"></span> Generando...';btn.disabled=true;setProg('ind',30);mostrarRespuestaEl('resp-carnet-ind','📄 Generando...','warning');const res=await llamarAppsScript('generarCarnet',{id});setProg('ind',90);btn.innerHTML='📄 Generar PDF';btn.disabled=false;ocultarProg('ind');if(res?.ok){descargarArchivo(res.data,res.filename);mostrarRespuestaEl('resp-carnet-ind','✅ Descargado','success');}else mostrarRespuestaEl('resp-carnet-ind','❌ '+(res?.mensaje||'Error'),'error');}
+async function generarCarnetLote(){const g=document.getElementById('carnet-grado').value;if(!g)return mostrarRespuestaEl('resp-carnet-lote','⚠️ Seleccione área','error');const btn=document.getElementById('btn-carnet-lote');btn.innerHTML='<span class="loading"></span> Generando...';btn.disabled=true;setProg('lote',20);mostrarRespuestaEl('resp-carnet-lote','📚 Generando...','warning');const res=await llamarAppsScript('generarLote',{grado:g});setProg('lote',90);btn.innerHTML='📚 Generar Lote';btn.disabled=false;ocultarProg('lote');if(res?.ok){descargarArchivo(res.data,res.filename);mostrarRespuestaEl('resp-carnet-lote','✅ Descargado','success');}else mostrarRespuestaEl('resp-carnet-lote','❌ '+(res?.mensaje||'Error'),'error');}
 function setProg(id,v){document.getElementById('prog-'+id).style.display='block';document.getElementById('prog-'+id+'-fill').style.width=v+'%';}
 function ocultarProg(id){setTimeout(()=>{document.getElementById('prog-'+id).style.display='none';document.getElementById('prog-'+id+'-fill').style.width='0%';},600);}
 
 // ════════════════════════════════
 // CREDENCIALES
 // ════════════════════════════════
-function switchCredTab(t){
-  ['crear','lista','mipass'].forEach(x=>{document.getElementById('cred-tab-'+x).classList.toggle('active',x===t);document.getElementById('cred-tab-'+x+'-btn').classList.toggle('active',x===t);});
-  if(t==='lista')cargarListaCredenciales();
-  if(t==='mipass'){['mp-actual','mp-nueva','mp-confirmar'].forEach(id=>document.getElementById(id).value='');document.getElementById('respuesta-mipass').style.display='none';setTimeout(()=>document.getElementById('mp-actual').focus(),100);}
-}
+function switchCredTab(t){['crear','lista','mipass'].forEach(x=>{document.getElementById('cred-tab-'+x).classList.toggle('active',x===t);document.getElementById('cred-tab-'+x+'-btn').classList.toggle('active',x===t);});if(t==='lista')cargarListaCredenciales();if(t==='mipass'){['mp-actual','mp-nueva','mp-confirmar'].forEach(id=>document.getElementById(id).value='');document.getElementById('respuesta-mipass').style.display='none';setTimeout(()=>document.getElementById('mp-actual').focus(),100);}}
 async function guardarCredencial(){if(modoEdicionCred)await actualizarCredencial();else await crearCredencial();}
 async function crearCredencial(){
-  const nombre=document.getElementById('cred-nombre').value.trim();const usuario=document.getElementById('cred-usuario').value.trim();const pass=document.getElementById('cred-pass').value.trim();const rol=document.getElementById('cred-rol').value;const permisos=obtenerPermisosSeleccionados();
-  if(!nombre||!usuario||!pass){mostrarRespuestaEl('respuesta-cred','⚠️ Nombre, usuario y contraseña son obligatorios','error');return;}
-  if(pass.length<4){mostrarRespuestaEl('respuesta-cred','⚠️ Contraseña mínimo 4 caracteres','error');return;}
-  if(permisos.length===0){mostrarRespuestaEl('respuesta-cred','⚠️ Asigna al menos un permiso','error');return;}
+  const nombre=document.getElementById('cred-nombre').value.trim(),usuario=document.getElementById('cred-usuario').value.trim(),pass=document.getElementById('cred-pass').value.trim(),rol=document.getElementById('cred-rol').value,permisos=obtenerPermisosSeleccionados();
+  if(!nombre||!usuario||!pass){mostrarRespuestaEl('respuesta-cred','⚠️ Nombre, usuario y contraseña obligatorios','error');return;}if(pass.length<4){mostrarRespuestaEl('respuesta-cred','⚠️ Contraseña mínimo 4 caracteres','error');return;}if(!permisos.length){mostrarRespuestaEl('respuesta-cred','⚠️ Asigna al menos un permiso','error');return;}
   const btn=document.getElementById('btn-guardar-cred');btn.innerHTML='<span class="loading"></span> Creando...';btn.disabled=true;
-  const res=await llamarAppsScript('crearCredencial',{nombre,usuario,pass,rol,permisos});
-  btn.innerHTML='💾 Guardar Acceso';btn.disabled=false;
-  if(res?.exito){mostrarRespuestaEl('respuesta-cred','✅ '+res.mensaje,'success');mostrarToast('✅ Acceso creado','success');limpiarFormCred();cargarListaCredenciales();}
-  else{mostrarRespuestaEl('respuesta-cred','❌ '+(res?.mensaje||'Error'),'error');}
+  const res=await llamarAppsScript('crearCredencial',{nombre,usuario,pass,rol,permisos});btn.innerHTML='💾 Guardar Acceso';btn.disabled=false;
+  if(res?.exito){mostrarRespuestaEl('respuesta-cred','✅ '+res.mensaje,'success');mostrarToast('✅ Acceso creado','success');limpiarFormCred();cargarListaCredenciales();}else mostrarRespuestaEl('respuesta-cred','❌ '+(res?.mensaje||'Error'),'error');
 }
 async function actualizarCredencial(){
-  const uO=document.getElementById('cred-usuario-original').value;const nombre=document.getElementById('cred-nombre').value.trim();const pass=document.getElementById('cred-pass').value.trim();const rol=document.getElementById('cred-rol').value;const permisos=obtenerPermisosSeleccionados();
-  if(!nombre){mostrarRespuestaEl('respuesta-cred','⚠️ Nombre obligatorio','error');return;}
-  if(permisos.length===0){mostrarRespuestaEl('respuesta-cred','⚠️ Asigna al menos un permiso','error');return;}
+  const uO=document.getElementById('cred-usuario-original').value,nombre=document.getElementById('cred-nombre').value.trim(),pass=document.getElementById('cred-pass').value.trim(),rol=document.getElementById('cred-rol').value,permisos=obtenerPermisosSeleccionados();
+  if(!nombre){mostrarRespuestaEl('respuesta-cred','⚠️ Nombre obligatorio','error');return;}if(!permisos.length){mostrarRespuestaEl('respuesta-cred','⚠️ Asigna al menos un permiso','error');return;}
   const btn=document.getElementById('btn-guardar-cred');btn.innerHTML='<span class="loading"></span> Actualizando...';btn.disabled=true;
-  const res=await llamarAppsScript('actualizarCredencial',{usuarioOriginal:uO,nombre,pass,rol,permisos});
-  btn.innerHTML='💾 Actualizar';btn.disabled=false;
-  if(res?.exito){mostrarRespuestaEl('respuesta-cred','✅ '+res.mensaje,'success');mostrarToast('✅ Acceso actualizado','success');cancelarEdicionCred();cargarListaCredenciales();}
-  else{mostrarRespuestaEl('respuesta-cred','❌ '+(res?.mensaje||'Error'),'error');}
+  const res=await llamarAppsScript('actualizarCredencial',{usuarioOriginal:uO,nombre,pass,rol,permisos});btn.innerHTML='💾 Actualizar';btn.disabled=false;
+  if(res?.exito){mostrarRespuestaEl('respuesta-cred','✅ '+res.mensaje,'success');mostrarToast('✅ Actualizado','success');cancelarEdicionCred();cargarListaCredenciales();}else mostrarRespuestaEl('respuesta-cred','❌ '+(res?.mensaje||'Error'),'error');
 }
 function obtenerPermisosSeleccionados(){return['asistencia','dashboard','personal','reportes','carnets'].filter(p=>document.getElementById('perm-'+p)?.checked);}
 function limpiarFormCred(){['cred-nombre','cred-usuario','cred-pass','cred-usuario-original'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('cred-rol').value='operador';['asistencia','dashboard','personal','reportes','carnets'].forEach(p=>{const el=document.getElementById('perm-'+p);if(el)el.checked=p==='asistencia';});document.getElementById('respuesta-cred').style.display='none';}
-function cargarFormEdicionCred(d){
-  modoEdicionCred=true;document.getElementById('cred-usuario-original').value=d.usuario;document.getElementById('cred-nombre').value=d.nombre;document.getElementById('cred-usuario').value=d.usuario;document.getElementById('cred-usuario').disabled=true;document.getElementById('cred-pass').value='';document.getElementById('cred-pass').placeholder='Dejar vacío = no cambiar';document.getElementById('cred-rol').value=d.rol||'operador';
-  const p=d.permisos||[];['asistencia','dashboard','personal','reportes','carnets'].forEach(x=>{const el=document.getElementById('perm-'+x);if(el)el.checked=p.includes(x);});
-  document.getElementById('cred-form-titulo').textContent='✏️ Editar acceso: @'+d.usuario;document.getElementById('btn-guardar-cred').innerHTML='💾 Actualizar';document.getElementById('btn-cancelar-cred').style.display='inline-flex';
-  switchCredTab('crear');window.scrollTo({top:0,behavior:'smooth'});
-}
-function cancelarEdicionCred(){
-  modoEdicionCred=false;document.getElementById('cred-usuario').disabled=false;document.getElementById('cred-pass').placeholder='Mínimo 4 caracteres';document.getElementById('cred-form-titulo').textContent='➕ Crear Nuevo Acceso al Sistema';document.getElementById('btn-guardar-cred').innerHTML='💾 Guardar Acceso';document.getElementById('btn-cancelar-cred').style.display='none';limpiarFormCred();
-}
+function cargarFormEdicionCred(d){modoEdicionCred=true;document.getElementById('cred-usuario-original').value=d.usuario;document.getElementById('cred-nombre').value=d.nombre;document.getElementById('cred-usuario').value=d.usuario;document.getElementById('cred-usuario').disabled=true;document.getElementById('cred-pass').value='';document.getElementById('cred-pass').placeholder='Dejar vacío = no cambiar';document.getElementById('cred-rol').value=d.rol||'operador';const p=d.permisos||[];['asistencia','dashboard','personal','reportes','carnets'].forEach(x=>{const el=document.getElementById('perm-'+x);if(el)el.checked=p.includes(x);});document.getElementById('cred-form-titulo').textContent='✏️ Editar: @'+d.usuario;document.getElementById('btn-guardar-cred').innerHTML='💾 Actualizar';document.getElementById('btn-cancelar-cred').style.display='inline-flex';switchCredTab('crear');window.scrollTo({top:0,behavior:'smooth'});}
+function cancelarEdicionCred(){modoEdicionCred=false;document.getElementById('cred-usuario').disabled=false;document.getElementById('cred-pass').placeholder='Mínimo 4 caracteres';document.getElementById('cred-form-titulo').textContent='➕ Crear Nuevo Acceso al Sistema';document.getElementById('btn-guardar-cred').innerHTML='💾 Guardar Acceso';document.getElementById('btn-cancelar-cred').style.display='none';limpiarFormCred();}
 async function cargarListaCredenciales(){
   const wrap=document.getElementById('cred-lista-wrap');wrap.innerHTML='<div class="empty-state"><span>⏳</span><p>Cargando...</p></div>';
   const res=await llamarAppsScript('listarCredenciales');
   if(!res?.credenciales?.length){wrap.innerHTML='<div class="empty-state"><span>👤</span><p>No hay accesos registrados</p></div>';return;}
-  const PI={asistencia:'📷',dashboard:'📊',personal:'👥',reportes:'📋',carnets:'🪪'};
-  const RC={admin:'badge-red',supervisor:'badge-amber',operador:'badge-blue'};
+  const PI={asistencia:'📷',dashboard:'📊',personal:'👥',reportes:'📋',carnets:'🪪'},RC={admin:'badge-red',supervisor:'badge-amber',operador:'badge-blue'};
   wrap.innerHTML=res.credenciales.map(c=>`<div class="cred-card"><div><div class="cred-name">${c.nombre} <span class="badge ${RC[c.rol]||'badge-blue'}">${c.rol}</span></div><div class="cred-user">@${c.usuario}</div><div class="cred-perms">${(c.permisos||[]).map(p=>`<span class="badge badge-green">${PI[p]||''} ${p}</span>`).join('')}</div></div><div class="cred-actions"><button class="btn btn-secondary btn-sm" onclick='cargarFormEdicionCred(${JSON.stringify(c)})'>✏️</button><button class="btn btn-danger btn-sm" onclick="abrirModalEliminarCred('${c.usuario}','${c.nombre}')">🗑️</button></div></div>`).join('');
 }
 function abrirModalEliminarCred(u,n){usuarioCredAEliminar=u;document.getElementById('modal-cred-nombre').textContent=`Se revocará el acceso de: ${n} (@${u})`;document.getElementById('modal-eliminar-cred').classList.add('show');}
-async function confirmarEliminarCred(){
-  if(!usuarioCredAEliminar)return;
-  const btn=document.getElementById('btn-confirmar-eliminar-cred');btn.innerHTML='<span class="loading"></span>';btn.disabled=true;
-  const res=await llamarAppsScript('eliminarCredencial',{usuario:usuarioCredAEliminar});
-  btn.innerHTML='🗑️ Sí, revocar';btn.disabled=false;cerrarModal('modal-eliminar-cred');
-  if(res?.exito){mostrarToast('🗑️ Acceso revocado','success');cargarListaCredenciales();}
-  else{mostrarToast('❌ '+(res?.mensaje||'Error'),'error');}
-  usuarioCredAEliminar='';
-}
+async function confirmarEliminarCred(){if(!usuarioCredAEliminar)return;const btn=document.getElementById('btn-confirmar-eliminar-cred');btn.innerHTML='<span class="loading"></span>';btn.disabled=true;const res=await llamarAppsScript('eliminarCredencial',{usuario:usuarioCredAEliminar});btn.innerHTML='🗑️ Sí, revocar';btn.disabled=false;cerrarModal('modal-eliminar-cred');if(res?.exito){mostrarToast('🗑️ Revocado','success');cargarListaCredenciales();}else mostrarToast('❌ '+(res?.mensaje||'Error'),'error');usuarioCredAEliminar='';}
 
 // ════════════════════════════════
 // CAMBIAR CONTRASEÑA
 // ════════════════════════════════
 async function cambiarMiContrasena(){
-  const actual   = document.getElementById('mp-actual').value.trim();
-  const nueva    = document.getElementById('mp-nueva').value.trim();
-  const confirmar= document.getElementById('mp-confirmar').value.trim();
-  if(!actual||!nueva||!confirmar){mostrarRespuestaEl('respuesta-mipass','⚠️ Completa todos los campos','error');return;}
-  if(nueva.length<4){mostrarRespuestaEl('respuesta-mipass','⚠️ Mínimo 4 caracteres','error');return;}
-  if(nueva!==confirmar){mostrarRespuestaEl('respuesta-mipass','⚠️ Las contraseñas no coinciden','error');return;}
-  const btn=document.getElementById('btn-cambiar-pass');
-  btn.innerHTML='<span class="loading"></span> Cambiando...';btn.disabled=true;
+  const actual=document.getElementById('mp-actual').value.trim(),nueva=document.getElementById('mp-nueva').value.trim(),confirmar=document.getElementById('mp-confirmar').value.trim();
+  if(!actual||!nueva||!confirmar){mostrarRespuestaEl('respuesta-mipass','⚠️ Completa todos los campos','error');return;}if(nueva.length<4){mostrarRespuestaEl('respuesta-mipass','⚠️ Mínimo 4 caracteres','error');return;}if(nueva!==confirmar){mostrarRespuestaEl('respuesta-mipass','⚠️ Las contraseñas no coinciden','error');return;}
+  const btn=document.getElementById('btn-cambiar-pass');btn.innerHTML='<span class="loading"></span> Cambiando...';btn.disabled=true;
   if(SESSION.usuario===CONFIG.ADMIN_USER){
-    let passActualOk=false;
-    try{
-      const chk=await llamarAppsScript('verificarCredencial',{usuario:CONFIG.ADMIN_USER,pass:actual});
-      if(chk?.ok) passActualOk=true;
-    }catch(e){}
-    if(!passActualOk){
-      btn.innerHTML='🔑 Cambiar Contraseña';btn.disabled=false;
-      mostrarRespuestaEl('respuesta-mipass','❌ Contraseña actual incorrecta','error');return;
-    }
-    const res=await llamarAppsScript('guardarContrasenaAdmin',{passNueva:nueva});
-    btn.innerHTML='🔑 Cambiar Contraseña';btn.disabled=false;
-    if(res?.exito){
-      mostrarRespuestaEl('respuesta-mipass','✅ Contraseña del administrador actualizada correctamente','success');
-      mostrarToast('✅ Contraseña actualizada','success');
-      document.getElementById('mp-actual').value='';document.getElementById('mp-nueva').value='';document.getElementById('mp-confirmar').value='';
-    }else{mostrarRespuestaEl('respuesta-mipass','❌ '+(res?.mensaje||'Error'),'error');}
-    return;
+    let ok=false;try{const c=await llamarAppsScript('verificarCredencial',{usuario:CONFIG.ADMIN_USER,pass:actual});if(c?.ok)ok=true;}catch(e){}
+    if(!ok){btn.innerHTML='🔑 Cambiar Contraseña';btn.disabled=false;mostrarRespuestaEl('respuesta-mipass','❌ Contraseña actual incorrecta','error');return;}
+    const res=await llamarAppsScript('guardarContrasenaAdmin',{passNueva:nueva});btn.innerHTML='🔑 Cambiar Contraseña';btn.disabled=false;
+    if(res?.exito){mostrarRespuestaEl('respuesta-mipass','✅ Contraseña actualizada','success');mostrarToast('✅ Contraseña actualizada','success');document.getElementById('mp-actual').value='';document.getElementById('mp-nueva').value='';document.getElementById('mp-confirmar').value='';}
+    else mostrarRespuestaEl('respuesta-mipass','❌ '+(res?.mensaje||'Error'),'error');return;
   }
-  const res=await llamarAppsScript('cambiarContrasenaAdmin',{usuario:SESSION.usuario,passActual:actual,passNueva:nueva});
-  btn.innerHTML='🔑 Cambiar Contraseña';btn.disabled=false;
+  const res=await llamarAppsScript('cambiarContrasenaAdmin',{usuario:SESSION.usuario,passActual:actual,passNueva:nueva});btn.innerHTML='🔑 Cambiar Contraseña';btn.disabled=false;
   if(res?.exito){mostrarRespuestaEl('respuesta-mipass','✅ '+res.mensaje,'success');mostrarToast('✅ Contraseña actualizada','success');document.getElementById('mp-actual').value='';document.getElementById('mp-nueva').value='';document.getElementById('mp-confirmar').value='';}
-  else{mostrarRespuestaEl('respuesta-mipass','❌ '+(res?.mensaje||'Error'),'error');}
+  else mostrarRespuestaEl('respuesta-mipass','❌ '+(res?.mensaje||'Error'),'error');
+}
+
+// ════════════════════════════════
+// DÍA LIBRE
+// ════════════════════════════════
+function mostrarPanelDiaLibre(mostrar){
+  const panel=document.getElementById('dia-libre-panel'),btn=document.getElementById('btn-submit');
+  if(mostrar){panel.style.display='block';document.getElementById('comentario-dia-libre').value='';document.getElementById('comentario-chars').textContent='0';btn.disabled=true;btn.textContent='📝 Escribe el motivo para registrar';}
+  else panel.style.display='none';
+}
+function validarComentarioDiaLibre(){
+  const ta=document.getElementById('comentario-dia-libre'),chars=document.getElementById('comentario-chars'),btn=document.getElementById('btn-submit'),texto=ta.value.trim();
+  chars.textContent=texto.length;
+  if(texto.length>=10){ta.classList.add('valido');btn.disabled=false;btn.innerHTML='✅ Registrar Asistencia <small style="opacity:.7;font-size:11px;">(día no laboral)</small>';}
+  else{ta.classList.remove('valido');btn.disabled=true;btn.textContent=`📝 Escribe al menos ${10-texto.length} caracteres más`;}
 }
 
 // ════════════════════════════════
@@ -2393,47 +1534,50 @@ function iniciarAplicacion(){
 }
 
 document.addEventListener('keypress',function(e){if(e.key==='Enter'&&document.getElementById('login-overlay').style.display!=='none')verificarLogin();});
-
-window.onload=function(){
-  const s=localStorage.getItem('session_pip');
-  if(s){try{const d=JSON.parse(s);if(d.loggedIn){SESSION=d;document.getElementById('login-overlay').style.display='none';document.getElementById('main-content').style.display='block';iniciarAplicacion();return;}}catch(e){}}
-};
-
+window.onload=function(){const s=localStorage.getItem('session_pip');if(s){try{const d=JSON.parse(s);if(d.loggedIn){SESSION=d;document.getElementById('login-overlay').style.display='none';document.getElementById('main-content').style.display='block';iniciarAplicacion();return;}}catch(e){}}};
 window.onbeforeunload=function(){detenerEscaneo();};
-
-// ════════════════════════════════════════════════════════════
-// DÍA LIBRE - PANEL DE COMENTARIO
-// ════════════════════════════════════════════════════════════
-function mostrarPanelDiaLibre(mostrar) {
-  const panel = document.getElementById('dia-libre-panel');
-  const btn   = document.getElementById('btn-submit');
-  if (mostrar) {
-    panel.style.display = 'block';
-    document.getElementById('comentario-dia-libre').value = '';
-    document.getElementById('comentario-chars').textContent = '0';
-    btn.disabled = true;
-    btn.textContent = '📝 Escribe el motivo para registrar';
-  } else {
-    panel.style.display = 'none';
-  }
-}
-
-function validarComentarioDiaLibre() {
-  const ta    = document.getElementById('comentario-dia-libre');
-  const chars = document.getElementById('comentario-chars');
-  const btn   = document.getElementById('btn-submit');
-  const texto = ta.value.trim();
-  chars.textContent = texto.length;
-  if (texto.length >= 10) {
-    ta.classList.add('valido');
-    btn.disabled = false;
-    btn.innerHTML = '✅ Registrar Asistencia <small style="opacity:.7;font-size:11px;">(día no laboral)</small>';
-  } else {
-    ta.classList.remove('valido');
-    btn.disabled = true;
-    btn.textContent = `📝 Escribe al menos ${10 - texto.length} caracteres más`;
-  }
-}
 </script>
+
+<!-- ════════════════════════════════════════════════════════════════
+  FUNCIÓN QUE DEBES AGREGAR EN TU Google Apps Script (Code.gs)
+  Agrégala junto a las demás funciones del switch en doPost()
+
+  En el switch añade:
+    case 'obtenerRegistrosHoyColaborador': resultado = obtenerRegistrosHoyColaborador(params.id); break;
+
+  Y agrega esta función:
+
+function obtenerRegistrosHoyColaborador(id) {
+  try {
+    const ss   = SpreadsheetApp.openById(HOJA_ID);
+    const hoja = ss.getSheetByName(NOMBRE_HOJA_DATOS);
+    if (!hoja) return { registros: [] };
+    const datos = hoja.getDataRange().getValues();
+    const enc   = datos[0].map(h => (h||'').toString().trim().toUpperCase());
+    const idxId    = 1;
+    const idxEst   = 5;
+    const hoy      = new Date();
+    const inicioHoy= new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+    const finHoy   = new Date(inicioHoy.getTime() + 24*60*60*1000);
+    const idBuscado= id.toString().trim().toUpperCase();
+    const registros= [];
+    for (let i = 1; i < datos.length; i++) {
+      const fila = datos[i];
+      if (!fila[idxId] || fila[idxId].toString().trim().toUpperCase() !== idBuscado) continue;
+      const f = parseFechaRegistro(fila[0]);
+      if (!f || f < inicioHoy || f >= finHoy) continue;
+      registros.push({
+        hora:   Utilities.formatDate(f, 'America/Lima', 'HH:mm:ss'),
+        estado: fila[idxEst] ? fila[idxEst].toString() : ''
+      });
+    }
+    registros.sort((a,b) => a.hora.localeCompare(b.hora));
+    return { registros };
+  } catch(e) {
+    return { registros: [] };
+  }
+}
+════════════════════════════════════════════════════════════════ -->
+
 </body>
 </html>
