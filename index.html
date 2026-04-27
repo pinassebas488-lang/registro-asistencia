@@ -1994,23 +1994,16 @@ async function registrarNuevoPersonal(){
     });
 
     if(resAcc?.exito) {
-      // Mostrar credenciales creadas
-      document.getElementById('p-acc-creado-info').style.display = 'block';
-      document.getElementById('p-acc-creado-user').textContent   = accUser;
-      document.getElementById('p-acc-creado-pass').textContent   = accPass;
-      mostrarRespuestaEl('respuesta-personal',
-        '✅ ' + res.mensaje + ' — Acceso creado para @' + accUser, 'success');
-      mostrarToast('✅ Colaborador y acceso registrados', 'success');
-      // Invalidar cache de personal para que aparezca en vinculador
+      mostrarToast('✅ Colaborador y acceso @' + accUser + ' registrados', 'success');
       _personalCache = [];
+      limpiarFormPersonal();
     } else {
       mostrarRespuestaEl('respuesta-personal',
         '⚠️ Colaborador guardado pero el acceso falló: ' + (resAcc?.mensaje||'Error'), 'warning');
       mostrarToast('⚠️ Colaborador guardado — acceso con errores', 'warning');
     }
   } else {
-    mostrarRespuestaEl('respuesta-personal','✅ '+res.mensaje+' (sin acceso al sistema)','success');
-    mostrarToast('✅ Colaborador registrado','success');
+    mostrarToast('✅ Colaborador registrado', 'success');
     _personalCache = [];
     limpiarFormPersonal();
   }
