@@ -26,7 +26,7 @@
     body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 
     /* LOGIN */
-    #login-overlay{display:flex;position:fixed;inset:0;background:linear-gradient(135deg,#0f172a,#1e293b);z-index:9999;justify-content:center;align-items:center;}
+    #login-overlay{display:none;position:fixed;inset:0;background:linear-gradient(135deg,#0f172a,#1e293b);z-index:9999;justify-content:center;align-items:center;}
     .login-bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(16,185,129,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(16,185,129,.05) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;}
     .login-glow{position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(16,185,129,.15),transparent 70%);border-radius:50%;pointer-events:none;}
     .login-container{width:100%;max-width:420px;padding:20px;position:relative;z-index:1;animation:loginIn .6s ease-out;}
@@ -378,6 +378,15 @@
     .btn-edit-coment{background:none;border:none;cursor:pointer;font-size:13px;padding:2px 4px;border-radius:4px;color:var(--text-muted);flex-shrink:0;}
     .btn-edit-coment:hover{background:rgba(59,130,246,.15);color:#93c5fd;}
     .coment-edit-wrap{display:flex;align-items:center;gap:5px;min-width:180px;}
+    /* COLAB DROPDOWN */
+    #cred-colab-dropdown .colab-item{padding:9px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);transition:background .15s;}
+    #cred-colab-dropdown .colab-item:last-child{border-bottom:none;}
+    #cred-colab-dropdown .colab-item:hover{background:rgba(16,185,129,.1);}
+    #cred-colab-dropdown .colab-item .colab-id{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#34d399;flex-shrink:0;}
+    #cred-colab-dropdown .colab-item .colab-info{flex:1;min-width:0;}
+    #cred-colab-dropdown .colab-item .colab-nombre{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    #cred-colab-dropdown .colab-item .colab-sub{font-size:11px;color:var(--text-muted);}
+    #cred-colab-dropdown .colab-empty{padding:12px;text-align:center;font-size:13px;color:var(--text-muted);}
     .coment-edit-input{flex:1;padding:4px 8px;background:var(--surface2);border:1px solid rgba(59,130,246,.4);border-radius:6px;color:var(--text);font-size:12px;outline:none;min-width:100px;}
     .coment-edit-input:focus{border-color:var(--primary);}
     .btn-save-coment{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);color:#34d399;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700;cursor:pointer;}
@@ -397,7 +406,7 @@
       <div class="login-logo">
         <div class="login-logo-icon">🏦</div>
         <h2>Finacorp</h2>
-        <p>Sistema de Control de Asistencia v5.5</p>
+        <p>Sistema de Control de Asistencia v6.0</p>
       </div>
       <div class="login-input-group">
         <label>Usuario</label>
@@ -409,7 +418,7 @@
       </div>
       <button class="login-btn" id="login-btn" onclick="verificarLogin()">Ingresar →</button>
       <div id="login-error" class="login-error">⚠️ Usuario o contraseña incorrectos</div>
-      <div class="login-footer"><p>© 2026 Finacorp — v5.5</p></div>
+      <div class="login-footer"><p>© 2026 Finacorp — v6.0 (QR Único)</p></div>
     </div>
   </div>
 </div>
@@ -453,6 +462,17 @@
             <div class="card">
               <div class="card-title">📷 Escáner QR</div>
 
+              <!-- ★ BANNER: muestra quién está logueado y registrará -->
+              <div id="session-qr-banner" style="display:none;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;">
+                <div style="font-size:28px;flex-shrink:0;" id="session-qr-avatar-icon">👤</div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#34d399;margin-bottom:2px;">Registrarás asistencia como:</div>
+                  <div style="font-size:15px;font-weight:800;color:#ecfdf5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="session-qr-nombre">—</div>
+                  <div style="font-size:11px;color:#6ee7b7;font-family:'JetBrains Mono',monospace;" id="session-qr-id">—</div>
+                </div>
+                <div id="session-qr-nolink-warn" style="display:none;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:6px;padding:6px 10px;font-size:11px;color:#fcd34d;font-weight:600;max-width:130px;text-align:center;">⚠️ Sin ID de colaborador vinculado</div>
+              </div>
+
               <!-- Barra de estado del QR -->
               <div class="qr-status-bar idle" id="qr-status-bar">
                 <div class="qr-pulse"></div>
@@ -477,7 +497,7 @@
                   <div class="qr-lock-name" id="qr-lock-name">—</div>
                   <div class="qr-lock-id"   id="qr-lock-id">—</div>
                   <div class="qr-lock-status" id="qr-lock-status">—</div>
-                  <button class="qr-lock-btn" onclick="desbloquearQR()">📷 Escanear otro QR</button>
+                  <button class="qr-lock-btn" onclick="desbloquearQR()">📷 Listo para siguiente</button>
                 </div>
 
                 <!-- Barra de countdown para auto-unlock (solo en día libre) -->
@@ -496,10 +516,10 @@
               <div class="card-title">✏️ Registro</div>
               <form id="formulario">
                 <div class="form-group">
-                  <label>ID del Colaborador <span style="color:#34d399;font-size:10px;font-weight:700;">— Solo QR</span></label>
+                  <label>Colaborador identificado <span style="color:#34d399;font-size:10px;font-weight:700;">— Auto por sesión + QR</span></label>
                   <div class="id-qr-only">
-                    <input type="text" id="id" required placeholder="Escanea el QR del colaborador" readonly tabindex="-1">
-                    <span class="id-qr-badge">📷 QR</span>
+                    <input type="text" id="id" required placeholder="Escanea el QR de la empresa para registrarte" readonly tabindex="-1">
+                    <span class="id-qr-badge">🔐 Auto</span>
                   </div>
                 </div>
 
@@ -592,20 +612,68 @@
             <div class="card">
               <div class="card-title" id="form-personal-titulo">➕ Registrar Nuevo Colaborador</div>
               <input type="hidden" id="p-id-original">
+              <!-- DATOS PERSONALES -->
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">👤 Datos del Colaborador</div>
               <div class="form-grid">
-                <div class="form-group" id="grupo-id-nuevo"><label>ID *</label><input type="text" id="p-id" placeholder="Ej: COL-001"></div>
+                <div class="form-group" id="grupo-id-nuevo"><label>ID *</label><input type="text" id="p-id" placeholder="Ej: COL-001" oninput="autoGenerarUsuario()"></div>
                 <div class="form-group" id="grupo-id-editar" style="display:none;"><label>ID (no editable)</label><input type="text" id="p-id-display" disabled></div>
-                <div class="form-group"><label>Nombres *</label><input type="text" id="p-nombres" placeholder="Ej: Juan Carlos"></div>
-                <div class="form-group"><label>Apellidos *</label><input type="text" id="p-apellidos" placeholder="Ej: García López"></div>
+                <div class="form-group"><label>Nombres *</label><input type="text" id="p-nombres" placeholder="Ej: Juan Carlos" oninput="autoGenerarUsuario()"></div>
+                <div class="form-group"><label>Apellidos *</label><input type="text" id="p-apellidos" placeholder="Ej: García López" oninput="autoGenerarUsuario()"></div>
                 <div class="form-group"><label>Área / Departamento *</label><input type="text" id="p-area" placeholder="Ej: Operaciones"></div>
                 <div class="form-group"><label>Cargo / Puesto</label><input type="text" id="p-cargo" placeholder="Ej: Coordinador"></div>
                 <div class="form-group"><label>Teléfono (WhatsApp)</label><input type="text" id="p-telefono" placeholder="Ej: 999888777"></div>
                 <div class="form-group"><label>Correo Electrónico</label><input type="email" id="p-correo" placeholder="Ej: juan@empresa.com"></div>
                 <div class="form-group full"><label>URL Foto (Google Drive)</label><input type="text" id="p-foto" placeholder="https://drive.google.com/..."></div>
               </div>
-              <div class="schedule-section">
+
+              <!-- ACCESO AL SISTEMA — solo en modo nuevo -->
+              <div id="seccion-acceso-personal" style="margin-top:6px;">
+                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#34d399;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(16,185,129,.2);">🔐 Acceso al Sistema <span style="font-size:10px;font-weight:400;color:var(--text-muted);text-transform:none;letter-spacing:0;">(se crea automáticamente con el colaborador)</span></div>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Usuario para login *</label>
+                    <div style="position:relative;">
+                      <input type="text" id="p-acc-usuario" placeholder="Ej: juan.garcia" autocomplete="off" style="padding-right:80px;">
+                      <span id="p-acc-usuario-badge" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;display:none;"></span>
+                    </div>
+                    <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Se genera automáticamente. Puedes editarlo.</div>
+                  </div>
+                  <div class="form-group">
+                    <label>Contraseña *</label>
+                    <div style="position:relative;">
+                      <input type="password" id="p-acc-pass" placeholder="Mínimo 4 caracteres" autocomplete="new-password" style="padding-right:80px;">
+                      <button type="button" onclick="generarPassAleatoria()" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#93c5fd;border-radius:6px;font-size:10px;font-weight:700;padding:2px 8px;cursor:pointer;">🎲 Auto</button>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Rol</label>
+                    <select id="p-acc-rol">
+                      <option value="operador">Operador</option>
+                      <option value="supervisor">Supervisor</option>
+                      <option value="admin">Administrador</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Permisos</label>
+                    <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px;">
+                      <label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:400;text-transform:none;letter-spacing:0;cursor:pointer;"><input type="checkbox" id="p-perm-asistencia" value="asistencia" checked style="width:14px;height:14px;accent-color:var(--primary);"> 📷 Registrar Asistencia</label>
+                      <label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:400;text-transform:none;letter-spacing:0;cursor:pointer;"><input type="checkbox" id="p-perm-dashboard" value="dashboard" style="width:14px;height:14px;accent-color:var(--primary);"> 📊 Dashboard</label>
+                      <label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:400;text-transform:none;letter-spacing:0;cursor:pointer;"><input type="checkbox" id="p-perm-reportes" value="reportes" style="width:14px;height:14px;accent-color:var(--primary);"> 📋 Reportes</label>
+                    </div>
+                  </div>
+                </div>
+                <!-- Resultado del acceso creado -->
+                <div id="p-acc-creado-info" style="display:none;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:var(--radius-sm);padding:12px;margin-top:4px;">
+                  <div style="font-size:12px;font-weight:700;color:#34d399;margin-bottom:6px;">✅ Acceso creado exitosamente</div>
+                  <div style="font-size:12px;color:var(--text-muted);">Usuario: <b style="color:var(--text);font-family:'JetBrains Mono',monospace;" id="p-acc-creado-user">—</b></div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">Contraseña temporal: <b style="color:var(--text);font-family:'JetBrains Mono',monospace;" id="p-acc-creado-pass">—</b> <span style="color:#f87171;font-size:11px;">(entrégala al colaborador)</span></div>
+                </div>
+              </div>
+
+              <!-- HORARIO -->
+              <div class="schedule-section" style="margin-top:14px;">
                 <div class="schedule-section-title">📅 Horario Laboral por Día</div>
-                <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Selecciona los días que trabaja el colaborador y configura el horario de cada día de forma independiente.</p>
+                <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Selecciona los días que trabaja y configura el horario de cada uno.</p>
                 <div style="margin-bottom:12px;">
                   <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:8px;">Días laborales</div>
                   <div class="days-selector" id="days-selector"></div>
@@ -617,8 +685,9 @@
                 </div>
                 <div class="day-schedule-list" id="day-schedule-list"></div>
               </div>
+
               <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
-                <button class="btn btn-primary" id="btn-guardar-personal" onclick="guardarPersonal()">💾 Guardar</button>
+                <button class="btn btn-primary" id="btn-guardar-personal" onclick="guardarPersonal()">💾 Guardar Colaborador</button>
                 <button class="btn btn-ghost" id="btn-cancelar-edicion-p" onclick="cancelarEdicionPersonal()" style="display:none;">✖ Cancelar</button>
                 <button class="btn btn-ghost" onclick="limpiarFormPersonal()">🗑️ Limpiar</button>
               </div>
@@ -714,22 +783,58 @@
         </div>
       </div>
 
-      <!-- CARNETS -->
+      <!-- QR DE EMPRESA -->
       <div class="page-content" id="page-carnets">
-        <div style="max-width:580px;">
+        <div style="max-width:520px;">
           <div class="card">
-            <div class="card-title">🪪 Carnet Individual</div>
-            <div class="form-group"><label>ID del Colaborador</label><input type="text" id="carnet-id" placeholder="Ej: COL-001"></div>
-            <button class="btn btn-primary" id="btn-carnet-ind" onclick="generarCarnetIndividual()">📄 Generar PDF</button>
-            <div class="progress-wrap" id="prog-ind"><div class="progress-bar"><div class="progress-fill" id="prog-ind-fill"></div></div></div>
-            <div class="respuesta" id="resp-carnet-ind"></div>
+            <div class="card-title">🔲 QR Único de Asistencia</div>
+            <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">
+              Este es el QR que <strong style="color:var(--text);">todos</strong> los colaboradores escanean para registrar su asistencia.
+              Imprímelo y colócalo en un lugar visible (recepción, ingreso, etc.).<br>
+              <span style="color:#34d399;font-weight:600;">El colaborador debe estar logueado en la app antes de escanear.</span>
+            </p>
+
+            <!-- Código configurado -->
+            <div style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+              <span style="font-size:20px;">🔐</span>
+              <div>
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#34d399;margin-bottom:2px;">Código del QR</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--text);word-break:break-all;" id="empresa-qr-codigo-display">—</div>
+              </div>
+            </div>
+
+            <!-- Imagen del QR -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:24px;background:var(--surface2);border-radius:var(--radius-sm);border:2px dashed var(--border);margin-bottom:16px;">
+              <div id="empresa-qr-loading" style="text-align:center;padding:20px;color:var(--text-muted);">
+                <div style="font-size:36px;margin-bottom:8px;">⏳</div>
+                <p style="font-size:13px;">Generando QR...</p>
+              </div>
+              <img id="empresa-qr-img" src="" alt="QR de la empresa" style="display:none;width:230px;height:230px;border-radius:10px;border:6px solid white;box-shadow:0 8px 32px rgba(0,0,0,.4);">
+              <div id="empresa-qr-footer" style="display:none;text-align:center;">
+                <div style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:1px;">FINACORP</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Escanea para registrar tu asistencia</div>
+              </div>
+            </div>
+
+            <!-- Botones de descarga -->
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn btn-primary" id="btn-descargar-qr-png" onclick="descargarQrEmpresaPng()" style="display:none;">🖼️ Descargar PNG</button>
+              <button class="btn btn-secondary" id="btn-descargar-qr-pdf" onclick="descargarQrEmpresaPdf()" style="display:none;">📄 Descargar PDF imprimible</button>
+              <button class="btn btn-ghost" onclick="regenerarQrEmpresa()">🔄 Regenerar</button>
+            </div>
+            <div class="respuesta" id="resp-qr-empresa"></div>
           </div>
-          <div class="card">
-            <div class="card-title">📚 Carnets por Área</div>
-            <div class="form-group"><label>Área / Departamento</label><select id="carnet-grado"><option value="">Cargando...</option></select></div>
-            <button class="btn btn-primary" id="btn-carnet-lote" onclick="generarCarnetLote()">📚 Generar Lote PDF</button>
-            <div class="progress-wrap" id="prog-lote"><div class="progress-bar"><div class="progress-fill" id="prog-lote-fill"></div></div></div>
-            <div class="respuesta" id="resp-carnet-lote"></div>
+
+          <!-- Info de uso -->
+          <div class="card" style="border-color:rgba(59,130,246,.2);background:rgba(59,130,246,.04);">
+            <div class="card-title" style="color:#93c5fd;">ℹ️ ¿Cómo funciona?</div>
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.9;">
+              <div style="display:flex;gap:10px;margin-bottom:6px;"><span style="color:#34d399;font-weight:700;flex-shrink:0;">1.</span><span>El colaborador abre la app e inicia sesión con su usuario y contraseña.</span></div>
+              <div style="display:flex;gap:10px;margin-bottom:6px;"><span style="color:#34d399;font-weight:700;flex-shrink:0;">2.</span><span>Va a <b style="color:var(--text);">Registrar Asistencia</b> y ve su nombre en el banner verde.</span></div>
+              <div style="display:flex;gap:10px;margin-bottom:6px;"><span style="color:#34d399;font-weight:700;flex-shrink:0;">3.</span><span>Apunta la cámara al QR impreso en la recepción.</span></div>
+              <div style="display:flex;gap:10px;margin-bottom:6px;"><span style="color:#34d399;font-weight:700;flex-shrink:0;">4.</span><span>El sistema detecta automáticamente si es <b style="color:#34d399;">Ingreso</b> o <b style="color:#f87171;">Salida</b>.</span></div>
+              <div style="display:flex;gap:10px;"><span style="color:#fcd34d;font-weight:700;flex-shrink:0;">🛡️</span><span>El dispositivo queda <b style="color:var(--text);">bloqueado 15 minutos</b> — aunque cambien de usuario, no puede volver a registrar.</span></div>
+            </div>
           </div>
         </div>
       </div>
@@ -751,6 +856,30 @@
                 <div class="form-group"><label>Usuario (para login) *</label><input type="text" id="cred-usuario" placeholder="Ej: maria.torres" autocomplete="off"></div>
                 <div class="form-group"><label>Contraseña *</label><input type="password" id="cred-pass" placeholder="Mínimo 4 caracteres" autocomplete="new-password"></div>
                 <div class="form-group"><label>Rol</label><select id="cred-rol"><option value="operador">Operador</option><option value="supervisor">Supervisor</option><option value="admin">Administrador</option></select></div>
+                <div class="form-group full" style="background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:12px;">
+                  <label>🪪 Colaborador vinculado <span style="color:#34d399;font-size:10px;">— Requerido para registrar asistencia por QR</span></label>
+                  <div style="position:relative;">
+                    <input type="text" id="cred-nombre-buscar" placeholder="Busca por nombre o ID del colaborador..." autocomplete="off"
+                      oninput="buscarColaboradorParaVincular(this.value)"
+                      onfocus="if(this.value.length>1)mostrarDropdownColab()"
+                      style="padding-right:38px;"
+                    >
+                    <span id="cred-colab-estado" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:16px;">🔍</span>
+                    <!-- Dropdown de resultados -->
+                    <div id="cred-colab-dropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid rgba(16,185,129,.4);border-radius:var(--radius-sm);z-index:200;max-height:200px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.4);"></div>
+                  </div>
+                  <!-- Colaborador seleccionado -->
+                  <div id="cred-colab-seleccionado" style="display:none;margin-top:8px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:6px;padding:8px 12px;display:none;align-items:center;gap:10px;">
+                    <span style="font-size:20px;">✅</span>
+                    <div style="flex:1;min-width:0;">
+                      <div style="font-size:13px;font-weight:700;color:#ecfdf5;" id="cred-colab-sel-nombre">—</div>
+                      <div style="font-size:11px;color:#6ee7b7;font-family:'JetBrains Mono',monospace;" id="cred-colab-sel-id">—</div>
+                    </div>
+                    <button type="button" onclick="limpiarSeleccionColab()" style="background:none;border:none;color:#f87171;font-size:16px;cursor:pointer;padding:2px 6px;" title="Quitar">✕</button>
+                  </div>
+                  <input type="hidden" id="cred-id-colaborador">
+                  <p style="font-size:11px;color:var(--text-muted);margin-top:6px;">👆 Busca el colaborador por nombre o ID. Al escanear el QR, el sistema registrará su asistencia automáticamente.</p>
+                </div>
               </div>
               <div class="form-group">
                 <label>Permisos de Acceso</label>
@@ -771,7 +900,16 @@
             </div>
           </div>
           <div class="tab-panel" id="cred-tab-lista">
-            <div class="card"><div class="card-title">👥 Accesos Registrados</div><div id="cred-lista-wrap"><div class="empty-state"><span>⏳</span><p>Cargando...</p></div></div></div>
+            <div class="card">
+              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+                <div class="card-title" style="margin-bottom:0;">👥 Accesos Registrados</div>
+                <div style="display:flex;gap:6px;">
+                  <button class="btn btn-ghost btn-sm" id="btn-diagnosticar-ids" onclick="diagnosticarIds()" style="font-size:11px;color:#93c5fd;border-color:rgba(59,130,246,.3);">🔍 Diagnóstico</button>
+                  <button class="btn btn-ghost btn-sm" id="btn-reparar-ids" onclick="repararIdsColaborador()" style="font-size:11px;color:#fcd34d;border-color:rgba(245,158,11,.3);">🔧 Reparar IDs</button>
+                </div>
+              </div>
+              <div id="cred-lista-wrap"><div class="empty-state"><span>⏳</span><p>Cargando...</p></div></div>
+            </div>
           </div>
           <div class="tab-panel" id="cred-tab-mipass">
             <div class="card" style="max-width:460px;">
@@ -855,13 +993,17 @@ const CONFIG = {
   // antes de poder escanear otro. Evita doble lectura accidental.
   QR_LOCK_MS_TRAS_REGISTRO: 4000,
   // Cooldown mínimo entre escaneos del MISMO id (anti-bounce de cámara)
-  QR_DEBOUNCE_MS: 1200
+  QR_DEBOUNCE_MS: 1200,
+  // ★ QR ÚNICO DE EMPRESA: este es el texto que debe contener el QR compartido.
+  // Genera un QR con este texto exacto en: https://qr.io o similar.
+  // Cámbialo si quieres renovar el QR de seguridad.
+  QR_EMPRESA_CODIGO: 'FINACORP-ASISTENCIA-QR-2025'
 };
 
 // ================================
 // ESTADO GLOBAL
 // ================================
-let SESSION = { loggedIn:false, usuario:'', nombre:'', rol:'', permisos:[] };
+let SESSION = { loggedIn:false, usuario:'', nombre:'', rol:'', permisos:[], idColaborador:'' };
 let reporteData=[], idAEliminar='', usuarioCredAEliminar='', idToggleActivo='', pendienteActivo=null;
 let modoEdicionPersonal=false, modoEdicionCred=false;
 let qrCodeReader=null, isScanning=false;
@@ -1272,8 +1414,29 @@ function mostrarErrorLogin(msg){const e=document.getElementById('login-error');e
 function mostrarModalCrearPass(){document.getElementById('cp-nueva').value='';document.getElementById('cp-confirmar').value='';document.getElementById('cp-error').style.display='none';document.getElementById('cp-btn').disabled=true;document.getElementById('cp-btn').style.opacity='.5';document.getElementById('cp-btn').style.cursor='not-allowed';document.getElementById('cp-req-len').className='fail';document.getElementById('cp-req-len').textContent='✗ Al menos 6 caracteres';document.getElementById('cp-req-match').className='fail';document.getElementById('cp-req-match').textContent='✗ Las contraseñas coinciden';document.getElementById('modal-crear-pass').classList.add('show');setTimeout(()=>document.getElementById('cp-nueva').focus(),200);}
 function validarCrearPass(){const n=document.getElementById('cp-nueva').value,c=document.getElementById('cp-confirmar').value,lOk=n.length>=6,mOk=n===c&&c.length>0;document.getElementById('cp-req-len').className=lOk?'ok':'fail';document.getElementById('cp-req-len').textContent=lOk?'✓ Al menos 6 caracteres':'✗ Al menos 6 caracteres';document.getElementById('cp-req-match').className=mOk?'ok':'fail';document.getElementById('cp-req-match').textContent=mOk?'✓ Las contraseñas coinciden':'✗ Las contraseñas coinciden';const ok=lOk&&mOk;document.getElementById('cp-btn').disabled=!ok;document.getElementById('cp-btn').style.opacity=ok?'1':'.5';document.getElementById('cp-btn').style.cursor=ok?'pointer':'not-allowed';}
 async function confirmarCrearPass(){const n=document.getElementById('cp-nueva').value.trim();if(n.length<6)return;const btn=document.getElementById('cp-btn');btn.textContent='Guardando...';btn.disabled=true;const r=await llamarAppsScript('guardarContrasenaAdmin',{passNueva:n});if(r?.exito){document.getElementById('modal-crear-pass').classList.remove('show');iniciarSesion({usuario:CONFIG.ADMIN_USER,nombre:'Administrador',rol:'admin',permisos:['asistencia','dashboard','personal','reportes','carnets','credenciales']});mostrarToast('🔐 Contraseña creada. ¡Bienvenido!','success');}else{const e=document.getElementById('cp-error');e.textContent='❌ '+(r?.mensaje||'Error al guardar');e.style.display='block';btn.textContent='Crear Contraseña ->';btn.disabled=false;}}
-function iniciarSesion(d){SESSION={loggedIn:true,usuario:d.usuario,nombre:d.nombre,rol:d.rol,permisos:d.permisos||[]};if(SESSION.rol==='admin'&&!SESSION.permisos.includes('credenciales'))SESSION.permisos.push('credenciales');localStorage.setItem('session_pip',JSON.stringify(SESSION));document.getElementById('login-overlay').style.display='none';document.getElementById('main-content').style.display='block';mostrarToast('¡Bienvenido, '+SESSION.nombre+'!','success');iniciarAplicacion();}
-function cerrarSesion(){localStorage.removeItem('session_pip');mostrarToast('Sesión cerrada','warning');setTimeout(()=>location.reload(),900);}
+function iniciarSesion(d){SESSION={loggedIn:true,usuario:d.usuario,nombre:d.nombre,rol:d.rol,permisos:d.permisos||[],idColaborador:d.idColaborador||''};if(SESSION.rol==='admin'&&!SESSION.permisos.includes('credenciales'))SESSION.permisos.push('credenciales');localStorage.setItem('session_pip',JSON.stringify(SESSION));document.getElementById('login-overlay').style.display='none';document.getElementById('main-content').style.display='block';mostrarToast('¡Bienvenido, '+SESSION.nombre+'!','success');iniciarAplicacion();}
+function cerrarSesion(){
+  // Detener cámara si está activa
+  detenerEscaneo();
+  // Limpiar sesión
+  localStorage.removeItem('session_pip');
+  SESSION = { loggedIn:false, usuario:'', nombre:'', rol:'', permisos:[], idColaborador:'' };
+  // Resetear UI sin recargar — evita pantalla en blanco
+  document.getElementById('main-content').style.display = 'none';
+  document.getElementById('login-overlay').style.display = 'flex';
+  // Limpiar campos de login
+  const lu = document.getElementById('login-user');
+  const lp = document.getElementById('login-pass');
+  if(lu) lu.value = '';
+  if(lp) lp.value = '';
+  document.getElementById('login-error').style.display = 'none';
+  // Limpiar cache de personal
+  _personalCache = [];
+  // Resetear estado QR
+  qrState = { locked:false, lastScannedId:null, lastScanTime:0, procesando:false, unlockTimer:null };
+  mostrarToast('Sesión cerrada','warning');
+  setTimeout(() => { if(lu) lu.focus(); }, 200);
+}
 
 // ================================
 // NAVEGACIÓN
@@ -1283,7 +1446,7 @@ const PAGES=[
   {id:'dashboard', label:'Dashboard',            icon:'📊',section:'Principal'},
   {id:'personal',  label:'Gestión de Personal',  icon:'👥',section:'Gestión'},
   {id:'reportes',  label:'Reportes & Exportar',  icon:'📋',section:'Gestión'},
-  {id:'carnets',   label:'Generar Carnets',       icon:'🪪',section:'Admin'},
+  {id:'carnets',   label:'QR de Empresa',          icon:'🔲',section:'Admin'},
   {id:'credenciales',label:'Accesos & Credenciales',icon:'🔐',section:'Admin'}
 ];
 function construirNav(){
@@ -1311,8 +1474,8 @@ function showPage(page,btn){
   closeSidebar();
   if(page==='dashboard')cargarDashboard();
   if(page==='reportes')cargarAreasEnFiltro();
-  if(page==='carnets')cargarGradosCarnets();
-  if(page==='credenciales'){switchCredTab('crear');cargarListaCredenciales();}
+  if(page==='carnets')regenerarQrEmpresa();
+  if(page==='credenciales'){switchCredTab('crear');cargarListaCredenciales();cargarPersonalParaVincular();}
   if(page==='personal'){initHorarioDias();renderizarSelectorDias();}
 }
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebar-overlay').classList.toggle('show');}
@@ -1426,8 +1589,11 @@ function iniciarEscaneo(){
 }
 
 /**
- * Callback central cuando la cámara detecta un QR.
- * Implementa debounce y bloqueo para evitar lecturas múltiples.
+ * ★ NUEVO FLUJO: QR ÚNICO DE EMPRESA
+ * Cuando alguien escanea el QR compartido de Finacorp,
+ * el sistema detecta quién es por su sesión activa y registra
+ * automáticamente SU asistencia. El dispositivo queda bloqueado
+ * 15 minutos para prevenir que otra persona registre con él.
  */
 function onQrDetectado(texto) {
   const ahora = Date.now();
@@ -1435,20 +1601,37 @@ function onQrDetectado(texto) {
   // 1) Si ya está procesando o bloqueado -> ignorar
   if (qrState.locked || qrState.procesando) return;
 
-  // 2) Debounce: mismo ID escaneado hace menos de QR_DEBOUNCE_MS -> ignorar
+  // 2) Debounce anti-rebote de cámara
   if (texto === qrState.lastScannedId && (ahora - qrState.lastScanTime) < CONFIG.QR_DEBOUNCE_MS) return;
 
-  // 3) Aceptar escaneo
+  // 3) ★ VERIFICAR que sea el QR de la empresa (no un QR cualquiera)
+  if (texto.trim() !== CONFIG.QR_EMPRESA_CODIGO) {
+    mostrarToast('⚠️ QR no reconocido. Usa el QR oficial de Finacorp.', 'warning');
+    setQrStatus('idle', '⚠️ QR no válido — usa el QR oficial de la empresa');
+    return;
+  }
+
+  // 4) ★ VERIFICAR que el usuario logueado tenga ID de colaborador vinculado
+  const _idColab = SESSION.idColaborador ? SESSION.idColaborador.toString().trim() : '';
+  if (!_idColab) {
+    mostrarToast('⛔ Tu usuario no tiene ID de colaborador vinculado. Contacta al admin.', 'error');
+    setQrStatus('idle', '⛔ Sin ID de colaborador — contacta al administrador');
+    mostrarRespuesta('⛔ Tu cuenta de acceso no tiene un ID de colaborador vinculado. El administrador debe configurarlo en "Accesos & Credenciales".', 'error');
+    return;
+  }
+
+  // 5) Aceptar escaneo
   qrState.lastScannedId = texto;
   qrState.lastScanTime  = ahora;
   qrState.procesando    = true;
 
-  setQrStatus('detected', '🎯 QR detectado -- procesando...');
-  document.getElementById('id').value = texto;
-  mostrarToast('✅ QR detectado', 'success');
+  setQrStatus('detected', '🎯 QR válido — identificando colaborador...');
+  // ★ Usar el ID del colaborador vinculado a la sesión activa
+  document.getElementById('id').value = _idColab;
+  mostrarToast('✅ QR válido — registrando tu asistencia', 'success');
 
-  // Procesar colaborador (async)
-  procesarQrEscaneado(texto);
+  // Procesar asistencia del usuario logueado
+  procesarQrEscaneado(_idColab);
 }
 
 async function procesarQrEscaneado(id) {
@@ -1724,15 +1907,113 @@ async function cargarDashboard(){
 // GESTIÓN DE PERSONAL
 // ================================
 function switchPersonalTab(t){['nuevo','buscar','lista'].forEach(x=>{const p=document.getElementById('tab-'+x),b=document.getElementById('tab-'+x+'-btn');if(p)p.classList.toggle('active',x===t);if(b)b.classList.toggle('active',x===t);});if(t==='buscar')setTimeout(()=>document.getElementById('buscar-personal-id').focus(),100);if(t==='lista')cargarListaPersonal();if(t==='nuevo'&&!modoEdicionPersonal){initHorarioDias();renderizarSelectorDias();}}
+// Auto-genera usuario a partir de nombre+apellido: juan.garcia
+function autoGenerarUsuario() {
+  if (modoEdicionPersonal) return; // no tocar en edición
+  const nombres   = (document.getElementById('p-nombres')?.value || '').trim().split(' ')[0];
+  const apellidos = (document.getElementById('p-apellidos')?.value || '').trim().split(' ')[0];
+  const usuarioEl = document.getElementById('p-acc-usuario');
+  const badgeEl   = document.getElementById('p-acc-usuario-badge');
+  if (!usuarioEl) return;
+  if (nombres && apellidos) {
+    const usuario = (quitarTildes(nombres) + '.' + quitarTildes(apellidos)).toLowerCase().replace(/[^a-z0-9.]/g,'');
+    usuarioEl.value = usuario;
+    if (badgeEl) {
+      badgeEl.textContent = '🤖 Auto';
+      badgeEl.style.display = 'inline-block';
+      badgeEl.style.background = 'rgba(16,185,129,.15)';
+      badgeEl.style.color = '#34d399';
+      badgeEl.style.border = '1px solid rgba(16,185,129,.3)';
+    }
+  }
+}
+
+function quitarTildes(str) {
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+}
+
+function generarPassAleatoria() {
+  const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
+  let pass = '';
+  for (let i = 0; i < 8; i++) pass += chars[Math.floor(Math.random() * chars.length)];
+  const inp = document.getElementById('p-acc-pass');
+  if (inp) {
+    inp.type  = 'text'; // mostrar temporalmente
+    inp.value = pass;
+    setTimeout(() => { inp.type = 'password'; }, 2500);
+  }
+  mostrarToast('🎲 Contraseña: ' + pass + ' (visible 2.5s)', 'info');
+}
+
 async function guardarPersonal(){if(modoEdicionPersonal)await actualizarPersonal();else await registrarNuevoPersonal();}
 async function registrarNuevoPersonal(){
-  const id=document.getElementById('p-id').value.trim(),nombres=document.getElementById('p-nombres').value.trim(),apellidos=document.getElementById('p-apellidos').value.trim(),area=document.getElementById('p-area').value.trim();
-  if(!id||!nombres||!apellidos||!area){mostrarRespuestaEl('respuesta-personal','⚠️ ID, Nombres, Apellidos y Área son obligatorios','error');return;}
-  const btn=document.getElementById('btn-guardar-personal');btn.innerHTML='<span class="loading"></span> Guardando...';btn.disabled=true;
-  const res=await llamarAppsScript('registrarNuevoUsuario',{id,nombres,apellidos,grado:area,perfil:document.getElementById('p-cargo').value.trim(),telefono:document.getElementById('p-telefono').value.trim(),foto:document.getElementById('p-foto').value.trim(),correo:document.getElementById('p-correo').value.trim(),horario:serializarHorario()});
-  btn.innerHTML='💾 Guardar';btn.disabled=false;
-  if(res?.exito){mostrarRespuestaEl('respuesta-personal','✅ '+res.mensaje,'success');mostrarToast('✅ Colaborador registrado','success');limpiarFormPersonal();}
-  else mostrarRespuestaEl('respuesta-personal','❌ '+(res?.mensaje||'Error'),'error');
+  const id       = document.getElementById('p-id').value.trim();
+  const nombres  = document.getElementById('p-nombres').value.trim();
+  const apellidos= document.getElementById('p-apellidos').value.trim();
+  const area     = document.getElementById('p-area').value.trim();
+  const accUser  = document.getElementById('p-acc-usuario').value.trim();
+  const accPass  = document.getElementById('p-acc-pass').value.trim();
+  const accRol   = document.getElementById('p-acc-rol').value;
+  const accPerms = ['asistencia','dashboard','reportes'].filter(p => document.getElementById('p-perm-'+p)?.checked);
+
+  if(!id||!nombres||!apellidos||!area){
+    mostrarRespuestaEl('respuesta-personal','⚠️ ID, Nombres, Apellidos y Área son obligatorios','error');return;
+  }
+  if(accUser && accPass.length > 0 && accPass.length < 4){
+    mostrarRespuestaEl('respuesta-personal','⚠️ La contraseña debe tener mínimo 4 caracteres','error');return;
+  }
+
+  const btn=document.getElementById('btn-guardar-personal');
+  btn.innerHTML='<span class="loading"></span> Guardando...';btn.disabled=true;
+
+  // 1. Registrar en datos_estudiantes
+  const res = await llamarAppsScript('registrarNuevoUsuario',{
+    id, nombres, apellidos, grado:area,
+    perfil:   document.getElementById('p-cargo').value.trim(),
+    telefono: document.getElementById('p-telefono').value.trim(),
+    foto:     document.getElementById('p-foto').value.trim(),
+    correo:   document.getElementById('p-correo').value.trim(),
+    horario:  serializarHorario()
+  });
+
+  btn.innerHTML='💾 Guardar Colaborador'; btn.disabled=false;
+
+  if(!res?.exito){
+    mostrarRespuestaEl('respuesta-personal','❌ '+(res?.mensaje||'Error al registrar'),'error');return;
+  }
+
+  // 2. Crear acceso en usuarios_sistema (si se proporcionó usuario y contraseña)
+  if(accUser && accPass) {
+    const resAcc = await llamarAppsScript('crearCredencial',{
+      nombre:         nombres + ' ' + apellidos,
+      usuario:        accUser,
+      pass:           accPass,
+      rol:            accRol,
+      permisos:       accPerms,
+      idColaborador:  id
+    });
+
+    if(resAcc?.exito) {
+      // Mostrar credenciales creadas
+      document.getElementById('p-acc-creado-info').style.display = 'block';
+      document.getElementById('p-acc-creado-user').textContent   = accUser;
+      document.getElementById('p-acc-creado-pass').textContent   = accPass;
+      mostrarRespuestaEl('respuesta-personal',
+        '✅ ' + res.mensaje + ' — Acceso creado para @' + accUser, 'success');
+      mostrarToast('✅ Colaborador y acceso registrados', 'success');
+      // Invalidar cache de personal para que aparezca en vinculador
+      _personalCache = [];
+    } else {
+      mostrarRespuestaEl('respuesta-personal',
+        '⚠️ Colaborador guardado pero el acceso falló: ' + (resAcc?.mensaje||'Error'), 'warning');
+      mostrarToast('⚠️ Colaborador guardado — acceso con errores', 'warning');
+    }
+  } else {
+    mostrarRespuestaEl('respuesta-personal','✅ '+res.mensaje+' (sin acceso al sistema)','success');
+    mostrarToast('✅ Colaborador registrado','success');
+    _personalCache = [];
+    limpiarFormPersonal();
+  }
 }
 async function actualizarPersonal(){
   const idO=document.getElementById('p-id-original').value,nombres=document.getElementById('p-nombres').value.trim(),apellidos=document.getElementById('p-apellidos').value.trim(),area=document.getElementById('p-area').value.trim();
@@ -1743,9 +2024,26 @@ async function actualizarPersonal(){
   if(res?.exito){mostrarRespuestaEl('respuesta-personal','✅ '+res.mensaje,'success');mostrarToast('✅ Actualizado','success');cancelarEdicionPersonal();}
   else mostrarRespuestaEl('respuesta-personal','❌ '+(res?.mensaje||'Error'),'error');
 }
-function limpiarFormPersonal(){['p-id','p-nombres','p-apellidos','p-area','p-cargo','p-telefono','p-correo','p-foto','p-id-original','p-id-display'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('respuesta-personal').style.display='none';_datosEdicionPersonal=null;initHorarioDias();renderizarSelectorDias();}
-function cargarFormEdicionPersonal(d){_datosEdicionPersonal=d;modoEdicionPersonal=true;document.getElementById('p-id-original').value=d.id;document.getElementById('p-id-display').value=d.id;document.getElementById('p-nombres').value=d.nombres||'';document.getElementById('p-apellidos').value=d.apellidos||'';document.getElementById('p-area').value=d.area||'';document.getElementById('p-cargo').value=d.cargo||'';document.getElementById('p-telefono').value=d.telefono||'';document.getElementById('p-correo').value=d.correo||'';document.getElementById('p-foto').value=d.foto||'';let hRaw=null;try{if(d.horario)hRaw=typeof d.horario==='string'?JSON.parse(d.horario):d.horario;}catch(e){}deserializarHorario(hRaw);renderizarSelectorDias();document.getElementById('grupo-id-nuevo').style.display='none';document.getElementById('grupo-id-editar').style.display='block';document.getElementById('form-personal-titulo').textContent='✏️ Editar: '+d.nombres+' '+d.apellidos;document.getElementById('btn-guardar-personal').innerHTML='💾 Actualizar';document.getElementById('btn-cancelar-edicion-p').style.display='inline-flex';switchPersonalTab('nuevo');window.scrollTo({top:0,behavior:'smooth'});}
-function cancelarEdicionPersonal(){modoEdicionPersonal=false;_datosEdicionPersonal=null;limpiarFormPersonal();document.getElementById('grupo-id-nuevo').style.display='block';document.getElementById('grupo-id-editar').style.display='none';document.getElementById('form-personal-titulo').textContent='➕ Registrar Nuevo Colaborador';document.getElementById('btn-guardar-personal').innerHTML='💾 Guardar';document.getElementById('btn-cancelar-edicion-p').style.display='none';}
+function limpiarFormPersonal(){
+  ['p-id','p-nombres','p-apellidos','p-area','p-cargo','p-telefono','p-correo','p-foto',
+   'p-id-original','p-id-display','p-acc-usuario','p-acc-pass'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  document.getElementById('p-acc-rol').value='operador';
+  ['asistencia','dashboard','reportes'].forEach(p=>{
+    const el=document.getElementById('p-perm-'+p);if(el)el.checked=p==='asistencia';
+  });
+  const badge=document.getElementById('p-acc-usuario-badge');if(badge)badge.style.display='none';
+  const accInfo=document.getElementById('p-acc-creado-info');if(accInfo)accInfo.style.display='none';
+  document.getElementById('respuesta-personal').style.display='none';
+  _datosEdicionPersonal=null;initHorarioDias();renderizarSelectorDias();
+}
+function cargarFormEdicionPersonal(d){_datosEdicionPersonal=d;modoEdicionPersonal=true;document.getElementById('p-id-original').value=d.id;document.getElementById('p-id-display').value=d.id;document.getElementById('p-nombres').value=d.nombres||'';document.getElementById('p-apellidos').value=d.apellidos||'';document.getElementById('p-area').value=d.area||'';document.getElementById('p-cargo').value=d.cargo||'';document.getElementById('p-telefono').value=d.telefono||'';document.getElementById('p-correo').value=d.correo||'';document.getElementById('p-foto').value=d.foto||'';let hRaw=null;try{if(d.horario)hRaw=typeof d.horario==='string'?JSON.parse(d.horario):d.horario;}catch(e){}deserializarHorario(hRaw);renderizarSelectorDias();document.getElementById('grupo-id-nuevo').style.display='none';document.getElementById('grupo-id-editar').style.display='block';document.getElementById('form-personal-titulo').textContent='✏️ Editar: '+d.nombres+' '+d.apellidos;document.getElementById('btn-guardar-personal').innerHTML='💾 Actualizar';document.getElementById('btn-cancelar-edicion-p').style.display='inline-flex';
+  // Ocultar sección de acceso al editar (ya existe, se gestiona desde Credenciales)
+  const secAcc=document.getElementById('seccion-acceso-personal');if(secAcc)secAcc.style.display='none';
+  switchPersonalTab('nuevo');window.scrollTo({top:0,behavior:'smooth'});}
+function cancelarEdicionPersonal(){modoEdicionPersonal=false;_datosEdicionPersonal=null;limpiarFormPersonal();document.getElementById('grupo-id-nuevo').style.display='block';document.getElementById('grupo-id-editar').style.display='none';document.getElementById('form-personal-titulo').textContent='➕ Registrar Nuevo Colaborador';document.getElementById('btn-guardar-personal').innerHTML='💾 Guardar Colaborador';document.getElementById('btn-cancelar-edicion-p').style.display='none';
+  const secAcc=document.getElementById('seccion-acceso-personal');if(secAcc)secAcc.style.display='block';}
 async function buscarPersonalAdmin(){
   const id=document.getElementById('buscar-personal-id').value.trim();if(!id)return;
   const wrap=document.getElementById('busqueda-personal-resultado');wrap.innerHTML='<p style="color:var(--text-muted);font-size:13px;">🔍 Buscando...</p>';
@@ -1926,41 +2224,274 @@ function agruparPorDia(registros){
 // ================================
 // CARNETS
 // ================================
-async function cargarGradosCarnets(){const res=await llamarAppsScript('listarGrados'),s=document.getElementById('carnet-grado');if(res?.grados){s.innerHTML='<option value="">Seleccione área...</option>';res.grados.forEach(g=>s.innerHTML+=`<option value="${g}">${g}</option>`);}}
-async function generarCarnetIndividual(){const id=document.getElementById('carnet-id').value.trim();if(!id)return mostrarRespuestaEl('resp-carnet-ind','⚠️ Ingrese ID','error');const btn=document.getElementById('btn-carnet-ind');btn.innerHTML='<span class="loading"></span> Generando...';btn.disabled=true;setProg('ind',30);mostrarRespuestaEl('resp-carnet-ind','📄 Generando...','warning');const res=await llamarAppsScript('generarCarnet',{id});setProg('ind',90);btn.innerHTML='📄 Generar PDF';btn.disabled=false;ocultarProg('ind');if(res?.ok){descargarArchivo(res.data,res.filename);mostrarRespuestaEl('resp-carnet-ind','✅ Descargado','success');}else mostrarRespuestaEl('resp-carnet-ind','❌ '+(res?.mensaje||'Error'),'error');}
-async function generarCarnetLote(){const g=document.getElementById('carnet-grado').value;if(!g)return mostrarRespuestaEl('resp-carnet-lote','⚠️ Seleccione área','error');const btn=document.getElementById('btn-carnet-lote');btn.innerHTML='<span class="loading"></span> Generando...';btn.disabled=true;setProg('lote',20);mostrarRespuestaEl('resp-carnet-lote','📚 Generando...','warning');const res=await llamarAppsScript('generarLote',{grado:g});setProg('lote',90);btn.innerHTML='📚 Generar Lote';btn.disabled=false;ocultarProg('lote');if(res?.ok){descargarArchivo(res.data,res.filename);mostrarRespuestaEl('resp-carnet-lote','✅ Descargado','success');}else mostrarRespuestaEl('resp-carnet-lote','❌ '+(res?.mensaje||'Error'),'error');}
-function setProg(id,v){document.getElementById('prog-'+id).style.display='block';document.getElementById('prog-'+id+'-fill').style.width=v+'%';}
-function ocultarProg(id){setTimeout(()=>{document.getElementById('prog-'+id).style.display='none';document.getElementById('prog-'+id+'-fill').style.width='0%';},600);}
+// ================================
+// QR DE EMPRESA
+// ================================
+function regenerarQrEmpresa() {
+  const codigo = CONFIG.QR_EMPRESA_CODIGO || 'FINACORP-ASISTENCIA-QR-2025';
+  document.getElementById('empresa-qr-codigo-display').textContent = codigo;
+  const loading = document.getElementById('empresa-qr-loading');
+  const img     = document.getElementById('empresa-qr-img');
+  const footer  = document.getElementById('empresa-qr-footer');
+  const btnPng  = document.getElementById('btn-descargar-qr-png');
+  const btnPdf  = document.getElementById('btn-descargar-qr-pdf');
+  loading.style.display = 'block';
+  img.style.display = 'none';
+  footer.style.display = 'none';
+  btnPng.style.display = 'none';
+  btnPdf.style.display = 'none';
+  const url = 'https://quickchart.io/qr?text=' + encodeURIComponent(codigo) + '&size=400&ecLevel=H&margin=2';
+  const tmp = new Image();
+  tmp.onload = function() {
+    img.src = url; img.style.display = 'block';
+    loading.style.display = 'none'; footer.style.display = 'block';
+    btnPng.style.display = 'inline-flex'; btnPdf.style.display = 'inline-flex';
+  };
+  tmp.onerror = function() {
+    loading.innerHTML = '<p style="color:#f87171;font-size:13px;">❌ Error al generar QR. Verifica tu conexión.</p>';
+  };
+  tmp.src = url;
+}
+
+async function descargarQrEmpresaPng() {
+  const codigo = CONFIG.QR_EMPRESA_CODIGO || 'FINACORP-ASISTENCIA-QR-2025';
+  const url    = 'https://quickchart.io/qr?text=' + encodeURIComponent(codigo) + '&size=400&ecLevel=H&margin=2';
+  const btn    = document.getElementById('btn-descargar-qr-png');
+  btn.innerHTML = '<span class="loading"></span> Descargando...'; btn.disabled = true;
+  try {
+    const resp = await fetch(url);
+    const blob = await resp.blob();
+    const burl = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = burl; a.download = 'QR_Finacorp_Asistencia.png';
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(burl); document.body.removeChild(a); }, 300);
+    mostrarToast('🖼️ QR PNG descargado', 'success');
+  } catch(e) { mostrarToast('❌ Error al descargar PNG', 'error'); }
+  btn.innerHTML = '🖼️ Descargar PNG'; btn.disabled = false;
+}
+
+async function descargarQrEmpresaPdf() {
+  const codigo = CONFIG.QR_EMPRESA_CODIGO || 'FINACORP-ASISTENCIA-QR-2025';
+  const url    = 'https://quickchart.io/qr?text=' + encodeURIComponent(codigo) + '&size=400&ecLevel=H&margin=2';
+  const btn    = document.getElementById('btn-descargar-qr-pdf');
+  btn.innerHTML = '<span class="loading"></span> Generando PDF...'; btn.disabled = true;
+  try {
+    const resp   = await fetch(url);
+    const blob   = await resp.blob();
+    const base64 = await new Promise((res, rej) => {
+      const reader = new FileReader();
+      reader.onload  = () => res(reader.result);
+      reader.onerror = rej;
+      reader.readAsDataURL(blob);
+    });
+    const { jsPDF } = window.jspdf;
+    const doc  = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    // Fondo oscuro
+    doc.setFillColor(15, 23, 42); doc.rect(0, 0, pageW, pageH, 'F');
+    // Título
+    doc.setTextColor(16, 185, 129); doc.setFontSize(30); doc.setFont('helvetica', 'bold');
+    doc.text('FINACORP', pageW/2, 28, { align: 'center' });
+    doc.setTextColor(148, 163, 184); doc.setFontSize(11); doc.setFont('helvetica', 'normal');
+    doc.text('Sistema de Control de Asistencia', pageW/2, 36, { align: 'center' });
+    doc.setDrawColor(51, 65, 85); doc.setLineWidth(0.5); doc.line(20, 43, pageW-20, 43);
+    // QR centrado
+    const qrSize = 110; const qrX = (pageW - qrSize) / 2; const qrY = 53;
+    doc.setFillColor(255,255,255); doc.roundedRect(qrX-6, qrY-6, qrSize+12, qrSize+12, 5, 5, 'F');
+    doc.addImage(base64, 'PNG', qrX, qrY, qrSize, qrSize);
+    // Texto principal
+    doc.setTextColor(241, 245, 249); doc.setFontSize(15); doc.setFont('helvetica', 'bold');
+    doc.text('ESCANEA PARA REGISTRAR TU ASISTENCIA', pageW/2, qrY+qrSize+16, { align: 'center' });
+    // Instrucciones
+    const pasos = [
+      '1.  Abre la app e inicia sesión con tu usuario.',
+      '2.  Ve a "Registrar Asistencia".',
+      '3.  Apunta la cámara a este QR.',
+      '4.  ¡Tu asistencia se registra automáticamente!'
+    ];
+    doc.setFontSize(11); doc.setFont('helvetica','normal'); doc.setTextColor(148,163,184);
+    pasos.forEach((p, i) => doc.text(p, pageW/2, qrY+qrSize+30+(i*9), { align:'center' }));
+    // Anti-fraude
+    doc.setFontSize(9); doc.setTextColor(100,116,139);
+    doc.text('Bloqueo anti-fraude: 15 minutos por dispositivo. Solo puedes registrar con tu usuario activo.', pageW/2, pageH-22, { align:'center' });
+    doc.text('Impreso: ' + new Date().toLocaleString('es-PE'), pageW/2, pageH-13, { align:'center' });
+    doc.save('QR_Finacorp_Asistencia.pdf');
+    mostrarToast('📄 PDF imprimible descargado', 'success');
+  } catch(e) { mostrarToast('❌ Error al generar PDF: ' + e.message, 'error'); }
+  btn.innerHTML = '📄 Descargar PDF imprimible'; btn.disabled = false;
+}
 
 // ================================
 // CREDENCIALES
 // ================================
+
+// Cache de personal para el autocompletado
+let _personalCache = [];
+
+async function cargarPersonalParaVincular() {
+  if (_personalCache.length > 0) return; // ya cargado
+  try {
+    const res = await llamarAppsScript('listarTodoElPersonal');
+    if (res?.personal) {
+      _personalCache = res.personal.filter(p => p.activo !== false && p.activo !== 'false');
+    }
+  } catch(e) {}
+}
+
+function buscarColaboradorParaVincular(query) {
+  const dd     = document.getElementById('cred-colab-dropdown');
+  const estado = document.getElementById('cred-colab-estado');
+  const q      = (query || '').trim().toLowerCase();
+
+  if (q.length < 1) { dd.style.display = 'none'; return; }
+
+  // Si no hay cache todavía, cargar
+  if (_personalCache.length === 0) {
+    estado.textContent = '⏳';
+    cargarPersonalParaVincular().then(() => buscarColaboradorParaVincular(query));
+    return;
+  }
+
+  const resultados = _personalCache.filter(p => {
+    const nombre = ((p.nombres||'') + ' ' + (p.apellidos||'')).toLowerCase();
+    const id     = (p.id || '').toLowerCase();
+    return nombre.includes(q) || id.includes(q);
+  }).slice(0, 8);
+
+  estado.textContent = '🔍';
+  renderDropdownColab(resultados, query);
+}
+
+function renderDropdownColab(resultados, query) {
+  const dd = document.getElementById('cred-colab-dropdown');
+  if (!resultados.length) {
+    dd.innerHTML = '<div class="colab-empty">Sin resultados para "' + query + '"</div>';
+    dd.style.display = 'block';
+    return;
+  }
+  dd.innerHTML = resultados.map(p => {
+    const nombre = ((p.nombres||'') + ' ' + (p.apellidos||'')).trim();
+    return `<div class="colab-item" onclick="seleccionarColab('${p.id}','${nombre.replace(/'/g,"\'")}','${(p.area||'').replace(/'/g,"\'")}','${(p.cargo||'').replace(/'/g,"\'")}')">
+      <span class="colab-id">${p.id}</span>
+      <div class="colab-info">
+        <div class="colab-nombre">${nombre}</div>
+        <div class="colab-sub">${p.area||''}${p.cargo?' · '+p.cargo:''}</div>
+      </div>
+    </div>`;
+  }).join('');
+  dd.style.display = 'block';
+}
+
+function mostrarDropdownColab() {
+  const q = (document.getElementById('cred-nombre-buscar')?.value || '').trim();
+  if (q.length >= 1) buscarColaboradorParaVincular(q);
+}
+
+function seleccionarColab(id, nombre, area, cargo) {
+  // Guardar ID en hidden
+  document.getElementById('cred-id-colaborador').value = id;
+  // Limpiar búsqueda y cerrar dropdown
+  document.getElementById('cred-nombre-buscar').value = '';
+  document.getElementById('cred-colab-dropdown').style.display = 'none';
+  document.getElementById('cred-colab-estado').textContent = '✅';
+  // Mostrar tarjeta de seleccionado
+  const sel = document.getElementById('cred-colab-seleccionado');
+  sel.style.display = 'flex';
+  document.getElementById('cred-colab-sel-nombre').textContent = nombre;
+  document.getElementById('cred-colab-sel-id').textContent = 'ID: ' + id + (area ? '  ·  ' + area : '') + (cargo ? '  ·  ' + cargo : '');
+  // Autocompletar nombre si el campo está vacío
+  const nombreInput = document.getElementById('cred-nombre');
+  if (nombreInput && !nombreInput.value.trim()) nombreInput.value = nombre;
+}
+
+function limpiarSeleccionColab() {
+  document.getElementById('cred-id-colaborador').value = '';
+  document.getElementById('cred-colab-seleccionado').style.display = 'none';
+  document.getElementById('cred-colab-estado').textContent = '🔍';
+  document.getElementById('cred-nombre-buscar').value = '';
+  document.getElementById('cred-colab-dropdown').style.display = 'none';
+}
+
+// Cerrar dropdown al hacer click afuera
+document.addEventListener('click', function(e) {
+  const dd = document.getElementById('cred-colab-dropdown');
+  if (dd && !dd.contains(e.target) && e.target.id !== 'cred-nombre-buscar') {
+    dd.style.display = 'none';
+  }
+});
+
+async function diagnosticarIds() {
+  const btn = document.getElementById('btn-diagnosticar-ids');
+  btn.innerHTML = '<span class="loading"></span>';
+  btn.disabled = true;
+  const res = await llamarAppsScript('diagnosticarCredenciales');
+  btn.innerHTML = '🔍 Diagnóstico';
+  btn.disabled = false;
+  if (res?.exito) {
+    let msg = `Columnas: ${res.totalColumnas}\nEncabezados: ${res.encabezados.join(' | ')}\n\n`;
+    (res.filas||[]).forEach(f => {
+      msg += `Fila ${f.fila}: @${f.usuario} → col8="${f.col8_string}" (tipo:${f.col8_tipo})\n`;
+    });
+    alert(msg);
+  } else {
+    alert('Error: ' + (res?.mensaje || 'Sin respuesta'));
+  }
+}
+
+async function repararIdsColaborador() {
+  const btn = document.getElementById('btn-reparar-ids');
+  btn.innerHTML = '<span class="loading"></span> Reparando...';
+  btn.disabled = true;
+  const res = await llamarAppsScript('repararFormatoIdColaborador');
+  btn.innerHTML = '🔧 Reparar IDs vinculados';
+  btn.disabled = false;
+  if (res?.exito) {
+    mostrarToast('✅ ' + res.mensaje, 'success');
+    cargarListaCredenciales(); // recargar para ver los cambios
+  } else {
+    mostrarToast('❌ ' + (res?.mensaje || 'Error'), 'error');
+  }
+}
+
 function switchCredTab(t){['crear','lista','mipass'].forEach(x=>{document.getElementById('cred-tab-'+x).classList.toggle('active',x===t);document.getElementById('cred-tab-'+x+'-btn').classList.toggle('active',x===t);});if(t==='lista')cargarListaCredenciales();if(t==='mipass'){['mp-actual','mp-nueva','mp-confirmar'].forEach(id=>document.getElementById(id).value='');document.getElementById('respuesta-mipass').style.display='none';setTimeout(()=>document.getElementById('mp-actual').focus(),100);}}
 async function guardarCredencial(){if(modoEdicionCred)await actualizarCredencial();else await crearCredencial();}
 async function crearCredencial(){
   const nombre=document.getElementById('cred-nombre').value.trim(),usuario=document.getElementById('cred-usuario').value.trim(),pass=document.getElementById('cred-pass').value.trim(),rol=document.getElementById('cred-rol').value,permisos=obtenerPermisosSeleccionados();
+  const idColaborador=(document.getElementById('cred-id-colaborador')?.value||'').trim().toUpperCase();
   if(!nombre||!usuario||!pass){mostrarRespuestaEl('respuesta-cred','⚠️ Nombre, usuario y contraseña obligatorios','error');return;}if(pass.length<4){mostrarRespuestaEl('respuesta-cred','⚠️ Contraseña mínimo 4 caracteres','error');return;}if(!permisos.length){mostrarRespuestaEl('respuesta-cred','⚠️ Asigna al menos un permiso','error');return;}
+  if(permisos.includes('asistencia')&&!idColaborador){mostrarRespuestaEl('respuesta-cred','⚠️ Si el usuario puede registrar asistencia, debe tener un ID de colaborador vinculado.','warning');return;}
   const btn=document.getElementById('btn-guardar-cred');btn.innerHTML='<span class="loading"></span> Creando...';btn.disabled=true;
-  const res=await llamarAppsScript('crearCredencial',{nombre,usuario,pass,rol,permisos});btn.innerHTML='💾 Guardar Acceso';btn.disabled=false;
+  const res=await llamarAppsScript('crearCredencial',{nombre,usuario,pass,rol,permisos,idColaborador});btn.innerHTML='💾 Guardar Acceso';btn.disabled=false;
   if(res?.exito){mostrarRespuestaEl('respuesta-cred','✅ '+res.mensaje,'success');mostrarToast('✅ Acceso creado','success');limpiarFormCred();cargarListaCredenciales();}else mostrarRespuestaEl('respuesta-cred','❌ '+(res?.mensaje||'Error'),'error');
 }
 async function actualizarCredencial(){
   const uO=document.getElementById('cred-usuario-original').value,nombre=document.getElementById('cred-nombre').value.trim(),pass=document.getElementById('cred-pass').value.trim(),rol=document.getElementById('cred-rol').value,permisos=obtenerPermisosSeleccionados();
+  const idColaborador=(document.getElementById('cred-id-colaborador')?.value||'').trim().toUpperCase();
   if(!nombre){mostrarRespuestaEl('respuesta-cred','⚠️ Nombre obligatorio','error');return;}if(!permisos.length){mostrarRespuestaEl('respuesta-cred','⚠️ Asigna al menos un permiso','error');return;}
   const btn=document.getElementById('btn-guardar-cred');btn.innerHTML='<span class="loading"></span> Actualizando...';btn.disabled=true;
-  const res=await llamarAppsScript('actualizarCredencial',{usuarioOriginal:uO,nombre,pass,rol,permisos});btn.innerHTML='💾 Actualizar';btn.disabled=false;
+  const res=await llamarAppsScript('actualizarCredencial',{usuarioOriginal:uO,nombre,pass,rol,permisos,idColaborador});btn.innerHTML='💾 Actualizar';btn.disabled=false;
   if(res?.exito){mostrarRespuestaEl('respuesta-cred','✅ '+res.mensaje,'success');mostrarToast('✅ Actualizado','success');cancelarEdicionCred();cargarListaCredenciales();}else mostrarRespuestaEl('respuesta-cred','❌ '+(res?.mensaje||'Error'),'error');
 }
 function obtenerPermisosSeleccionados(){return['asistencia','dashboard','personal','reportes','carnets'].filter(p=>document.getElementById('perm-'+p)?.checked);}
-function limpiarFormCred(){['cred-nombre','cred-usuario','cred-pass','cred-usuario-original'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('cred-rol').value='operador';['asistencia','dashboard','personal','reportes','carnets'].forEach(p=>{const el=document.getElementById('perm-'+p);if(el)el.checked=p==='asistencia';});document.getElementById('respuesta-cred').style.display='none';}
-function cargarFormEdicionCred(d){modoEdicionCred=true;document.getElementById('cred-usuario-original').value=d.usuario;document.getElementById('cred-nombre').value=d.nombre;document.getElementById('cred-usuario').value=d.usuario;document.getElementById('cred-usuario').disabled=true;document.getElementById('cred-pass').value='';document.getElementById('cred-pass').placeholder='Dejar vacío = no cambiar';document.getElementById('cred-rol').value=d.rol||'operador';const p=d.permisos||[];['asistencia','dashboard','personal','reportes','carnets'].forEach(x=>{const el=document.getElementById('perm-'+x);if(el)el.checked=p.includes(x);});document.getElementById('cred-form-titulo').textContent='✏️ Editar: @'+d.usuario;document.getElementById('btn-guardar-cred').innerHTML='💾 Actualizar';document.getElementById('btn-cancelar-cred').style.display='inline-flex';switchCredTab('crear');window.scrollTo({top:0,behavior:'smooth'});}
+function limpiarFormCred(){['cred-nombre','cred-usuario','cred-pass','cred-usuario-original','cred-id-colaborador','cred-nombre-buscar'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('cred-rol').value='operador';['asistencia','dashboard','personal','reportes','carnets'].forEach(p=>{const el=document.getElementById('perm-'+p);if(el)el.checked=p==='asistencia';});document.getElementById('respuesta-cred').style.display='none';const sel=document.getElementById('cred-colab-seleccionado');if(sel)sel.style.display='none';const estado=document.getElementById('cred-colab-estado');if(estado)estado.textContent='🔍';}
+function cargarFormEdicionCred(d){modoEdicionCred=true;document.getElementById('cred-usuario-original').value=d.usuario;document.getElementById('cred-nombre').value=d.nombre;document.getElementById('cred-usuario').value=d.usuario;document.getElementById('cred-usuario').disabled=true;document.getElementById('cred-pass').value='';document.getElementById('cred-pass').placeholder='Dejar vacío = no cambiar';document.getElementById('cred-rol').value=d.rol||'operador';const p=d.permisos||[];['asistencia','dashboard','personal','reportes','carnets'].forEach(x=>{const el=document.getElementById('perm-'+x);if(el)el.checked=p.includes(x);});const idColabEl=document.getElementById('cred-id-colaborador');if(idColabEl)idColabEl.value=d.idColaborador||'';
+  // Mostrar tarjeta del colaborador vinculado si existe
+  if(d.idColaborador){
+    const pColab=_personalCache.find(p=>p.id===d.idColaborador);
+    const nombre=pColab?((pColab.nombres||'')+' '+(pColab.apellidos||'')).trim():d.nombre||'';
+    const area=pColab?pColab.area||'':'';
+    const cargo=pColab?pColab.cargo||'':'';
+    seleccionarColab(d.idColaborador,nombre,area,cargo);
+  }document.getElementById('cred-form-titulo').textContent='✏️ Editar: @'+d.usuario;document.getElementById('btn-guardar-cred').innerHTML='💾 Actualizar';document.getElementById('btn-cancelar-cred').style.display='inline-flex';switchCredTab('crear');window.scrollTo({top:0,behavior:'smooth'});}
 function cancelarEdicionCred(){modoEdicionCred=false;document.getElementById('cred-usuario').disabled=false;document.getElementById('cred-pass').placeholder='Mínimo 4 caracteres';document.getElementById('cred-form-titulo').textContent='➕ Crear Nuevo Acceso al Sistema';document.getElementById('btn-guardar-cred').innerHTML='💾 Guardar Acceso';document.getElementById('btn-cancelar-cred').style.display='none';limpiarFormCred();}
 async function cargarListaCredenciales(){
   const wrap=document.getElementById('cred-lista-wrap');wrap.innerHTML='<div class="empty-state"><span>⏳</span><p>Cargando...</p></div>';
   const res=await llamarAppsScript('listarCredenciales');
   if(!res?.credenciales?.length){wrap.innerHTML='<div class="empty-state"><span>👤</span><p>No hay accesos registrados</p></div>';return;}
   const PI={asistencia:'📷',dashboard:'📊',personal:'👥',reportes:'📋',carnets:'🪪'},RC={admin:'badge-red',supervisor:'badge-amber',operador:'badge-blue'};
-  wrap.innerHTML=res.credenciales.map(c=>`<div class="cred-card"><div><div class="cred-name">${c.nombre} <span class="badge ${RC[c.rol]||'badge-blue'}">${c.rol}</span></div><div class="cred-user">@${c.usuario}</div><div class="cred-perms">${(c.permisos||[]).map(p=>`<span class="badge badge-green">${PI[p]||''} ${p}</span>`).join('')}</div></div><div class="cred-actions"><button class="btn btn-secondary btn-sm" onclick='cargarFormEdicionCred(${JSON.stringify(c)})'>✏️</button><button class="btn btn-danger btn-sm" onclick="abrirModalEliminarCred('${c.usuario}','${c.nombre}')">🗑️</button></div></div>`).join('');
+  wrap.innerHTML=res.credenciales.map(c=>`<div class="cred-card"><div><div class="cred-name">${c.nombre} <span class="badge ${RC[c.rol]||'badge-blue'}">${c.rol}</span></div><div class="cred-user">@${c.usuario}</div>${c.idColaborador?`<div style="font-size:11px;color:#34d399;margin-top:3px;font-family:'JetBrains Mono',monospace;">🪪 ID: ${c.idColaborador}</div>`:'<div style="font-size:11px;color:#f87171;margin-top:3px;">⚠️ Sin ID de colaborador vinculado</div>'}<div class="cred-perms">${(c.permisos||[]).map(p=>`<span class="badge badge-green">${PI[p]||''} ${p}</span>`).join('')}</div></div><div class="cred-actions"><button class="btn btn-secondary btn-sm" onclick='cargarFormEdicionCred(${JSON.stringify(c)})'>✏️</button><button class="btn btn-danger btn-sm" onclick="abrirModalEliminarCred('${c.usuario}','${c.nombre}')">🗑️</button></div></div>`).join('');
 }
 function abrirModalEliminarCred(u,n){usuarioCredAEliminar=u;document.getElementById('modal-cred-nombre').textContent=`Se revocará el acceso de: ${n} (@${u})`;document.getElementById('modal-eliminar-cred').classList.add('show');}
 async function confirmarEliminarCred(){if(!usuarioCredAEliminar)return;const btn=document.getElementById('btn-confirmar-eliminar-cred');btn.innerHTML='<span class="loading"></span>';btn.disabled=true;const res=await llamarAppsScript('eliminarCredencial',{usuario:usuarioCredAEliminar});btn.innerHTML='🗑️ Sí, revocar';btn.disabled=false;cerrarModal('modal-eliminar-cred');if(res?.exito){mostrarToast('🗑️ Revocado','success');cargarListaCredenciales();}else mostrarToast('❌ '+(res?.mensaje||'Error'),'error');usuarioCredAEliminar='';}
@@ -2012,7 +2543,7 @@ function validarComentarioDiaLibre(){
 // ================================
 // INIT
 // ================================
-function iniciarAplicacion(){
+async function iniciarAplicacion(){
   construirNav();
   initHorarioDias();
   // El form no hace nada por sí solo -- todo va por los botones específicos
@@ -2020,9 +2551,72 @@ function iniciarAplicacion(){
   if(form) form.addEventListener('submit', e => e.preventDefault());
   document.getElementById('camera-toggle').addEventListener('change', e => toggleCamera(e.target.checked));
   setInterval(actualizarReloj,1000); actualizarReloj();
+  generarIdDispositivo();
+
+  // ★ Cargar/verificar ID de colaborador vinculado a la sesión
+  await verificarYMostrarBannerSesion();
+
   setTimeout(()=>{ if(cameraEnabled && SESSION.permisos.includes('asistencia')) cargarCamaras(); }, 800);
   if(SESSION.permisos.includes('asistencia')) cargarUltimosRegistros();
-  generarIdDispositivo();
+}
+
+// ================================================================
+// ★ BANNER DE SESIÓN + VINCULACIÓN AUTOMÁTICA
+// Si el SESSION ya tiene idColaborador (vino del login), úsalo.
+// Si no, intentar obtenerlo del servidor consultando el usuario.
+// ================================================================
+async function verificarYMostrarBannerSesion() {
+  const banner = document.getElementById('session-qr-banner');
+  if (!banner) return;
+
+  // Si no tiene permiso de asistencia, no mostrar el banner
+  if (!SESSION.permisos.includes('asistencia')) return;
+
+  banner.style.display = 'flex';
+
+  // Si ya tenemos el idColaborador en la sesión, usarlo directo
+  const _sesionId = SESSION.idColaborador ? SESSION.idColaborador.toString().trim() : '';
+  if (_sesionId) {
+    actualizarBannerSesion(_sesionId);
+    return;
+  }
+
+  // Si no lo tiene (sesión anterior guardada sin este campo), consultarlo
+  document.getElementById('session-qr-nombre').textContent = SESSION.nombre || SESSION.usuario;
+  document.getElementById('session-qr-id').textContent = '⏳ Verificando vinculación...';
+
+  try {
+    const res = await llamarAppsScript('obtenerIdColaboradorDeUsuario', { usuario: SESSION.usuario });
+    if (res?.encontrado && res.idColaborador) {
+      SESSION.idColaborador = res.idColaborador;
+      localStorage.setItem('session_pip', JSON.stringify(SESSION));
+      actualizarBannerSesion(SESSION.idColaborador);
+    } else {
+      // Usuario sin ID vinculado
+      actualizarBannerSesion('');
+    }
+  } catch(e) {
+    actualizarBannerSesion('');
+  }
+}
+
+function actualizarBannerSesion(idColab) {
+  document.getElementById('session-qr-nombre').textContent = SESSION.nombre || SESSION.usuario;
+  const warnEl = document.getElementById('session-qr-nolink-warn');
+  const idEl   = document.getElementById('session-qr-id');
+  const iconEl = document.getElementById('session-qr-avatar-icon');
+
+  // ★ Usar length check — el ID puede ser un número como "2" o "15"
+  const tieneId = idColab !== null && idColab !== undefined && idColab.toString().trim() !== '';
+  if (tieneId) {
+    idEl.textContent       = 'ID: ' + idColab;
+    iconEl.textContent     = '✅';
+    warnEl.style.display   = 'none';
+  } else {
+    idEl.textContent       = 'Sin ID vinculado';
+    iconEl.textContent     = '⚠️';
+    warnEl.style.display   = 'block';
+  }
 }
 
 document.addEventListener('keypress', function(e){
@@ -2043,6 +2637,10 @@ window.onload = function(){
       }
     }catch(e){}
   }
+  // Sin sesión válida — mostrar login explícitamente
+  document.getElementById('login-overlay').style.display='flex';
+  document.getElementById('main-content').style.display='none';
+  setTimeout(()=>{ const lu=document.getElementById('login-user'); if(lu)lu.focus(); }, 100);
 };
 
 window.onbeforeunload = function(){ detenerEscaneo(); };
